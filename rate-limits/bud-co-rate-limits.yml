@@ -1,0 +1,33 @@
+specification: API Commons Rate Limits
+specificationVersion: '0.1'
+schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/RateLimits
+provider: Bud Financial
+providerId: bud-co
+created: '2026-05-25'
+modified: '2026-05-25'
+reconciled: false
+tags:
+- Rate Limiting
+- Open Banking
+- Bud
+description: Bud Financial does not publish a globally documented rate-limit table on its public docs. Per-tenant
+  limits are configured per contract and surfaced through the Bud Developer Console. ASPSP-side rate limits (set
+  by individual UK and EU banks) apply on top of Bud's own envelope and frequently dominate (e.g. CMA9 typical
+  4 unattended refreshes per consent per 24h). This file documents the patterns Bud exposes and the headers
+  consumers should monitor.
+sources:
+- https://docs.thisisbud.com
+- https://docs.thisisbud.com/llms.txt
+responseCodes:
+  throttled: 429
+  quotaExceeded: 429
+algorithm: token-bucket
+notes:
+- 'ASPSP-imposed limits on unattended refreshes (commonly 4 per consent per 24 hours under UK Open Banking)
+  apply at the connection layer regardless of Bud-side capacity.'
+- Asynchronous task endpoints (authorisation-url, refresh, ingestion) return a 202 with a task ID; consumers
+  should poll task status rather than hammer the initiation endpoint.
+- Per-customer concurrency and per-tenant call-rate limits are negotiated in each commercial agreement.
+contact:
+  url: https://bud.co
+  email: help@thisisbud.com

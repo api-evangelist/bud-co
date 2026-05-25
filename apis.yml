@@ -1,0 +1,306 @@
+aid: bud-co
+url: https://raw.githubusercontent.com/api-evangelist/bud-co/refs/heads/main/apis.yml
+name: Bud Financial
+description: Bud Financial (formerly Bud, thisisbud.com) is a UK-based fintech infrastructure company providing
+  AI-driven Open Banking aggregation, transaction enrichment, categorization, affordability assessment, and
+  payment initiation APIs. The Bud platform unifies Open Banking connections to UK and EU ASPSPs behind a single
+  REST API and layers AI/ML-powered enrichment, categorization, merchant identification, affordability scoring,
+  income/expenditure analysis, and actionable financial insights on top of raw transaction data. Banks, lenders,
+  and consumer fintechs use Bud for KYC/AML checks, lending decisions, money management, and embedded payments.
+created: '2026-05-25'
+modified: '2026-05-25'
+tags:
+- Open Banking
+- Transaction Enrichment
+- Categorization
+- Affordability
+- Payments
+- AISP
+- PISP
+- Financial Data
+- FinTech
+- UK
+- AI
+- Machine Learning
+common:
+- url: https://bud.co
+  type: WebSite
+- url: https://docs.thisisbud.com
+  type: Documentation
+- url: https://console.thisisbud.com
+  type: Console
+- url: https://support.thisisbud.com
+  type: Support
+- url: https://www.linkedin.com/company/bud-financial/
+  type: LinkedIn
+- url: https://github.com/thisisbud/bud-public-developer-resources
+  type: GitHub
+- url: https://docs.thisisbud.com/llms.txt
+  type: LLMSTxT
+apis:
+- aid: bud-co:bud-connect-api
+  name: Bud Connect API
+  tags:
+  - Open Banking
+  - AISP
+  - Account Aggregation
+  - Consent
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  properties:
+  - url: https://docs.thisisbud.com
+    type: Documentation
+  - url: openapi/bud-platform-openapi.yml
+    type: OpenAPI
+  - url: capabilities/connect-open-banking.yaml
+    type: NaftikoCapability
+  - url: capabilities/connect-ingestion.yaml
+    type: NaftikoCapability
+  description: Open Banking aggregation API providing unified access to UK and EU ASPSP connections. Initiate
+    consents through Bud's hosted Bud Connect gateway or build a native flow with the underlying authorisation,
+    refresh, consent management, and reconfirmation endpoints. Bud handles the heterogeneity of ASPSP
+    integrations behind a single set of asynchronous task-based endpoints, with webhook callbacks for
+    connection, refresh, and consent events.
+- aid: bud-co:bud-ingestion-api
+  name: Bud First-Party Ingestion API
+  tags:
+  - Ingestion
+  - Transactions
+  - Accounts
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  properties:
+  - url: https://docs.thisisbud.com
+    type: Documentation
+  - url: openapi/bud-platform-openapi.yml
+    type: OpenAPI
+  - url: capabilities/ingestion-accounts.yaml
+    type: NaftikoCapability
+  - url: capabilities/ingestion-transactions.yaml
+    type: NaftikoCapability
+  description: Push your own first-party account and transaction data into the Bud platform for enrichment,
+    categorization, and insights without requiring an Open Banking consent. Supports synchronous and
+    asynchronous ingestion, account open/close/reopen, and transaction book/decline lifecycle events.
+- aid: bud-co:bud-customers-platform-api
+  name: Bud Customers Platform API
+  tags:
+  - Customers
+  - Identity
+  - Platform
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  properties:
+  - url: https://docs.thisisbud.com
+    type: Documentation
+  - url: openapi/bud-platform-openapi.yml
+    type: OpenAPI
+  - url: capabilities/platform-customers.yaml
+    type: NaftikoCapability
+  description: Create, retrieve, batch-create, and manage end-user customer records on the Bud platform.
+    Supports V1, V2, and V3 customer endpoints, idempotent identifiers, customer context configuration, and
+    asynchronous task tracking.
+- aid: bud-co:bud-financial-data-api
+  name: Bud Financial Data API
+  tags:
+  - Accounts
+  - Transactions
+  - Balances
+  - Enrichment
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  properties:
+  - url: https://docs.thisisbud.com
+    type: Documentation
+  - url: openapi/bud-platform-openapi.yml
+    type: OpenAPI
+  - url: json-schema/bud-transaction-schema.json
+    type: JSONSchema
+  - url: json-schema/bud-account-schema.json
+    type: JSONSchema
+  - url: json-ld/bud-co-context.jsonld
+    type: JSONLD
+  - url: capabilities/financial-accounts.yaml
+    type: NaftikoCapability
+  - url: capabilities/financial-transactions.yaml
+    type: NaftikoCapability
+  - url: capabilities/financial-balances.yaml
+    type: NaftikoCapability
+  description: Retrieve enriched accounts, transactions, balances, and authorised payments. Bud's AI/ML
+    enrichment engine attaches category, merchant, geolocation, and recurrence metadata to every transaction.
+    Financial V3 endpoints expose the latest enriched schema with transaction-date ranges and per-account
+    balance history.
+- aid: bud-co:bud-enrichment-api
+  name: Bud Enrichment API
+  tags:
+  - Enrichment
+  - Categorization
+  - Merchants
+  - Aggregations
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  properties:
+  - url: https://docs.thisisbud.com
+    type: Documentation
+  - url: openapi/bud-platform-openapi.yml
+    type: OpenAPI
+  - url: capabilities/enrichment-categories.yaml
+    type: NaftikoCapability
+  - url: capabilities/enrichment-merchants.yaml
+    type: NaftikoCapability
+  - url: capabilities/enrichment-corrections.yaml
+    type: NaftikoCapability
+  description: Access Bud's enrichment resources: category models, category and merchant taxonomies,
+    aggregated category and merchant totals, essential-spending statistics, and correction endpoints for
+    re-labelling categories and merchants on individual transactions. Custom buckets let you group categories
+    or merchants into your own reporting groupings.
+- aid: bud-co:bud-financial-insights-api
+  name: Bud Financial Insights API
+  tags:
+  - Insights
+  - Analytics
+  - Recurring Payments
+  - Subscriptions
+  - Income
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  properties:
+  - url: https://docs.thisisbud.com
+    type: Documentation
+  - url: openapi/bud-platform-openapi.yml
+    type: OpenAPI
+  - url: capabilities/insights-actionable.yaml
+    type: NaftikoCapability
+  - url: capabilities/insights-custom.yaml
+    type: NaftikoCapability
+  - url: capabilities/insights-recurring.yaml
+    type: NaftikoCapability
+  description: Generate deep insights from transaction data: actionable balance, income, and spending
+    insights; custom insight management; subscription and recurring-transaction detection; income finder;
+    future-transaction forecasting; benefit transactions; loan and debt-collection identification; and the
+    Insights Product Finder.
+- aid: bud-co:bud-search-api
+  name: Bud Intelligent Search API
+  tags:
+  - Search
+  - AI
+  - Natural Language
+  - Beta
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  properties:
+  - url: https://docs.thisisbud.com
+    type: Documentation
+  - url: openapi/bud-platform-openapi.yml
+    type: OpenAPI
+  - url: capabilities/search-transactions.yaml
+    type: NaftikoCapability
+  description: Beta intelligent search across transactions with AI-generated insights. Submit a natural
+    language query, retrieve matching transactions and a derived narrative insight referencing the matched
+    set.
+- aid: bud-co:bud-affordability-api
+  name: Bud Affordability and Assess API
+  tags:
+  - Affordability
+  - Lending
+  - Assess
+  - Risk
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  properties:
+  - url: https://docs.thisisbud.com
+    type: Documentation
+  - url: openapi/bud-platform-openapi.yml
+    type: OpenAPI
+  - url: capabilities/affordability-reports.yaml
+    type: NaftikoCapability
+  - url: capabilities/assess-applications.yaml
+    type: NaftikoCapability
+  description: Pre-fill affordability forms and power lending decisions with structured income and
+    expenditure breakdowns. Generate affordability reports (V1 and V2), drill into affordability
+    transactions, retrieve beta risk insights (income-expenditure, merchants, unauthorised overdraft,
+    income-health), and manage Assess customer applications with linked customer references.
+- aid: bud-co:bud-characteristics-api
+  name: Bud Customer Characteristics API
+  tags:
+  - Characteristics
+  - Risk
+  - Credit
+  - Lending
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  properties:
+  - url: https://docs.thisisbud.com
+    type: Documentation
+  - url: openapi/bud-platform-openapi.yml
+    type: OpenAPI
+  - url: capabilities/characteristics-customer.yaml
+    type: NaftikoCapability
+  description: Retrieve derived behavioural characteristics for a customer across credit card, loan,
+    overdraft, and saver lenses. Designed to feed lending models and risk decisioning with explainable
+    feature sets calculated from enriched transaction history.
+- aid: bud-co:bud-goals-api
+  name: Bud Goals and Budgets API
+  tags:
+  - Budgets
+  - Savings
+  - Goals
+  - Money Management
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  properties:
+  - url: https://docs.thisisbud.com
+    type: Documentation
+  - url: openapi/bud-platform-openapi.yml
+    type: OpenAPI
+  - url: capabilities/goals-savings.yaml
+    type: NaftikoCapability
+  - url: capabilities/goals-budgets.yaml
+    type: NaftikoCapability
+  description: Manage savings goals (V2) and spending budgets (V1) for end customers. Create, retrieve, list,
+    and delete goals, attach contributing transactions to a budget, and track progress against a target
+    amount and time horizon.
+- aid: bud-co:bud-payments-api
+  name: Bud Payments API
+  tags:
+  - Payments
+  - PISP
+  - Open Banking
+  - Standing Orders
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  properties:
+  - url: https://docs.thisisbud.com
+    type: Documentation
+  - url: openapi/bud-platform-openapi.yml
+    type: OpenAPI
+  - url: capabilities/payments-single.yaml
+    type: NaftikoCapability
+  - url: capabilities/payments-standing-order.yaml
+    type: NaftikoCapability
+  - url: capabilities/payments-scheduled.yaml
+    type: NaftikoCapability
+  description: Initiate authorised single payments, scheduled payments, and standing orders directly from a
+    customer's bank account using Bud's PISP service. Either redirect users to a Bud-hosted Bud Pay URL or
+    drive the flow yourself with native authorisation-code, confirmation, and status endpoints.
+- aid: bud-co:bud-widgets-api
+  name: Bud Embedded Widgets API
+  tags:
+  - Widgets
+  - Embeddable
+  - UI
+  - Frontend
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  properties:
+  - url: https://docs.thisisbud.com
+    type: Documentation
+  - url: openapi/bud-platform-openapi.yml
+    type: OpenAPI
+  - url: capabilities/widgets-urls.yaml
+    type: NaftikoCapability
+  description: Request signed URLs for Bud's embeddable frontend widgets - accounts, balances over time,
+    financial calendar, insight summary, intelligent search, recurring and forecasted transactions, savings
+    goals, spending analysis, and spending budgets - drop them into your app without rebuilding the UI.
+maintainers:
+- FN: Kin Lane
+  email: info@apievangelist.com

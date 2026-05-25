@@ -1,0 +1,69 @@
+specification: FinOps Framework
+specificationVersion: '1.0'
+schema: https://www.finops.org/framework/
+provider: Bud Financial
+providerId: bud-co
+created: '2026-05-25'
+modified: '2026-05-25'
+reconciled: false
+tags:
+- FinOps
+- Cost Management
+- Open Banking
+- Enrichment
+- Affordability
+description: FinOps-aligned cost model for Bud Financial. Bud's commercial surface is enterprise-only and
+  unit prices are not publicly published, so FOCUS-style cost lines are described here as categories rather
+  than per-unit dollar figures.
+alignedWith:
+  framework: FinOps Foundation Framework
+  frameworkUrl: https://www.finops.org/framework/
+  dataSpec: FOCUS
+  dataSpecVersion: '1.3'
+  dataSpecUrl: https://focus.finops.org/focus-specification/v1-3/
+publisherName: Bud Financial
+serviceCategory: Financial Services - Open Banking and Enrichment
+billingModel:
+  pricingCategory: Usage-Based (Enterprise Contract)
+  billingFrequency: Monthly
+  billingCurrency: GBP
+  chargeCategories:
+  - Usage
+  - Purchase
+  - Adjustment
+  primaryUnit: call
+  secondaryUnits:
+  - enriched-transaction
+  - connected-customer
+  - affordability-report
+  - payment-initiation
+  - kyc-check
+costDrivers:
+- name: Connect calls
+  description: Open Banking authorisation, refresh, consent, and connection-management calls against the Bud
+    Connect API.
+  metric: requests
+- name: Enriched transactions
+  description: Transactions ingested or aggregated and run through Bud's enrichment, categorization, and
+    merchant identification pipeline.
+  metric: transactions
+- name: Connected customers
+  description: Customers with an active Open Banking connection over the billing period.
+  metric: customers
+- name: Affordability reports
+  description: V1/V2 affordability reports generated through the Bud Assess product.
+  metric: reports
+- name: Payment initiations
+  description: Single, scheduled, and standing-order payments initiated through Bud Pay.
+  metric: payments
+- name: KYC checks
+  description: Business and individual KYC checks performed through Bud Check.
+  metric: checks
+notes:
+- Bud does not expose a self-serve billing console at time of profiling. Cost allocation is performed
+  contractually and surfaced through account-managed reporting.
+- Tag transactions with `bud_product` (connect/intelligence/assess/pay/check) for FOCUS service-category
+  alignment.
+sources:
+- https://bud.co
+- https://docs.thisisbud.com

@@ -1,0 +1,69 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Bud Financial Data - Transactions
+  description: List enriched transactions for a customer's accounts including category, merchant and recurrence labels.
+  tags:
+  - Bud
+  - Transactions
+  created: '2026-05-25'
+  modified: '2026-05-25'
+binds:
+- namespace: env
+  keys:
+    BUD_ACCESS_TOKEN: BUD_ACCESS_TOKEN
+capability:
+  consumes:
+  - type: http
+    namespace: financial-transactions
+    baseUri: https://api-sandbox.thisisbud.com
+    description: Bud Financial Data - Transactions business capability. OAuth2 bearer-token authenticated against the Bud platform.
+    resources:
+    - name: list-transactions
+      path: /financial/v2/transactions
+      operations:
+      - name: list-transactions
+        method: GET
+        description: Bud Financial Data - Transactions operation against Bud.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    authentication:
+      type: apikey
+      key: Authorization
+      value: 'Bearer {{env.BUD_ACCESS_TOKEN}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: financial-transactions-rest
+    port: 8080
+    description: REST adapter for Bud Financial Data - Transactions. One Spectral-compliant resource per consumed operation.
+    resources:
+    - path: /v1/financial/v2/transactions
+      name: list-transactions
+      description: REST surface for list-transactions.
+      operations:
+      - method: GET
+        name: list-transactions
+        description: Bud Financial Data - Transactions
+        call: financial-transactions.list-transactions
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: financial-transactions-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for Bud Financial Data - Transactions. One tool per consumed operation.
+    tools:
+    - name: bud-list-transactions
+      description: Bud Financial Data - Transactions
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: financial-transactions.list-transactions
+      outputParameters:
+      - type: object
+        mapping: $.

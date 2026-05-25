@@ -1,0 +1,69 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Bud Ingestion - Transactions
+  description: Push first-party transactions into the Bud platform for enrichment and categorization.
+  tags:
+  - Bud
+  - Ingestion
+  created: '2026-05-25'
+  modified: '2026-05-25'
+binds:
+- namespace: env
+  keys:
+    BUD_ACCESS_TOKEN: BUD_ACCESS_TOKEN
+capability:
+  consumes:
+  - type: http
+    namespace: ingestion-transactions
+    baseUri: https://api-sandbox.thisisbud.com
+    description: Bud Ingestion - Transactions business capability. OAuth2 bearer-token authenticated against the Bud platform.
+    resources:
+    - name: ingest-transactions
+      path: /v2/ingest/transactions
+      operations:
+      - name: ingest-transactions
+        method: POST
+        description: Bud Ingestion - Transactions operation against Bud.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    authentication:
+      type: apikey
+      key: Authorization
+      value: 'Bearer {{env.BUD_ACCESS_TOKEN}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: ingestion-transactions-rest
+    port: 8080
+    description: REST adapter for Bud Ingestion - Transactions. One Spectral-compliant resource per consumed operation.
+    resources:
+    - path: /v1/v2/ingest/transactions
+      name: ingest-transactions
+      description: REST surface for ingest-transactions.
+      operations:
+      - method: POST
+        name: ingest-transactions
+        description: Bud Ingestion - Transactions
+        call: ingestion-transactions.ingest-transactions
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: ingestion-transactions-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for Bud Ingestion - Transactions. One tool per consumed operation.
+    tools:
+    - name: bud-ingest-transactions
+      description: Bud Ingestion - Transactions
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: ingestion-transactions.ingest-transactions
+      outputParameters:
+      - type: object
+        mapping: $.

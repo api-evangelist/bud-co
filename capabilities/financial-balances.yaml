@@ -1,0 +1,69 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Bud Financial Data - Balances
+  description: Retrieve current and historical balances for a customer's accounts.
+  tags:
+  - Bud
+  - Balances
+  created: '2026-05-25'
+  modified: '2026-05-25'
+binds:
+- namespace: env
+  keys:
+    BUD_ACCESS_TOKEN: BUD_ACCESS_TOKEN
+capability:
+  consumes:
+  - type: http
+    namespace: financial-balances
+    baseUri: https://api-sandbox.thisisbud.com
+    description: Bud Financial Data - Balances business capability. OAuth2 bearer-token authenticated against the Bud platform.
+    resources:
+    - name: list-balances
+      path: /financial/v3/balances
+      operations:
+      - name: list-balances
+        method: GET
+        description: Bud Financial Data - Balances operation against Bud.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    authentication:
+      type: apikey
+      key: Authorization
+      value: 'Bearer {{env.BUD_ACCESS_TOKEN}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: financial-balances-rest
+    port: 8080
+    description: REST adapter for Bud Financial Data - Balances. One Spectral-compliant resource per consumed operation.
+    resources:
+    - path: /v1/financial/v3/balances
+      name: list-balances
+      description: REST surface for list-balances.
+      operations:
+      - method: GET
+        name: list-balances
+        description: Bud Financial Data - Balances
+        call: financial-balances.list-balances
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: financial-balances-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for Bud Financial Data - Balances. One tool per consumed operation.
+    tools:
+    - name: bud-list-balances
+      description: Bud Financial Data - Balances
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: financial-balances.list-balances
+      outputParameters:
+      - type: object
+        mapping: $.

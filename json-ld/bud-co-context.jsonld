@@ -1,0 +1,101 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "@vocab": "https://schema.org/",
+    "bud": "https://api-sandbox.thisisbud.com/",
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "fibo": "https://spec.edmcouncil.org/fibo/ontology/",
+
+    "Customer": {
+      "@id": "bud:Customer",
+      "@context": {
+        "id": {"@id": "bud:Customer/id", "@type": "xsd:string"},
+        "idempotent_identifier": {"@id": "bud:Customer/idempotentIdentifier", "@type": "xsd:string"},
+        "created_at": {"@id": "bud:Customer/createdAt", "@type": "xsd:dateTime"}
+      }
+    },
+
+    "Account": {
+      "@id": "bud:Account",
+      "@context": {
+        "id": {"@id": "bud:Account/id", "@type": "xsd:string"},
+        "customer_id": {"@id": "bud:Account/customerId", "@type": "xsd:string"},
+        "type": {"@id": "bud:Account/type", "@type": "xsd:string"},
+        "currency": {"@id": "bud:Account/currency", "@type": "xsd:string"},
+        "iban": {"@id": "bud:Account/iban", "@type": "xsd:string"},
+        "balances": {"@id": "bud:Account/balances"}
+      }
+    },
+
+    "Transaction": {
+      "@id": "bud:Transaction",
+      "@context": {
+        "id": {"@id": "bud:Transaction/id", "@type": "xsd:string"},
+        "account_id": {"@id": "bud:Transaction/accountId", "@type": "xsd:string"},
+        "amount": {"@id": "bud:Transaction/amount", "@type": "xsd:decimal"},
+        "currency": {"@id": "bud:Transaction/currency", "@type": "xsd:string"},
+        "date": {"@id": "bud:Transaction/date", "@type": "xsd:date"},
+        "description": {"@id": "bud:Transaction/description", "@type": "xsd:string"},
+        "category": {"@id": "bud:Transaction/category"},
+        "merchant": {"@id": "bud:Transaction/merchant"},
+        "recurrence": {"@id": "bud:Transaction/recurrence"}
+      }
+    },
+
+    "Merchant": {
+      "@id": "bud:Merchant",
+      "@context": {
+        "id": {"@id": "bud:Merchant/id", "@type": "xsd:string"},
+        "name": {"@id": "bud:Merchant/name", "@type": "xsd:string"},
+        "logo": {"@id": "bud:Merchant/logo", "@type": "xsd:anyURI"},
+        "website": {"@id": "bud:Merchant/website", "@type": "xsd:anyURI"}
+      }
+    },
+
+    "Category": {
+      "@id": "bud:Category",
+      "@context": {
+        "id": {"@id": "bud:Category/id", "@type": "xsd:string"},
+        "name": {"@id": "bud:Category/name", "@type": "xsd:string"},
+        "model_id": {"@id": "bud:Category/modelId", "@type": "xsd:string"},
+        "parent": {"@id": "bud:Category/parent", "@type": "xsd:string"}
+      }
+    },
+
+    "Connection": {
+      "@id": "bud:Connection",
+      "@context": {
+        "id": {"@id": "bud:Connection/id", "@type": "xsd:string"},
+        "provider_id": {"@id": "bud:Connection/providerId", "@type": "xsd:string"},
+        "status": {"@id": "bud:Connection/status", "@type": "xsd:string"},
+        "consent_id": {"@id": "bud:Connection/consentId", "@type": "xsd:string"},
+        "expires_at": {"@id": "bud:Connection/expiresAt", "@type": "xsd:dateTime"}
+      }
+    },
+
+    "AffordabilityReport": {
+      "@id": "bud:AffordabilityReport",
+      "@context": {
+        "customer_id": {"@id": "bud:AffordabilityReport/customerId", "@type": "xsd:string"},
+        "income": {"@id": "bud:AffordabilityReport/income"},
+        "expenditure": {"@id": "bud:AffordabilityReport/expenditure"},
+        "disposable_income": {"@id": "bud:AffordabilityReport/disposableIncome", "@type": "xsd:decimal"}
+      }
+    },
+
+    "Payment": {
+      "@id": "bud:Payment",
+      "@context": {
+        "id": {"@id": "bud:Payment/id", "@type": "xsd:string"},
+        "amount": {"@id": "bud:Payment/amount", "@type": "xsd:decimal"},
+        "currency": {"@id": "bud:Payment/currency", "@type": "xsd:string"},
+        "type": {"@id": "bud:Payment/type", "@type": "xsd:string"},
+        "status": {"@id": "bud:Payment/status", "@type": "xsd:string"},
+        "creditor": {"@id": "bud:Payment/creditor"},
+        "debtor": {"@id": "bud:Payment/debtor"}
+      }
+    }
+  }
+}

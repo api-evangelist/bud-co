@@ -1,0 +1,119 @@
+specification: API Commons Plans
+specificationVersion: '0.1'
+schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/Plans
+provider: Bud Financial
+providerId: bud-co
+created: '2026-05-25'
+modified: '2026-05-25'
+reconciled: false
+tags:
+- Open Banking
+- Enrichment
+- Affordability
+- Payments
+- Plans
+description: Bud Financial uses an enterprise-only commercial engagement model. Pricing is not published on
+  the public site; commercial terms are negotiated per customer based on product mix (Connect, Intelligence,
+  Pay, Check, Assess), call volume, customer counts, enrichment usage, and contract length. The plans below
+  capture the product surface that is offered as a paid service, but unit prices are marked as redacted until
+  reconciled with a Bud sales contact.
+sources:
+- https://bud.co
+- https://docs.thisisbud.com
+- https://www.thisisbud.com/developers
+plans:
+- id: bud-connect
+  name: Bud Connect
+  type: enterprise
+  description: Open Banking aggregation - access to the Bud Connect gateway, native authorisation flow,
+    refresh, consent management, and ASPSP connection management across UK and EU providers.
+  entries:
+  - label: Open Banking calls
+    name: open-banking-calls
+    type: metered
+    metric: requests
+    limit: -1
+    timeFrame: month
+    geo: UK+EU
+    unit: 1
+    price: redacted
+    userMultiplied: false
+  - label: Active connected customers
+    name: connected-customers
+    type: metered
+    metric: customers
+    limit: -1
+    timeFrame: month
+    geo: global
+    unit: 1
+    price: redacted
+    userMultiplied: false
+- id: bud-intelligence
+  name: Bud Intelligence
+  type: enterprise
+  description: Transaction enrichment, categorization, merchant identification, insights, recurring-payment
+    detection, income finder, characteristics, and intelligent search.
+  entries:
+  - label: Enriched transactions
+    name: enriched-transactions
+    type: metered
+    metric: transactions
+    limit: -1
+    timeFrame: month
+    geo: global
+    unit: 1000
+    price: redacted
+    userMultiplied: false
+- id: bud-assess
+  name: Bud Assess
+  type: enterprise
+  description: Affordability reports, lender-grade income and expenditure breakdowns, risk insights, and
+    customer-application management for lending decisions.
+  entries:
+  - label: Affordability reports
+    name: affordability-reports
+    type: metered
+    metric: reports
+    limit: -1
+    timeFrame: month
+    geo: UK
+    unit: 1
+    price: redacted
+    userMultiplied: false
+- id: bud-pay
+  name: Bud Pay
+  type: enterprise
+  description: PISP payment initiation - single payments, scheduled payments, and standing orders via the
+    Bud-hosted Bud Pay URL or native API flow.
+  entries:
+  - label: Payment initiations
+    name: payment-initiations
+    type: metered
+    metric: payments
+    limit: -1
+    timeFrame: month
+    geo: UK+EU
+    unit: 1
+    price: redacted
+    userMultiplied: false
+- id: bud-check
+  name: Bud Check
+  type: enterprise
+  description: KYC and verification services performed against businesses and customers.
+  entries:
+  - label: KYC checks
+    name: kyc-checks
+    type: metered
+    metric: checks
+    limit: -1
+    timeFrame: month
+    geo: UK
+    unit: 1
+    price: redacted
+    userMultiplied: false
+freeTier:
+  description: Free sandbox access to the Bud Developer Console at console.thisisbud.com for evaluation.
+    Sandbox uses dummy data. Production usage requires a commercial agreement.
+contact:
+  url: https://bud.co
+  email: help@thisisbud.com

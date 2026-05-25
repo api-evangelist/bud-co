@@ -1,0 +1,36 @@
+{
+  "id": "tx_01HZBUDXAMPLE123",
+  "account_id": "acc_01HZBUDXAMPLEACC",
+  "provider_transaction_id": "TX-2026-05-23-0001",
+  "amount": -42.50,
+  "currency": "GBP",
+  "date": "2026-05-23",
+  "booking_date": "2026-05-23T18:42:11Z",
+  "value_date": "2026-05-23T18:42:11Z",
+  "description": "TFL TRAVEL CH TFL.GOV.UK/CP GBR",
+  "category": {
+    "id": "transport.public-transit",
+    "name": "Public Transit",
+    "model_id": "bud-default-v6",
+    "parent": "transport"
+  },
+  "merchant": {
+    "id": "mrc_tfl",
+    "name": "Transport for London",
+    "logo": "https://logos.bud.co/tfl.png",
+    "website": "https://tfl.gov.uk",
+    "category": "Government"
+  },
+  "recurrence": {
+    "is_recurring": true,
+    "frequency": "weekly",
+    "next_expected_date": "2026-05-30"
+  },
+  "geo": {
+    "country": "GB",
+    "city": "London"
+  },
+  "status": "booked",
+  "type": "debit",
+  "running_balance": 1842.10
+}

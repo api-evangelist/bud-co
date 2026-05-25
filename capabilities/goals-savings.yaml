@@ -1,0 +1,69 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Bud Goals - Savings
+  description: Create and manage customer savings goals.
+  tags:
+  - Bud
+  - Savings
+  created: '2026-05-25'
+  modified: '2026-05-25'
+binds:
+- namespace: env
+  keys:
+    BUD_ACCESS_TOKEN: BUD_ACCESS_TOKEN
+capability:
+  consumes:
+  - type: http
+    namespace: goals-savings
+    baseUri: https://api-sandbox.thisisbud.com
+    description: Bud Goals - Savings business capability. OAuth2 bearer-token authenticated against the Bud platform.
+    resources:
+    - name: list-savings-goals
+      path: /goals/v2/savings/goals
+      operations:
+      - name: list-savings-goals
+        method: GET
+        description: Bud Goals - Savings operation against Bud.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    authentication:
+      type: apikey
+      key: Authorization
+      value: 'Bearer {{env.BUD_ACCESS_TOKEN}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: goals-savings-rest
+    port: 8080
+    description: REST adapter for Bud Goals - Savings. One Spectral-compliant resource per consumed operation.
+    resources:
+    - path: /v1/goals/v2/savings/goals
+      name: list-savings-goals
+      description: REST surface for list-savings-goals.
+      operations:
+      - method: GET
+        name: list-savings-goals
+        description: Bud Goals - Savings
+        call: goals-savings.list-savings-goals
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: goals-savings-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for Bud Goals - Savings. One tool per consumed operation.
+    tools:
+    - name: bud-list-savings-goals
+      description: Bud Goals - Savings
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: goals-savings.list-savings-goals
+      outputParameters:
+      - type: object
+        mapping: $.

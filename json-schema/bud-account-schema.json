@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/bud-co/refs/heads/main/json-schema/bud-account-schema.json",
+  "title": "Bud Account",
+  "type": "object",
+  "description": "An account record on the Bud platform, sourced either from an Open Banking connection (Connect API) or first-party ingestion.",
+  "required": ["id", "customer_id", "type", "currency"],
+  "properties": {
+    "id": {"type": "string", "description": "Bud-assigned account identifier."},
+    "customer_id": {"type": "string", "description": "Identifier of the customer that owns this account."},
+    "connection_id": {"type": "string", "description": "Identifier of the Open Banking connection the account was sourced from (null for ingested accounts)."},
+    "provider_account_id": {"type": "string"},
+    "provider": {
+      "type": "object",
+      "properties": {
+        "id": {"type": "string"},
+        "name": {"type": "string"},
+        "country": {"type": "string"}
+      }
+    },
+    "type": {
+      "type": "string",
+      "enum": ["current", "savings", "credit_card", "loan", "mortgage", "investment", "ewallet", "other"]
+    },
+    "subtype": {"type": "string"},
+    "name": {"type": "string"},
+    "nickname": {"type": "string"},
+    "currency": {"type": "string", "description": "ISO 4217 currency code."},
+    "account_number": {"type": "string"},
+    "sort_code": {"type": "string"},
+    "iban": {"type": "string"},
+    "balances": {
+      "type": "object",
+      "properties": {
+        "current": {"type": "number"},
+        "available": {"type": "number"},
+        "credit_limit": {"type": "number"},
+        "as_of": {"type": "string", "format": "date-time"}
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "closed", "reopened", "dormant"]
+    },
+    "created_at": {"type": "string", "format": "date-time"},
+    "updated_at": {"type": "string", "format": "date-time"}
+  }
+}

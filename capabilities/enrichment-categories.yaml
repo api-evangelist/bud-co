@@ -1,0 +1,69 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Bud Enrichment - Categories
+  description: Retrieve aggregated category totals and trends for a customer over a time window.
+  tags:
+  - Bud
+  - Categorization
+  created: '2026-05-25'
+  modified: '2026-05-25'
+binds:
+- namespace: env
+  keys:
+    BUD_ACCESS_TOKEN: BUD_ACCESS_TOKEN
+capability:
+  consumes:
+  - type: http
+    namespace: enrichment-categories
+    baseUri: https://api-sandbox.thisisbud.com
+    description: Bud Enrichment - Categories business capability. OAuth2 bearer-token authenticated against the Bud platform.
+    resources:
+    - name: list-category-totals
+      path: /aggregations/v2/totals/categories
+      operations:
+      - name: list-category-totals
+        method: GET
+        description: Bud Enrichment - Categories operation against Bud.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    authentication:
+      type: apikey
+      key: Authorization
+      value: 'Bearer {{env.BUD_ACCESS_TOKEN}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: enrichment-categories-rest
+    port: 8080
+    description: REST adapter for Bud Enrichment - Categories. One Spectral-compliant resource per consumed operation.
+    resources:
+    - path: /v1/aggregations/v2/totals/categories
+      name: list-category-totals
+      description: REST surface for list-category-totals.
+      operations:
+      - method: GET
+        name: list-category-totals
+        description: Bud Enrichment - Categories
+        call: enrichment-categories.list-category-totals
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: enrichment-categories-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for Bud Enrichment - Categories. One tool per consumed operation.
+    tools:
+    - name: bud-list-category-totals
+      description: Bud Enrichment - Categories
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: enrichment-categories.list-category-totals
+      outputParameters:
+      - type: object
+        mapping: $.

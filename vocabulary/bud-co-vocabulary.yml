@@ -1,0 +1,125 @@
+vocabulary: Bud Financial
+vocabularyId: bud-co
+created: '2026-05-25'
+modified: '2026-05-25'
+description: Domain vocabulary for the Bud Financial platform - Open Banking aggregation, transaction
+  enrichment, affordability assessment, and payment initiation.
+dimensions:
+- name: Products
+  description: The top-level commercial products that Bud offers.
+  terms:
+  - id: connect
+    label: Connect
+    description: Open Banking aggregation and first-party ingestion.
+  - id: intelligence
+    label: Intelligence
+    description: Enrichment, insights, categorization, characteristics, and search.
+  - id: assess
+    label: Assess
+    description: Affordability and lending decision support.
+  - id: pay
+    label: Pay
+    description: PISP payment initiation.
+  - id: check
+    label: Check
+    description: KYC and verification.
+- name: Services
+  description: Logical services within the Bud platform.
+  terms:
+  - id: open-banking-aggregation
+    label: Open Banking Aggregation API
+  - id: first-party-ingestion
+    label: First Party Ingestion API
+  - id: financial-data
+    label: Financial Data API
+  - id: enrichment
+    label: Enrichment API
+  - id: financial-insights
+    label: Financial Insights API
+  - id: signal
+    label: Signal API
+  - id: financial-review
+    label: Financial Review API
+  - id: payments
+    label: Payments API
+  - id: kyc
+    label: KYC API
+- name: Open Banking Roles
+  terms:
+  - id: aisp
+    label: AISP
+    description: Account Information Service Provider.
+  - id: pisp
+    label: PISP
+    description: Payment Initiation Service Provider.
+  - id: aspsp
+    label: ASPSP
+    description: Account Servicing Payment Service Provider (the connected bank).
+- name: Connection Lifecycle
+  terms:
+  - id: authorisation
+    label: Authorisation
+  - id: consent
+    label: Consent
+  - id: refresh
+    label: Refresh
+  - id: revocation
+    label: Revocation
+  - id: reconfirmation
+    label: Reconfirmation
+- name: Enrichment Dimensions
+  terms:
+  - id: category
+    label: Category
+  - id: merchant
+    label: Merchant
+  - id: recurrence
+    label: Recurrence
+  - id: geo
+    label: Geolocation
+  - id: characteristic
+    label: Characteristic
+- name: Payment Types
+  terms:
+  - id: single
+    label: Single Payment
+  - id: scheduled
+    label: Scheduled Payment
+  - id: standing-order
+    label: Standing Order
+- name: Insight Types
+  terms:
+  - id: actionable-balance
+    label: Actionable Balance Insight
+  - id: actionable-income
+    label: Actionable Income Insight
+  - id: actionable-spending
+    label: Actionable Spending Insight
+  - id: custom-insight
+    label: Custom Insight
+  - id: subscription
+    label: Subscription
+  - id: recurring-transaction
+    label: Recurring Transaction
+  - id: future-transaction
+    label: Future Transaction
+  - id: income
+    label: Income
+  - id: benefit
+    label: Benefit
+  - id: loan
+    label: Loan
+  - id: debt-collection
+    label: Debt Collection
+- name: Standards and Regulation
+  terms:
+  - id: psd2
+    label: PSD2
+  - id: open-banking-uk
+    label: UK Open Banking Standard
+  - id: berlin-group
+    label: Berlin Group NextGenPSD2
+  - id: fca
+    label: FCA Authorisation
+  - id: gdpr
+    label: GDPR

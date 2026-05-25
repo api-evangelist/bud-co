@@ -1,0 +1,69 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Bud Ingestion - Accounts
+  description: Push first-party account data into the Bud platform for downstream enrichment.
+  tags:
+  - Bud
+  - Ingestion
+  created: '2026-05-25'
+  modified: '2026-05-25'
+binds:
+- namespace: env
+  keys:
+    BUD_ACCESS_TOKEN: BUD_ACCESS_TOKEN
+capability:
+  consumes:
+  - type: http
+    namespace: ingestion-accounts
+    baseUri: https://api-sandbox.thisisbud.com
+    description: Bud Ingestion - Accounts business capability. OAuth2 bearer-token authenticated against the Bud platform.
+    resources:
+    - name: ingest-accounts
+      path: /v2/ingest/accounts
+      operations:
+      - name: ingest-accounts
+        method: POST
+        description: Bud Ingestion - Accounts operation against Bud.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    authentication:
+      type: apikey
+      key: Authorization
+      value: 'Bearer {{env.BUD_ACCESS_TOKEN}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: ingestion-accounts-rest
+    port: 8080
+    description: REST adapter for Bud Ingestion - Accounts. One Spectral-compliant resource per consumed operation.
+    resources:
+    - path: /v1/v2/ingest/accounts
+      name: ingest-accounts
+      description: REST surface for ingest-accounts.
+      operations:
+      - method: POST
+        name: ingest-accounts
+        description: Bud Ingestion - Accounts
+        call: ingestion-accounts.ingest-accounts
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: ingestion-accounts-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for Bud Ingestion - Accounts. One tool per consumed operation.
+    tools:
+    - name: bud-ingest-accounts
+      description: Bud Ingestion - Accounts
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: ingestion-accounts.ingest-accounts
+      outputParameters:
+      - type: object
+        mapping: $.

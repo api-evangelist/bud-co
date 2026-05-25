@@ -1,0 +1,69 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Bud Widgets - URLs
+  description: Request a signed URL for one of Bud's embeddable widgets (accounts, balances, insights, search, budgets, goals).
+  tags:
+  - Bud
+  - Widgets
+  created: '2026-05-25'
+  modified: '2026-05-25'
+binds:
+- namespace: env
+  keys:
+    BUD_ACCESS_TOKEN: BUD_ACCESS_TOKEN
+capability:
+  consumes:
+  - type: http
+    namespace: widgets-urls
+    baseUri: https://api-sandbox.thisisbud.com
+    description: Bud Widgets - URLs business capability. OAuth2 bearer-token authenticated against the Bud platform.
+    resources:
+    - name: create-summary-widget-url
+      path: /widget/v1/summary/url
+      operations:
+      - name: create-summary-widget-url
+        method: POST
+        description: Bud Widgets - URLs operation against Bud.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    authentication:
+      type: apikey
+      key: Authorization
+      value: 'Bearer {{env.BUD_ACCESS_TOKEN}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: widgets-urls-rest
+    port: 8080
+    description: REST adapter for Bud Widgets - URLs. One Spectral-compliant resource per consumed operation.
+    resources:
+    - path: /v1/widget/v1/summary/url
+      name: create-summary-widget-url
+      description: REST surface for create-summary-widget-url.
+      operations:
+      - method: POST
+        name: create-summary-widget-url
+        description: Bud Widgets - URLs
+        call: widgets-urls.create-summary-widget-url
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: widgets-urls-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for Bud Widgets - URLs. One tool per consumed operation.
+    tools:
+    - name: bud-create-summary-widget-url
+      description: Bud Widgets - URLs
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: widgets-urls.create-summary-widget-url
+      outputParameters:
+      - type: object
+        mapping: $.

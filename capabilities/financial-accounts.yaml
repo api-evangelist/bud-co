@@ -1,0 +1,69 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Bud Financial Data - Accounts
+  description: List a customer's accounts with enriched metadata from Bud's aggregation layer.
+  tags:
+  - Bud
+  - Accounts
+  created: '2026-05-25'
+  modified: '2026-05-25'
+binds:
+- namespace: env
+  keys:
+    BUD_ACCESS_TOKEN: BUD_ACCESS_TOKEN
+capability:
+  consumes:
+  - type: http
+    namespace: financial-accounts
+    baseUri: https://api-sandbox.thisisbud.com
+    description: Bud Financial Data - Accounts business capability. OAuth2 bearer-token authenticated against the Bud platform.
+    resources:
+    - name: list-accounts
+      path: /financial/v3/accounts
+      operations:
+      - name: list-accounts
+        method: GET
+        description: Bud Financial Data - Accounts operation against Bud.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    authentication:
+      type: apikey
+      key: Authorization
+      value: 'Bearer {{env.BUD_ACCESS_TOKEN}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: financial-accounts-rest
+    port: 8080
+    description: REST adapter for Bud Financial Data - Accounts. One Spectral-compliant resource per consumed operation.
+    resources:
+    - path: /v1/financial/v3/accounts
+      name: list-accounts
+      description: REST surface for list-accounts.
+      operations:
+      - method: GET
+        name: list-accounts
+        description: Bud Financial Data - Accounts
+        call: financial-accounts.list-accounts
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: financial-accounts-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for Bud Financial Data - Accounts. One tool per consumed operation.
+    tools:
+    - name: bud-list-accounts
+      description: Bud Financial Data - Accounts
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: financial-accounts.list-accounts
+      outputParameters:
+      - type: object
+        mapping: $.

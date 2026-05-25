@@ -1,0 +1,36 @@
+{
+  "customer_id": "cus_01HZBUDEXAMPLE",
+  "generated_at": "2026-05-25T09:15:00Z",
+  "window": {
+    "from": "2026-02-25",
+    "to": "2026-05-25",
+    "months_covered": 3
+  },
+  "income": {
+    "monthly_average": 3850.00,
+    "currency": "GBP",
+    "sources": [
+      {"name": "Salary - Acme Ltd", "monthly_average": 3500.00, "confidence": 0.97},
+      {"name": "Universal Credit", "monthly_average": 350.00, "confidence": 0.88}
+    ]
+  },
+  "expenditure": {
+    "monthly_average": 2960.00,
+    "currency": "GBP",
+    "breakdown": [
+      {"category": "housing", "monthly_average": 1100.00},
+      {"category": "utilities", "monthly_average": 220.00},
+      {"category": "groceries", "monthly_average": 480.00},
+      {"category": "transport", "monthly_average": 180.00},
+      {"category": "subscriptions", "monthly_average": 95.00},
+      {"category": "debt-repayment", "monthly_average": 410.00},
+      {"category": "discretionary", "monthly_average": 475.00}
+    ]
+  },
+  "disposable_income": 890.00,
+  "risk_insights": {
+    "unauthorised_overdraft_events_90d": 0,
+    "gambling_spend_90d": 12.00,
+    "essential_spend_ratio": 0.61
+  }
+}

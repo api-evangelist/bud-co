@@ -1,0 +1,49 @@
+extends:
+- spectral:oas
+rules:
+  bud-paths-kebab-case:
+    description: Bud API paths use kebab-case segments (e.g. /open-banking/v2/refresh, /account-access-consents).
+    given: $.paths.*~
+    severity: warn
+    then:
+      function: pattern
+      functionOptions:
+        match: '^(/[a-z0-9-]+|/\{[a-z_]+\})+$'
+  bud-versioned-paths:
+    description: Bud API paths must contain a version segment such as v1, v2, v3, or beta.
+    given: $.paths.*~
+    severity: warn
+    then:
+      function: pattern
+      functionOptions:
+        match: '/(v[0-9]+|beta)(/|$)'
+  bud-operation-summary-title-case:
+    description: Bud operation summaries should be in Title Case (matches the existing API reference style).
+    given: $.paths[*][get,post,put,patch,delete].summary
+    severity: warn
+    then:
+      function: pattern
+      functionOptions:
+        match: '^[A-Z]'
+  bud-operation-tag-required:
+    description: Every operation must have at least one tag to anchor it under a Bud product surface.
+    given: $.paths[*][get,post,put,patch,delete]
+    severity: error
+    then:
+      field: tags
+      function: truthy
+  bud-oauth2-security:
+    description: Non-OAuth endpoints (everything except /v1/oauth/token) must declare a security requirement.
+    given: $.paths[?(@property != '/v1/oauth/token')][get,post,put,patch,delete]
+    severity: warn
+    then:
+      field: security
+      function: truthy
+  bud-task-id-pattern:
+    description: Asynchronous endpoints expose the task identifier as `{task_id}` consistently.
+    given: $.paths.*~
+    severity: hint
+    then:
+      function: pattern
+      functionOptions:
+        notMatch: '\{taskId\}'

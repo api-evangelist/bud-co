@@ -1,0 +1,69 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Bud Characteristics - Customer
+  description: Retrieve derived behavioural characteristics for a customer across credit card, loan, overdraft, and saver dimensions.
+  tags:
+  - Bud
+  - Characteristics
+  created: '2026-05-25'
+  modified: '2026-05-25'
+binds:
+- namespace: env
+  keys:
+    BUD_ACCESS_TOKEN: BUD_ACCESS_TOKEN
+capability:
+  consumes:
+  - type: http
+    namespace: characteristics-customer
+    baseUri: https://api-sandbox.thisisbud.com
+    description: Bud Characteristics - Customer business capability. OAuth2 bearer-token authenticated against the Bud platform.
+    resources:
+    - name: get-customer-characteristics
+      path: /characteristics/v1/customer
+      operations:
+      - name: get-customer-characteristics
+        method: GET
+        description: Bud Characteristics - Customer operation against Bud.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    authentication:
+      type: apikey
+      key: Authorization
+      value: 'Bearer {{env.BUD_ACCESS_TOKEN}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: characteristics-customer-rest
+    port: 8080
+    description: REST adapter for Bud Characteristics - Customer. One Spectral-compliant resource per consumed operation.
+    resources:
+    - path: /v1/characteristics/v1/customer
+      name: get-customer-characteristics
+      description: REST surface for get-customer-characteristics.
+      operations:
+      - method: GET
+        name: get-customer-characteristics
+        description: Bud Characteristics - Customer
+        call: characteristics-customer.get-customer-characteristics
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: characteristics-customer-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for Bud Characteristics - Customer. One tool per consumed operation.
+    tools:
+    - name: bud-get-customer-characteristics
+      description: Bud Characteristics - Customer
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: characteristics-customer.get-customer-characteristics
+      outputParameters:
+      - type: object
+        mapping: $.

@@ -1,0 +1,69 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Bud Search - Transactions
+  description: Run an AI-powered natural-language search across a customer's transactions and retrieve matches plus a derived insight.
+  tags:
+  - Bud
+  - Search
+  created: '2026-05-25'
+  modified: '2026-05-25'
+binds:
+- namespace: env
+  keys:
+    BUD_ACCESS_TOKEN: BUD_ACCESS_TOKEN
+capability:
+  consumes:
+  - type: http
+    namespace: search-transactions
+    baseUri: https://api-sandbox.thisisbud.com
+    description: Bud Search - Transactions business capability. OAuth2 bearer-token authenticated against the Bud platform.
+    resources:
+    - name: create-transaction-search
+      path: /search/beta/transactions
+      operations:
+      - name: create-transaction-search
+        method: POST
+        description: Bud Search - Transactions operation against Bud.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    authentication:
+      type: apikey
+      key: Authorization
+      value: 'Bearer {{env.BUD_ACCESS_TOKEN}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: search-transactions-rest
+    port: 8080
+    description: REST adapter for Bud Search - Transactions. One Spectral-compliant resource per consumed operation.
+    resources:
+    - path: /v1/search/beta/transactions
+      name: create-transaction-search
+      description: REST surface for create-transaction-search.
+      operations:
+      - method: POST
+        name: create-transaction-search
+        description: Bud Search - Transactions
+        call: search-transactions.create-transaction-search
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: search-transactions-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for Bud Search - Transactions. One tool per consumed operation.
+    tools:
+    - name: bud-create-transaction-search
+      description: Bud Search - Transactions
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: search-transactions.create-transaction-search
+      outputParameters:
+      - type: object
+        mapping: $.

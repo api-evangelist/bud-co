@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/bud-co/refs/heads/main/json-schema/bud-transaction-schema.json",
+  "title": "Bud Enriched Transaction",
+  "type": "object",
+  "description": "An enriched transaction record returned by the Bud Financial Data API. Includes raw bank data plus Bud's AI/ML-derived enrichment fields (category, merchant, recurrence, geolocation).",
+  "required": ["id", "account_id", "amount", "currency", "date"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Bud-assigned globally unique transaction identifier."
+    },
+    "account_id": {
+      "type": "string",
+      "description": "Identifier of the account the transaction belongs to."
+    },
+    "provider_transaction_id": {
+      "type": "string",
+      "description": "Original transaction identifier provided by the source ASPSP or ingested system."
+    },
+    "amount": {
+      "type": "number",
+      "description": "Transaction amount. Debits are negative, credits positive."
+    },
+    "currency": {
+      "type": "string",
+      "description": "ISO 4217 currency code."
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Posted date of the transaction."
+    },
+    "booking_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "value_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "description": {
+      "type": "string",
+      "description": "Raw bank-provided description string."
+    },
+    "category": {
+      "type": "object",
+      "description": "Bud-assigned category from the active category model.",
+      "properties": {
+        "id": {"type": "string"},
+        "name": {"type": "string"},
+        "model_id": {"type": "string"},
+        "parent": {"type": "string"}
+      }
+    },
+    "merchant": {
+      "type": "object",
+      "description": "Bud-identified merchant for the transaction.",
+      "properties": {
+        "id": {"type": "string"},
+        "name": {"type": "string"},
+        "logo": {"type": "string", "format": "uri"},
+        "website": {"type": "string", "format": "uri"},
+        "category": {"type": "string"}
+      }
+    },
+    "recurrence": {
+      "type": "object",
+      "description": "Recurring-transaction metadata, set when Bud detects a recurring pattern.",
+      "properties": {
+        "is_recurring": {"type": "boolean"},
+        "frequency": {"type": "string", "enum": ["daily", "weekly", "fortnightly", "monthly", "quarterly", "annually", "irregular"]},
+        "next_expected_date": {"type": "string", "format": "date"}
+      }
+    },
+    "geo": {
+      "type": "object",
+      "properties": {
+        "country": {"type": "string"},
+        "city": {"type": "string"},
+        "latitude": {"type": "number"},
+        "longitude": {"type": "number"}
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["booked", "pending", "declined"]
+    },
+    "type": {
+      "type": "string",
+      "description": "Transaction type (debit, credit, transfer, fee, etc.)."
+    },
+    "running_balance": {
+      "type": "number"
+    }
+  }
+}

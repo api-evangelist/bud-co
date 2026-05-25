@@ -1,0 +1,69 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Bud Enrichment - Corrections
+  description: Submit category and merchant corrections for individual transactions to retrain the customer-facing labels.
+  tags:
+  - Bud
+  - Corrections
+  created: '2026-05-25'
+  modified: '2026-05-25'
+binds:
+- namespace: env
+  keys:
+    BUD_ACCESS_TOKEN: BUD_ACCESS_TOKEN
+capability:
+  consumes:
+  - type: http
+    namespace: enrichment-corrections
+    baseUri: https://api-sandbox.thisisbud.com
+    description: Bud Enrichment - Corrections business capability. OAuth2 bearer-token authenticated against the Bud platform.
+    resources:
+    - name: submit-category-correction
+      path: /corrections/v2/categories
+      operations:
+      - name: submit-category-correction
+        method: POST
+        description: Bud Enrichment - Corrections operation against Bud.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    authentication:
+      type: apikey
+      key: Authorization
+      value: 'Bearer {{env.BUD_ACCESS_TOKEN}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: enrichment-corrections-rest
+    port: 8080
+    description: REST adapter for Bud Enrichment - Corrections. One Spectral-compliant resource per consumed operation.
+    resources:
+    - path: /v1/corrections/v2/categories
+      name: submit-category-correction
+      description: REST surface for submit-category-correction.
+      operations:
+      - method: POST
+        name: submit-category-correction
+        description: Bud Enrichment - Corrections
+        call: enrichment-corrections.submit-category-correction
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: enrichment-corrections-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for Bud Enrichment - Corrections. One tool per consumed operation.
+    tools:
+    - name: bud-submit-category-correction
+      description: Bud Enrichment - Corrections
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: enrichment-corrections.submit-category-correction
+      outputParameters:
+      - type: object
+        mapping: $.

@@ -1,0 +1,69 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Bud Assess - Applications
+  description: Create and manage customer applications in the Bud Assess product and link them to customer records.
+  tags:
+  - Bud
+  - Assess
+  created: '2026-05-25'
+  modified: '2026-05-25'
+binds:
+- namespace: env
+  keys:
+    BUD_ACCESS_TOKEN: BUD_ACCESS_TOKEN
+capability:
+  consumes:
+  - type: http
+    namespace: assess-applications
+    baseUri: https://api-sandbox.thisisbud.com
+    description: Bud Assess - Applications business capability. OAuth2 bearer-token authenticated against the Bud platform.
+    resources:
+    - name: create-customer-application
+      path: /assess/v1/customer-applications
+      operations:
+      - name: create-customer-application
+        method: POST
+        description: Bud Assess - Applications operation against Bud.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    authentication:
+      type: apikey
+      key: Authorization
+      value: 'Bearer {{env.BUD_ACCESS_TOKEN}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: assess-applications-rest
+    port: 8080
+    description: REST adapter for Bud Assess - Applications. One Spectral-compliant resource per consumed operation.
+    resources:
+    - path: /v1/assess/v1/customer-applications
+      name: create-customer-application
+      description: REST surface for create-customer-application.
+      operations:
+      - method: POST
+        name: create-customer-application
+        description: Bud Assess - Applications
+        call: assess-applications.create-customer-application
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: assess-applications-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for Bud Assess - Applications. One tool per consumed operation.
+    tools:
+    - name: bud-create-customer-application
+      description: Bud Assess - Applications
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: assess-applications.create-customer-application
+      outputParameters:
+      - type: object
+        mapping: $.
