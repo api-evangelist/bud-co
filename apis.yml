@@ -25,7 +25,7 @@ tags:
   - Machine Learning
 common:
   - url: https://bud.co
-    type: WebSite
+    type: Website
   - url: https://docs.thisisbud.com
     type: Documentation
   - url: https://console.thisisbud.com
@@ -37,7 +37,7 @@ common:
   - url: https://github.com/thisisbud/bud-public-developer-resources
     type: GitHub
   - url: https://docs.thisisbud.com/llms.txt
-    type: LLMSTxT
+    type: LlmsText
 apis:
   - aid: bud-co:bud-connect-api
     name: Bud Connect API
