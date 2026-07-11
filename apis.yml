@@ -24,6 +24,8 @@ tags:
   - AI
   - Machine Learning
 common:
+  - type: OAuthScopes
+    url: scopes/bud-co-scopes.yml
   - url: https://bud.co
     type: Website
   - url: https://docs.thisisbud.com

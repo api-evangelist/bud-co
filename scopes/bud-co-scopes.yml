@@ -1,0 +1,68 @@
+generated: '2026-07-11'
+method: derived
+source: openapi/bud-platform-openapi.yml
+docs: https://docs.thisisbud.com/docs/authentication
+note: >-
+  Bud's OAuth2 uses the client_credentials (and refresh_token) grant with API
+  credentials granting full platform access; no OAuth scopes are used or
+  documented (https://docs.thisisbud.com/docs/authentication).
+schemes:
+- name: OAuth2
+  source: openapi/bud-platform-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: /v1/oauth/token
+  description: |-
+    Authentication flow:
+
+    1. Perform OAuth2 Client Credentials authentication using API Credentials (`client_id`,`client_secret`) to obtain an `access_token` against `/v1/oauth/token` endpoint,
+    2. Use `access_token` as Bearer Authorisation for every other API request,
+    3. Include `X-Client-Id` (=client_id) within the header of every API request,
+    4. Note that some of the requests may also require `X-Customer-Id` to be provided within the request header.
+
+    ### Examples
+    Obtain OAuth2 `access_token` and `refresh_token` using `grant_type=client_credentials` and HTTP Basic auth header
+
+    ```
+    curl --basic --user {{client_id}}:{{client_secret}} \
+      -X POST https://api-sandbox.thisisbud.com/v1/oauth/token \
+      -H 'Content-Type: application/x-www-form-urlencoded' \
+      -d grant_type=client_credentials
+    ```
+
+    Successful response:
+    ```
+    {
+      "operation_id": "oauth_token_post",
+      "data": {
+        "access_token": "dd0c17e3fd6d2ce94aa091257a3ea393b4f9b5cf3d3e998f07dc9826da86ff15",
+        "token_type": "bearer",
+        "expires_in": 3600,
+        "refresh_token": "fac32cca7559d9f6e8f1dfe9a99c71fa1dcfeb482bedf287d7934d2667ae54b3"
+      }
+    }
+    ```
+
+    Refresh `access_token` token using `refresh_token` against `/v1/oauth/token` endpoint with `grant_type=refresh_token`
+
+    ```
+    curl -X POST \
+      https://api-sandbox.thisisbud.com/v1/oauth/token \
+      -H 'Content-Type: application/x-www-form-urlencoded' \
+      -H 'X-Client-Id: {{client_id}}' \
+      -d 'grant_type=refresh_token&refresh_token={{refresh_token}}'
+    ```
+
+    Successful response:
+    ```
+    {
+        "operation_id": "oauth_token_post",
+        "data": {
+            "access_token": "cc0c17e3fd6d2ce94aa091257a3ea393b4f9b5cf3d3e998f07dc9826da86ff94",
+            "token_type": "bearer",
+            "expires_in": 3600,
+            "refresh_token": "ffc30cca7559d9f6e8f1dfe9a99c71fa1dcfeb482bedf287d7934d2667ae54b3"
+        }
+    }
+    ```
+scopes: []
