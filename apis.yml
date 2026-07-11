@@ -24,6 +24,10 @@ tags:
   - AI
   - Machine Learning
 common:
+  - type: DomainSecurity
+    url: security/bud-co-domain-security.yml
+  - type: Authentication
+    url: authentication/bud-co-authentication.yml
   - type: OAuthScopes
     url: scopes/bud-co-scopes.yml
   - url: https://bud.co

@@ -1,0 +1,30 @@
+generated: '2026-07-11'
+method: derived
+source: openapi/bud-platform-openapi.yml
+summary:
+  types:
+  - http
+  - oauth2
+  oauth2_flows:
+  - clientCredentials
+schemes:
+- name: Basic
+  type: http
+  scheme: basic
+  sources:
+  - openapi/bud-platform-openapi.yml
+- name: OAuth2
+  type: oauth2
+  flows:
+  - flow: clientCredentials
+    tokenUrl: /v1/oauth/token
+    scopes: 0
+  description: |-
+    Authentication flow:
+
+    1. Perform OAuth2 Client Credentials authentication using API Credentials (`client_id`,`client_secret`) to obtain an `access_token` against `/v1/oauth/token` endpoint,
+    2. Use `access_token` as Bearer Authorisation for every other API request,
+    3. Include `X-Client-Id` (=client_id) within the header of every API request,
+    4. Note that some of the requests may also require `X-Cus
+  sources:
+  - openapi/bud-platform-openapi.yml
