@@ -24,6 +24,8 @@ tags:
   - AI
   - Machine Learning
 common:
+  - type: AgenticAccess
+    url: agentic-access/bud-co-agentic-access.yml
   - type: DomainSecurity
     url: security/bud-co-domain-security.yml
   - type: Authentication
