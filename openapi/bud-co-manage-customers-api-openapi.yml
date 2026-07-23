@@ -1,0 +1,1265 @@
+openapi: 3.0.3
+info:
+  title: 'Bud API Services: Documentation Aggregation Buckets Manage Customers API'
+  version: 2.10.10
+  description: "# Overview\n\n## Introduction\nWelcome to Bud's API Platform documentation. Here you will find everything you need to build features, apps and experiences using Bud's API Services. All endpoints follow standard RESTful principles and example request and response payload snippets are provided to get you up and running quickly and easily.\n\nTo start interacting with our platform, please sign up for access [here](https://www.thisisbud.com/developers#developer-console). You will be provided with access to the [Bud Developer Console](https://console.thisisbud.com) where you can create the API Credentials required to obtain an OAuth2 access token.\n\nIf you have any questions, please use our [Support Centre](https://support.thisisbud.com/hc/en-gb) or email us on [help@thisisbud.com](mailto:help@thisisbud.com).\n\n## Bud Platform Products\n\n| Product | Service | Description |\n|--|--|--|\n| Connect | Open Banking Aggregation API | Simplified and unified access to Open Banking Aggregation APIs. |\n| Connect | First Party Ingestion API | Push your own data onto the Bud platform via Bud's first party ingestion endpoints. |\n| Intelligence | Financial Data API | Obtain enriched first and third party transactional data. |\n| Intelligence | Enrichment API | Access enrichment resources and retrieve high level aggregations of transactional data. |\n| Intelligence | Financial Insights API | Obtain a deeper understanding of your customers transactional data through a variety of different insights. |\n| Intelligence | Signal API | Contextual, relevant triggers and notifications that drive action from customers. |\n| Intelligence | Financial Review API | Pre-fill affordability forms to speed up services and reduce drop-off with custom groups of income and spending. |\n| Pay | Payments API | Make authorised payments and transfers directly from a customer’s account. |\n| Check | KYC API | Perform relevant checks against businesses and customers. |\n\n## Environments and API Base URIs\n\nBud currently supports two environments on its platform:\n\n1.  Bud’s Sandbox Environment - [https://api-sandbox.thisisbud.com/](https://api-sandbox.thisisbud.com/)\n\n2.  Bud’s Production Environment - [https://api.thisisbud.com/](https://api.thisisbud.com/)\n\n\n## Bud’s Sandbox Environment\n\n### About\n\nBud Sandbox Platform is a development environment for integrating and testing Bud’s services. Its version is kept up to date with production. Bud’s sandbox environment mirrors our production environment and all updates are made in tandem. On the Sandbox environment, the variety of providers that you can connect to via Open Banking is limited and contains a predefined set of dummy accounts and transaction data. The instance size doesn’t differ from production, although certain rate limits are in place.\n\n### API Access\n\nTo start interacting with Bud’s Sandbox API you have to sign up for a developer account [here](https://www.thisisbud.com/developers#developer-console).\n\nOnce you’ve completed the signup and activation process you will be able to create a new project in the [Developer Console](https://console.thisisbud.com) to receive API Credentials (client_id and client_secret). These can be used to obtain OAuth2 access and refresh tokens using authentication endpoint. The access token must be supplied as a Bearer token within every service API call made to the Bud Platform. Once the access token has expired, the refresh token must be used to obtain another access token.\n\n\nDetails on the authentication process can be found in the Authentication section of this documentation.\n\n### Sandbox Providers\n\nBud’s sandbox is built to mirror its production environment. The main difference is the available open banking providers that a customer is able to connect to. In the sandbox, Bud’s aggregation service only supports the use of Open Banking sandbox providers which issue dummy data.\n\nCurrently, you are able to connect to customer profiles with predefined accounts and transaction data sets (managed by Bud) which are available via the NatWest Sandbox provider.\n\nFrom a Marketplace perspective, you can test any available journeys and play around with them, see how the product is constructed, what information the endpoints return and potentially create a new product of your choosing, following the API journey. Please note, that you will be unable to physically carry out any of the marketplace journeys (e.g. send rental data to Experian, or switch your Utility provider) within the Sandbox environment.\n\nNecessary access credentials can be found in the Bud [Developer Console](https://console.thisisbud.com) interface.\n\n## Bud’s Production Environment\n\n### About\n\nBud’s production environment is designed for use within your application when going live to real Customers. The environment is fully scalable, secure and facilitates the use of real Customer data.\n\n### API Access\n\nTo start interacting with Bud’s Production environment you must first sign up for a developer account [here](https://www.thisisbud.com/developers#developer-console). Once you have been assigned a relevant account manager, please contact them to get access to Bud’s production environment.\n\n### Providers\n\nBud’s production environment provides live access to all currently available providers via the Bud Platform (i.e. third party products and services). Please click here for a list of the currently supported Open Banking providers available via Buds Open Banking Aggregation API. This list is updated as and when new providers are on boarded onto the Bud platform.\n\nThe production environment allows your Customers to connect to additional third party products and services via the Bud platform. A list of the different Investment and Pension Aggregation providers can be seen here. Information surrounding additional third party providers, relevant to a specific marketplace journey, can be found in the relevant documentation below.\n\n## Message formats\n\nBud’s platform is made available through Application Programming Interface (API) endpoints, all of which adhere to [RESTful](https://restfulapi.net/) principles. Standard HTTP verbs and status codes are used for requests and response statuses. Request and response payloads are [JSON](http://www.json.org/) encoded data formatted. Communication with the Bud Platform is handled over HTTPS protocol only.\n\n| Data Type | Standard |\n| -- | -- |\n| Strings encoding | `UTF-8` |\n| Datetime | `ISO 8601` |\n| Currency codes | `ISO 4217` |\n\n### HTTP Verbs\n\n| Verb | Usage Context |\n| -- | -- |\n| GET | Used to retrieve the resource representation or metadata |\n| POST | Used to create a new resource on the server |\n| PUT | Used to update the resource state |\n| PATCH | Used to partially update a resource |\n| DELETE | Used to delete the resource|\n\n### HTTP Response Codes\n\n| Code Class |  Description |\n| -- | -- |\n| `1XX` | Informational - provisional response from the server |\n| `2XX` | Success - the request has been processed successfully by the server |\n| `4XX` | Client Error - the request has not been processed due to client-side issue with the request |\n| `5XX` | Server Error - the request has not been processed due to server-side issue |\n\n## Requests Custom Headers\n\nSome endpoints will require the presence of custom headers in the HTTP Request to be properly processed by Bud Platform services.\n\n| Header Name | Description|\n| ----------- | ---------------------------- |\n| `X-Client-Id` | API Credentials `client_id` value required for request authorisation purposes |\n| `X-Customer-Id` | Customer Identifier value necessary for establishing the Customer context of the data to be retrieved or processed |\n| `X-Account-Id` | Customer Account Identifier value necessary for establishing the context to retrieve specific customer’s account data.|\n| `X-From` | Start date from when the transactions data should be returned |\n| `X-To` | End date till when the transactions data should be returned |\n\n## Response Styling\n\n### Response Custom Headers\n\n| Header Name |  Description |\n| -- | -- |\n| `X-Request-Id` | Bud request identifier for troubleshooting purposes |\n\n## Success Responses\n\nThe description and the listed status codes below indicate that an action requested by the client was successfully processed.\n\nThe successful responses will have status codes in the `200-299` range and have relevant response content where required. However, `204 No Content` and `205 Reset Content` status codes won't contain a response content.\n\n### Response Style Properties\n| Field        | Description                                                          | Properties                                    |\n| ------------ | -------------------------------------------------------------------- | --------------------------------------------- |\n| operation_id | A descriptive enough string that is linked to the operation/feature. | A `required` lower case snake case `string`   |\n| data         | A data-set that is relevant to the endpoint.                         | An `optional` single/multidimensional `array` |\n| metadata     | Contains endpoint specific additional information.                   | An `optional` JSON `object`                   |\n\n#### Examples\n\n##### 200 OK\n\nAfter getting an existing resource with `GET /resources/{id}`.\n\n```json\n{\n  \"operation_id\": \"resources_get\",\n  \"data\": {\n    \"id\": \"111-AAA-222-BBB\",\n    \"name\": \"Bud\",\n    \"email\": \"bud@thisisbud.com\",\n    \"created_at\": \"2019-01-01T15:53:00+05:00\"\n  }\n}\n```\n\n##### 201 Created\n\nAfter creating a new resource with `POST /resources`.\n\n```json\n{\n  \"operation_id\": \"resources_post\",\n  \"data\": {\n    \"id\": \"111-AAA-222-BBB\"\n  }\n}\n```\n## Error Responses\n\n### Response Style Properties\n\n| Field        | Description                                                             | Properties                                    |\n| ------------ | ----------------------------------------------------------------------- | --------------------------------------------- |\n| operation_id | A descriptive enough string that is linked to the operation/feature.    | A `required` snake case `string`              |\n| code_id      | A descriptive enough string that is linked to the reason for the error. | A `required` snake case `string`              |\n| message      | An actual user friendly error message.                                  | A `required` `string`                         |\n| metadata     | Contains endpoint specific additional information.                      | An `optional` JSON `object`                   |\n| errors       | A data-set that is relevant to the error.                               | An `optional` JSON `object`                   |\n\n### Client Error Responses\n\nThe description and the listed status codes below indicate that the action requested by the client was not successfully processed due to apparent client errors in the request.\n\nThe client errors will have status codes in the 400-499 range and have relevant response content where required.\n\n#### Generic Client Error Responses\n| Error Code | Cause | Response Body |\n|--------------|---------|-----------|\n|401|Unauthorized|`{\"operation_id\": \"unknown\",\"code_id\":\"unknown\",\"message\": \"Unauthorised request\",\"errors\": {}}` |\n|404|Not Found|`{\"operation_id\": \"unknown\",\"code_id\":\"unknown\",\"message\": \"Route or resource not found\",\"errors\": {}}` |\n|405|Method Not Allowed|`{\"operation_id\": \"unknown\",\"code_id\":\"unknown\",\"message\": \"Method not allowed\",\"errors\": {}}` |\n\n#### List of Code Ids\n\n| Name                            | Description                                                                                                                         |\n|---------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|\n| failed_validation               | Occurs when a request validation process fails.                                                                                     |\n| invalid_login                   | Occurs when insufficient login credentials were provided.                                                                           |\n| resource_not_found              | Occurs when a requested record or a feature was not found.                                                                          |\n| unique_constraint               | Occurs when a request tries to create an existing record in database.                                                               |\n| task_not_found                  | The specified task could not be found.                                                                                              |\n| account_not_found               | The specified account could not be found. Please check the account identifier is correct. The account might be closed or suspended. |\n| internal_error                  | An unexpected internal error.                                                                                                       |\n| internal_timeout                | A task had timed out.                                                                                                               |\n| internal_transient_error        | A unexpected transient internal error.                                                                                              |\n| request_validation              | Occurs when a request validation process fails.                                                                                     |\n| auth_denied                     | Authorisation process cancelled.                                                                                                    |\n| auth_expired                    | The authorisation url has expired. Please generate a new one to continue.                                                           |\n| connection_not_found            | No active connection with the provider                                                                                              |\n| connection_expired              | The connection consent has expired. re-authentication required                                                                      |\n| connection_revoked              | The connection consent has been revoked. Re-authentication required                                                                 |\n| connection_status               | The connection consent is in the wrong status to perform the action.                                                                |\n| connection_permission           | The connection consent does not have the require permissions for this resource                                                      |\n| provider_not_found              | Unknown provider                                                                                                                    |\n| provider_failure                | The provider has had an unexpected failure                                                                                          |\n| provider_timeout                | The provider has taken to long to respond.                                                                                          |\n| provider_maintenance            | The provider is temporarily unavailable due to maintenance                                                                          |\n| provider_request_limit          | The provider rate limit has been exceeded                                                                                           |\n| provider_endpoint_unimplemented | The provider has not implemented this endpoint                                                                                      |\n| provider_endpoint_deprecated    | The provider has deprecated this endpoint                                                                                           |\n| provider_reauthenticate         | The provider has deemed this consent needs to be reauthenticated.                                                                   |\n\n#### Examples\n\n##### 400 Bad Request\n\nReturned after a failed attempt to create a new resource by passing invalid data to POST /resources.\n\nAfter trying to create a new resources by passing invalid data to `POST /resources`.\n\n```json\n{\n  \"operation_id\": \"resources_post\",\n  \"code_id\": \"failed_validation\",\n  \"message\": \"Invalid request payload.\",\n  \"metadata\": {},\n  \"errors\": {\n    \"name\": \"This value is required.\",\n    \"email\": \"This value is invalid.\"\n  }\n}\n```\n### Server Error Responses\n\nThe server errors will have status codes in the 500-599 range. The server errors will look very much like the \"Client Errors\" but will contain bare minimum information attached to them.\n\n#### Generic Server Error Responses\n| Error Code | Cause | Response Body |\n|--------------|---------|-----------|\n|`500`| Internal Server Error| `{\"message\": \"An error occurred while processing your request\"}`|\n|`503`| Service Unavailable| `{\"message\": \"Service unavailable\"}` |\n\n# Updates & Versioning\n\nUpdates to Bud's API documentation are made frequently. The current version of the documentation can be clearly viewed at the very top of this page.\n\n## Backward Compatibility\n\nBud aims to make integration as seamless as possible for its clients and therefore takes all possible steps to prevent backward-compatibility breaks. In the scenario where a backward-compatibility break is unavoidable, Bud creates a new endpoint, either: (a) by bumping the version within the endpoint URL; or (b) in some circumstances renaming the URL entirely. The previous endpoint may then become deprecated, and support for the endpoint will cease after a period of three months. Clients with access to any of Bud’s API services will be notified of deprecations to any endpoints and provided with ample time in which to make any necessary changes.\n\nFields within response or request schemas may also become deprecated. Along with deprecated endpoints, these breaking changes will be clearly highlighted within the below changelog.\n\n## Deprecations\n\nBud will continue to support deprecations for a period of **three months** after they are first announced.\n\n| Date of Announcement | Deprecation Details                                                                                                                                                                                                                                                                                                                                                                                                                        |\n|:---------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|\n| 04/12/2020           | Changed the base URL of the **GET Warnings**, **GET Trends** and **GET Forecast** endpoints from `/v1/assistant/` to `/v1/signal/`.                                                                                                                                                                                                                                                                                                        |\n| 06/08/2020           | Removed `bank_name` field in favour of a new field called `provider` in the following endpoints:<br>__POST__`/v1/open-banking/authorisation-url` (Request Payload)<br> __POST__`/v1/open-banking/connect/{connection_task_id}` (Response Payload)<br> __POST__`/v1/open-banking/refresh/{task_id}` (Response Payload)                                                                                                                      |\n| 01/09/2021           | Deprecated **GET Warnings** endpoints in favour of new **GET Money Management**, **GET Customer Characteristics** and **GET Financial Insight** endpoints.                                                                                                                                                                                                                                                                                 |\n| 01/11/2021           | Deprecated **Retrieve Authorisation Gateway URL** endpoint in favour of new **Retrieve Authorisation Gateway URL (v2)** endpoint.                                                                                                                                                                                                                                                                                                          |\n| 01/11/2021           | Deprecated **Energy Switching API**, **Mortgage API**, **Home Insurance API** and **Broadband API** which formed Bud's marketplace offering.                                                                                                                                                                                                                                                                                               |\n| 14/03/2022           | Deprecated **Enrich Transaction** endpoints from the Ingest and Enrich API suite.                                                                                                                                                                                                                                                                                                                                                          |\n| 01/08/2022           | Deprecated `YYYY-MM-DD` date format for `X-From` and `X-To` headers within `/v1/affordability/spending-groups`. Both `X-From` and `X-To` headers now follow the `YYYY-MM` date format.                                                                                                                                                                                                                                                     |\n| 05/09/2022           | Deprecated **Retrieve Merchant Totals V1** in favour of new **Retrieve Merchant Totals V2** endpoint                                                                                                                                                                                                                                                                                                                                       |\n| 23/01/2023           | Deprecated **List Transactions V1**. Bud understands that many clients have integrated this endpoint in order to retrieve transactions held on the Bud platform. As a result, there is a **six month** deprecation window, meaning that support for this endpoint will cease on the **1st of August 2023**, meaning clients must have migrated over to the new and improved **List Transactions V2** endpoint by that point in time.       |\n| 23/01/2023           | Deprecated **Create Customers V1**. Support will continue for this endpoint, however we recommend clients to migrate to V2 and for all new clients to integrate with the V2 endpoint.                                                                                                                                                                                                                                                      |\n| 24/03/2023           | Deprecated **Retrieve Accounts** endpoint. Bud understands that many clients have integrated this endpoint in order to retrieve accounts held on the Bud platform. As a result, there is a **six month** deprecation window, meaning that support for this endpoint will cease on the **24th of September 2023**, meaning clients must have migrated over to the new and improved **Retrieve Accounts V2** endpoint by that point in time. |\n| 28/03/2023           | Deprecated **Retrieve Financial Forecast** in favour of **Retrieve Forecasted Transactions V2**.                                                                                                                                                                                                                                                                                                                                           |\n| 28/03/2023           | Deprecated **Create Transaction Rule(s)**.                                                                                                                                                                                                                                                                                                                                                                                                 |\n| 28/03/2023           | Deprecated **Retrieve Trends** in favour of **Retrieve Category Totals**.                                                                                                                                                                                                                                                                                                                                                                  |\n| 22/06/2023           | Deprecated **Retrieve Forecasted Transactions V1** in favour of **Retrieve Forecasted Transactions V2**.                                                                                                                                                                                                                                                                                                                                   |\n| 25/07/2023           | Deprecated **Retrieve Income Transactions V1** in favour of **Retrieve Income Transactions V2**.                                                                                                                                                                                                                                                                                                                                           |\n| 25/07/2023           | Deprecated **Retrieve Salary Information V1** in favour of **Retrieve Income Transactions V2**.                                                                                                                                                                                                                                                                                                                                            |\n| 17/08/2023           | Deprecated **Submit Authorisation Codes** in favour of **Submit Authorisation Codes V2**.                                                                                                                                                                                                                                                                                                                                                  |\n| 04/10/2023           | Deprecated **Open Banking Sync Complete** callback in favour the **Connect Completed Notification Callback** and **Refresh Completed Notification Callback** callbacks.                                                                                                                                                                                                                                                                    |\n| 18/10/2023           | Deprecated **Retrieve Transaction Ingestion Task Status** in favour of **Retrieve Ingestion Task Status**.                                                                                                                                                                                                                                                                                                                                 |\n| 18/10/2023           | Deprecated **Retrieve Accounts Ingestion Task Status** in favour of **Retrieve Ingestion Task Status**.                                                                                                                                                                                                                                                                                                                                    |\n| 15/01/2024           | Deprecated **Remove Customer** in favour of **Remove Customer V3**.                                                                                                                                                                                                                                                                                                                                                                        |\n| 15/01/2024           | Deprecated **Compare Custom Insight**, **Retrieve Custom Insight**, **Create Custom Insight**                                                                                                                                                                                                                                                                                                                                              |\n| 25/01/2024           | Deprecated **Retrieve Ingestion Task Status V2** in favour of **Retrieve Ingestion Task Status V3**                                                                                                                                                                                                                                                                                                                                        |\n| 21/05/2024           | Deprecated **Initiate Refresh** in favour of **Initiate Refresh V2** (Six month deprecation Notice)                                                                                                                                                                                                                                                                                                                                        |\n| 21/05/2024           | Deprecated **Retrieve Refresh Status** in favour of **Retrieve Refresh Status V2** (Six month deprecation Notice)                                                                                                                                                                                                                                                                                                                          |\n| 27/08/2024           | Deprecated **Retrieve Affordability Transactions** in favour of **Retrieve Affordability Transactions V2** (Three month deprecation Notice)                                                                                                                                                                                                                                                                                                |\n| 28/08/2024           | Deprecated **Retrieve Balances Over Time** in favour of **Retrieve Balances Over Time V3** (Three month deprecation Notice)                                                                                                                                                                                                                                                                                                                |\n| 04/09/2024           | Deprecated **Retrieve Account V2** in favour of **Retrieve Account V3** (Six month deprecation notice)                                                                                                                                                                                                                                                                                                                                     |\n| 04/09/2024           | Deprecated **Retrieve Account By ID V2** in favour of **Retrieve Account By ID V3** (Six month deprecation notice)                                                                                                                                                                                                                                                                                                                         |\n| 02/10/2024           | Deprecated **Retrieve Affordability Transactions** in favour of **Retrieve Affordability Transactions V2** (Three month deprecation Notice)                                                                                                                                                                                                                                                                                                |\n| 27/01/2026           | Deprecated `posted_date_time` field on __Retrieve Transations V2__ in favour of `value_date_time` on __Retrieve Transactions V2__                                                                                                                                                                                                                                                                                                          |\n| 27/01/2026           | Deprecated `date-field` parameter on __Retrieve Balances Over Time V3__                                                                                                                                                                                                                                                                                                                                                                    |\n| 27/01/2026           | Deprecated `date-field` parameter on __Retrieve Balances Over Time By Account V3__                                                                                                                                                                                                                                                                                                                                                         |\n\n## Changelog\n\nThis changelog represents a list of all changes that have been made to Bud’s API documentation. This includes both backward-compatible and backward-incompatible changes.\n\n**Version 4.4.0: 30/04/2026**\n>- Add `pan` as a valid account identifier type in __Ingest Accounts__.\n\n**Version 4.3.0: 23/04/2026**\n>- Add __Generate Savings Goals URL__ endpoint.\n\n**Version 4.2.0: 21/04/2026**\n>- Remove deprecated __Savings Goals V1__ endpoints.\n\n**Version 4.1.0: 20/04/2026**\n>- Add __Create Savings Goal V2__ endpoint.\n>- Add __Retrieve Savings Goals V2__ endpoint.\n>- Add __Retrieve Savings Goal V2__ endpoint.\n>- Add __Update Savings Goal V2__ endpoint.\n>- Add __Remove Savings Goal V2__ endpoint.\n\n**Version 4.0.1: 02/03/2026**\n>- Extend description of __Ingest Transactions__.\n\n**Version 4.0.0: 09/02/2026**\n>- Add __Remove Customer By Idempotent Identifier V3__ endpoint.\n\n**Version 3.0.0: 09/02/2026**\n>- Remove __Create Spending Budget__ `account_id` request body parameter\n>- Add `account_id` filtering parameter to __Retrieve Spending Budgets__ endpoint.\n>- Add `account_id` filtering parameter to __Retrieve Spending Budget Transactions__ endpoint.\n\n**Version 2.26.2: 27/01/2026**\n>- Add `value_date_time` field on __Retrieve Transactions V2__ endpoint.\n>- Add `value_date_time` field on __Ingest Transactions__ endpoint request and response.\n>- Mark `date-field` parameter as deprecated on __Retrieve Balances Over Time V3__ endpoint.\n>- Mark `date-field` parameter as deprecated on __Retrieve Balances Over Time By Account V3__ endpoint.\n\n**Version 2.26.0: 19/01/2026**\n>- Add __Generate Spending Budgets URL__ endpoint.\n\n**Version 2.25.2: 12/01/2026**\n>- Mark `posted_date_time` field as deprecated on __Retrieve Transactions V2__ endpoint.\n\n**Version 2.25.1: 08/01/2026**\n> - Added `exclude_category` parameter to __Category Totals V2__ endpoint.\n\n**Version 2.25.0: 07/01/2026**\n>- Add hcst as valid tag being returned from __Retrieve Transactions V2__ endpoint.\n\n**Version 2.24.1: 06/01/2026**\n>- Remove `posted_date_time` from __Ingest Transactions__ endpoint request and response.\n\n**Version 2.24.0: 02/12/2025**\n>- Add __Retrieve Account Transaction Dates__ endpoint.\n\n**Version 2.23.2: 25/11/2025**\n>- Add __Generate Accounts URL__ endpoint.\n>- Added `credit_transactions_count` and `debit_transactions_count` fields to __Merchant Totals V2__ response.\n\n**Version 2.23.1: 07/11/2025**\n>- Add `provider_display_name` and `provider_logo` fields to __Retrieve Accounts v3__ and __Retrieve Accounts V3 By ID__ response.\n\n**Version 2.23.0: 06/11/2025**\n>- Update endpoint url for __Generate Card Summary URL__ endpoint\n>- Update endpoint url for __Generate Financial Calendar URL__ endpoint\n>- Update endpoint url for __Generate Balances Over Time URL__ endpoint\n>- Update endpoint url for __Generate Recurring and Forecasted Transactions URL__ endpoint\n>- Update endpoint url for __Generate Spending Analysis URL__ endpoint\n>- Update endpoint url for __Generate Intelligent Search Widget URL__ endpoint\n\n**Version 2.22.0: 04/11/2025**\n>- Add __Remove Account Data V2__ endpoint.\n\n**Version 2.21.6: 04/11/2025**\n>- Update account_type filter values on __Retrive Accounts V3__ request.\n\n**Version 2.21.5: 24/10/2025**\n>- Add `counterparty` field to __Ingest Transactions__ request and sync response.\n>- Add `suggested_description` field to __Ingest Transactions__ request.\n>- Add `opening_date_time` field to __Ingest Accounts__ request.\n>- Expanded values for `account_type` field on __Ingest Accounts__ request\n>- Add `counterparty` field to __Retrieve Transactions V2__ response.\n>- Add `opening_date_time` field to __Retrieve Accounts V3__ response.\n>- Add `opening_date_time` field to __Retrieve Accounts V3 By ID__ response.\n>- Add `account_category` field to __Retrieve Accounts V3__ response.\n>- Add `account_category` field to __Retrieve Accounts V3 By ID__ response.\n>- Expand values for `account_type` field on __Retrieve Accounts V3__ response.\n>- Expand values for `account_type` field on __Retrieve Accounts V3 By ID__ response.\n\n**Version 2.21.4: 21/10/2025**\n>- Add new fields to `metadata` to __Generate Card Summary URL__ request and sync response.\n\n**Version 2.21.2: 30/09/2025**\n>- Add `running_balance` field to __Ingest Transactions__ request and sync response.\n>- Add `running_balance` field to __Retrieve Transactions V2__ response.\n>- Add `holders` field to __Ingest Accounts__ request.\n\n**Version 2.21.1: 29/09/2025**\n>- Add `consent_details` to the refresh.v2.* webhooks.\n\n**Version 2.21.0: 25/09/2025**\n>- Add __Generate MCP URL__ endpoint.\n\n**Version 2.20.0: 24/09/2025**\n>- Add __Close Accounts__ endpoint.\n>- Add __Reopen Accounts__ endpoint.\n>- Add `status` and `closed_at` fields to __Retrieve Accounts V3__.\n\n**Version 2.19.4: 03/09/2025**\n>- Add `posted_date_time` field to __Ingest Transactions__ request and sync response.\n\n**Version 2.19.3: 03/09/2025**\n>- Add `updated_after` field to __Retrieve Transactions V2__ metadata.\n>- Add `deleted` field to __Retrieve Transactions V2__ metadata.\n\n**Version 2.19.2: 27/08/2025**\n>- Add `us_account_number` identifier to __Retrieve Accounts V3__\n\n**Version 2.19.1: 18/08/2025**\n>- Update the permissions value returned when listing consents\n\n**Version 2.19.0: 12/08/2025**\n>- Add support for use of `customer_idempotent_identifier` field in place of `customer_id` field in __Ingest Accounts__, __Ingest Transactions__, __Book Transactions__, and __Decline Transactions__. This allows for easier integration, and allows customers to automatically be created at the point of ingestion.\n\n**Version 2.18.0: 25/06/2025**\n>- Add `X-Customer-Idempotent-Identifier` header to all endpoints that support `X-Customer-Id` header.\n\n**Version 2.17.10: 12/06/2025**\n>- Add `idempotent_identifier` filter to __Retrieve Customers V3__.\n\n**Version 2.17.9: 12/06/2025**\n>- Updated list of possible tags in __Retrieve Transactions V2__ endpoint response.\n\n**Version 2.17.8: 16/05/2025**\n>- Extend `status` query parameter possible values in __Retrieve Financial Data__ endpoint.\n>- Extend `status` possible values in __Retrieve Financial Data__ endpoint response.\n>- Extend `frequency` possible values in __Retrieve Financial Data__ endpoint response.\n\n**Version 2.17.7: 22/04/2025**\n> - Added `account_id` filter to __Category Totals V2__ endpoint.\n> - Added `account_id` filter to __Category Totals V2__ trends endpoint.\n\n**Version: 2.15.24: 03/04/2025**\n>- Add `subtask_details` object to __FPIIngestSucceededCallback__ and __FPIIngestFailedCallback__.\n\n**Version: 2.15.23: 20/02/2025**\n>- Add __Generate Spending Analysis URL__ endpoint.\n\n**Version: 2.15.22: 20/02/2025**\n>- Updated list of possible tags in __Retrieve Transactions V2__ endpoint response.\n\n**Version: 2.15.21: 30/01/2025**\n>- Add `country_code` field to __Ingest Transactions V2__ request.\n\n**Version: 2.15.20: 23/12/2024**\n>- Add new labels parameters to the __Retrieve Categories V2__ endpoint.\n\n**Version: 2.15.19: 10/12/2024**\n>- Add __Merchant Feedback__ endpoint.\n\n**Version: 2.15.18: 05/12/2024**\n>- Add __Essential Spend Statistics__ endpoint.\n\n**Version: 2.15.17: 02/12/2024**\n>- Add __Recurring and Forecasted Transactions URL__ endpoint.\n\n**Version: 2.15.16: 02/12/2024**\n>- Add __Generate Balances Over Time URL__ endpoint.\n\n**Version: 2.15.15: 02/12/2024**\n>- Add `credit_total` and `debit_total` field metadata of __Category Totals V2__ endpoint response.\n\n**Version: 2.15.14: 02/12/2024**\n>- Add __Generate Financial Calendar URL__ endpoint.\n\n**Version: 2.13.7: 26/11/2024**\n>- Add `provider` and `transaction_type` field to __Ingest Transactions V2__ endpoint request.\n>- Add `transaction_type` field to __Ingest Transactions V2__ endpoint sync response.\n>- Add `transaction_type` field to __Retrieve Transactions V2__ endpoint response.\n\n**Version: 2.13.6: 15/11/2024**\n>- Add __Generate Card Summary URL__ endpoint.\n\n**Version: 2.13.5: 12/11/2024**\n>- Improve `suggested_description` and `suggested_logo` examples for __Retrieve Transactions V2__ endpoint response.\n>- Improve `suggested_description` and `suggested_logo` examples for __Ingest Transactions V2__ endpoint response.\n\n**Version: 2.13.4: 11/11/2024**\n>- Add `suggested_description` and `suggested_logo` field to __Retrieve Transactions V2__ endpoint response.\n>- Add `suggested_description` and `suggested_logo` field to __Ingest Transactions V2__ endpoint sync response.\n>- Extend `status` enum with `declined` for __Ingest Transactions V2__ endpoint sync response.\n>- Extend `status` description for when `declined` is returned for __Retrieve Transactions V2__ endpoint response.\n\n**Version: 2.13.3: 29/10/2024**\n>- Add `X-Bud-Categorisation-Model` header to __Ingest Transactions V2__ endpoint.\n\n**Version: 2.13.2: 23/10/2024**\n> - Fixed operation ID for __Retrieve Accounts By ID V3__ endpoint\n\n**Version: 2.13.1: 21/10/2024**\n> - Added settlement (book and decline) route enums for __Retrieve Ingestion Task Status V2__ and __Retrieve Ingestion Task Status V3__ endpoint responses.\n\n**Version 2.13.0: 16/09/2024**\n> - Added __Book Transactions V3__ endpoint.\n> - Added __Decline Transactions V3__ endpoint.\n> - Added status filter to __Retrieve Transactions V2__.\n\n**Version 2.12.4: 04/09/2024**\n> - Added __Result__ field to __Retrieve Ingestion Task Status V3__ endpoint response.\n\n**Version 2.12.3: 04/09/2024**\n> - Deprecated __Retrieve Accounts V2__ endpoint.\n> - Deprecated __Retrieve Accounts By ID V2__ endpoint.\n\n**Version 2.12.2: 28/08/2024**\n> - Added __Retrieve Accounts V3__ endpoint.\n> - Added __Retrieve Accounts By ID V3__ endpoint.\n\n**Version 2.12.1: 01/08/2024**\n> - Add status field to __Ingest Transactions V2__ on application/bud-transaction-v3+json format.\n\n**Version 2.12.0: 30/07/2024**\n> - Added __Income Expenditure Report Insight Beta__ endpoint.\n> - Added __Income Expenditure Report Insight Transactions Beta__ endpoint.\n> - Added __Income Health Insight Report Beta__ endpoint.\n> - Added __Income Health Report Insight Transactions Beta__ endpoint.\n> - Added __Unauthorised Overdraft Insight Report Beta__ endpoint.\n> - Added __Unauthorised Overdraft Insight Report Transactions Beta__ endpoint.\n> - Added __Merchant Report Insight Beta__ endpoint.\n> - Added __Merchant Report Insight Transactions Beta__ endpoint.\n\n**Version 2.11.5: 29/07/2024**\n> - Added new  __Correction Merchant Search__ endpoint under __Correct Financial Data__.\n> - Added new  __Correct Transaction Merchant__ endpoint under __Correct Financial Data__.\n\n**Version 2.11.4: 24/07/2024**\n> - Remove body requirement from __Reconfirm Consent__\n\n**Version 2.11.3: 01/07/2024**\n> - Added link to __Consents__ guide from __Retrieve Customer Consents__\n\n**Version 2.11.2: 21/06/2024**\n> - Added __website__ field to merchant field in enrichments field in  __Retrieve Transactions V2__.\n> - Added __website__ field to processor field in enrichments field in  __Retrieve Transactions V2__.\n\n**Version 2.11.1: 19/06/2024**\n> - Added a new __Correct Financial Data__ section within __FINANCIAL DATA API__.\n> - Relocated __Correct Transaction Categories V2__ endpoint to __Correct Financial Data__ from __Manage Financial Data__.\n> - Added new  __Similar Transactions__ endpoint under __Correct Financial Data__.\n> - Added new  __Similar Transactions Including Merchants__ endpoint under __Correct Financial Data__.\n\n**Version 2.11.0: 17/05/2024**\n> - Added __Initiate Refresh V2__ endpoint.\n> - Added __Retrieve Refresh Status V2__ endpoint.\n> - Deprecated __Initiate Refresh__ endpoint in favour of __Initiate Refresh V2__ endpoint (Six month deprecation period).\n> - Deprecated __Retrieve Refresh Status__ endpoint in favour of __Retrieve Refresh Status V2__ endpoint (Six month deprecation period).\n\n**Version 2.10.10: 17/05/2024**\n>- Add optional `X-Customer-Ip-Address` header to __Initiate Refresh__.\n\n**Version 2.10.9: 05/03/2024**\n> - Added insight type as a string on Balances, Income and Spending insights endpoints.\n> - Added link to Actionable Insights guide as a note on Balances, Income and Spending insights endpoints.\n\n**Version 2.10.8: 08/02/2024**\n> - Fixed path for __Custom Insights__ endpoints.\n\n**Version 2.10.7: 02/02/2024**\n> - Added new fields for __Retrieve Balances Over Time__ and __Retrieve Balances Over Time By Account__ endpoint.\n\n**Version 2.10.5: 25/10/2024**:\n> - Add provider field to the __OBWebhookBody__ and __OBSyncWebhookBody__ schemas.\n\n**Version 2.10.3: 25/01/2024**:\n> - Deprecated __Retrieve Ingestion Task Status V2__ endpoint in favour of __Retrieve Ingestion Task Status V3__ endpoint.\n\n**Version 2.10.2: 24/01/2024**\n> - Document has_new_transactions and reconnect_required Refresh Callback Webhook values.\n\n**Version 2.10.1: 24/01/2024**\n> - Removed the deprecated __Retrieve Financial Forecast__ endpoint.\n> - Removed the deprecated __Retrieve Trends__ endpoint.\n> - Removed the deprecated __Retrieve Financial Insights__ endpoint.\n> - Removed the deprecated __Retrieve Energy Payments__ endpoint.\n> - Removed the deprecated __Energy Payments Discover__ endpoint.\n> - Removed the deprecated __Retrieve Category Totals__ endpoint.\n> - Removed the deprecated __Create Transaction Rule__ endpoint.\n> - Removed the deprecated __Correct Transaction Categories__ endpoint.\n> - Removed the deprecated __Retrieve Money Management__ endpoint.\n\n**Version 2.9.13: 18/01/2024**\n> - Updated description for __Retrieve Balances Over Time__ and __Retrieve Balances Over Time By Account__ endpoint.\n\n**Version 2.9.12: 15/01/2024**\n> - Deprecate __Remove Customer__ endpoint in favour of the __Remove Customer V3__ endpoint.\n> - Added __Remove Customer V3__ and __Retrieve Remove Customer__ V3 Status endpoints.\n\n**Version 2.9.11: 12/12/2023**\n> - Updated __Reconfirm Consent__ description to include a note about which clients can use the endpoint.\n\n**Version 2.9.10: 07/12/2023**\n> - Updated __Create Customer V3__ endpoint to include `created_at` and a new 200 response for existing customers.\n\n**Version 2.9.9: 06/12/2023**\n> - Fixed __Retrieve Future Transactions V2__ change\\_percentage query parameter example.\n\n**Version 2.9.8: 05/12/2023**\n> - Updated the description on __Retrieve Accounts V2__ endpoint to include new account types.\n\n**Version 2.9.5: 29/11/2023**\n> - Added the `categories` field to the __Retrieve Future Transactions V2__ endpoint.\n> - Update the examples for the __Retrieve Subscriptions V1__ endpoint.\n\n**Version 2.9.4: 09/11/2023**\n> - Removed the deprecated __Retrieve Future Transactions V1__ endpoint.\n> - Removed the deprecated __Retrieve Income Transactions V1__ endpoint.\n> - Removed the deprecated __Retrieve Salary Information__ endpoint.\n> - Moved the __Retrieve Benefits Totals__ endpoint from the __Enrichment Totals__ API to the __Smart Finders__ API.\n\n**Version 2.9.3: 26/10/2023**\n> - Added Spending Budget endpoints (Create, Update, Delete, Retrieve and Retrieve Transactions) to the __Goals API__.\n\n**Version 2.9.2: 04/10/2023**\n> - Deprecated __Open Banking Sync Complete__ callback in favour of the task type specific callbacks __Connect Completed Notification Callback__ and __Refresh Completed Notification Callback__.\n> - Add __Consent Revoked Notification Callback__ and __Consent Reconfirmed Notification Callback__ callbacks.\n\n**Version 2.9.1: 28/09/2023**\n> - Fixed __Submit Authorisation Codes V2__ description where the reference to __Retrieve Connection Status__ was incorrectly set.\n\n**Version 2.9.0: 21/09/2023**\n> - Add __Goals API__.\n\n**Version 2.8.25: 20/10/2023**\n> - Added the  `idempotent_identifier` attribute to the __Create Customer V3__ endpoint.\n> - Removed documentation for __List Transactions V1__ and __Retrieve Accounts V1__ endpoints as passed the deprecation due date.\n\n**Version 2.8.24: 18/10/2023**\n> - Deprecated __Retrieve Transaction Ingestion Task Status__ endpoint in favour of __Retrieve Ingestion Task Status__ endpoint.\n> - Deprecated __Retrieve Accounts Ingestion Task Status__ endpoint in favour of __Retrieve Ingestion Task Status__ endpoint.\n\n**Version 2.8.19: 06/10/2023**\n> - Corrected __Goals API__ to utilise RFC-3339 timestamps\n\n**Version 2.8.15: 20/09/2023**\n> - Added __Authorised Payments V2__\n\n**Version 2.8.14: 05/09/2023**\n> - Remove the __Retrieve Authorisation Gateway URL__ endpoint.\n\n**Version 2.8.13: 29/08/2023**\n> - Deprecated the __Correct Transaction Categories V1__ endpoint (with a deprecation date of 1st December 2023) in favour of __Correct Transaction Categories V2__.\n> - Added a deprecation date of 1st December 2023 to the following endpoints: __Create Transaction Rule(s)__, __Retrieve Category Totals__, __Initiate Energy Payments Discovery__, __Retrieve Energy Payments__, __Retrieve Money Management__, __Retrieve Customer Characteristics__, __Retrieve Financial Insights__, __Retrieve Trends__, __Retrieve Financial Forecast__.\n\n**Version 2.8.12: 17/08/2023**\n> -  Deprecated the __v1_affordability_spending_groups_post__ endpoint in favour of __aggregations_v2_buckets_post__\n\n**Version 2.8.11: 17/08/2023**\n> - Added the `Submit Authorisation Codes V2` endpoint\n> - Deprecated the `Submit Authorisation Codes` endpoint\n\n**Version 2.8.10: 16/08/2023**\n> - Added bucket endpoints\n\n**Version 2.8.9: 08/08/2023**\n> - Added `download_data`, `reconfirm_consent` and `revoke_consent` to the `initial_screen` options for the __Retrieve Authorisation Gateway URL V2__ endpoint\n> - Deprecated the `reconfirm_consent` body parameter for the __Retrieve Authorisation Gateway URL V2__ endpoint\n\n**Version 2.8.8: 02/08/2023**\n> - Fixed error in __Category Totals V2__ path\n> - Fixed error in __Category Totals V2__ include L2 attribute\n\n**Version 2.8.7: 28/07/2023**\n> - Removed the __Retrieve Financial Products__ endpoint as the deprecation notice has expired.\n\n**Version 2.8.6: 25/07/2023**\n> - Removed the __Retrieve Categories V1__ endpoint as the deprecation notice has expired.\n> - Deprecated the __Retrieve Income Transactions V1__ endpoint in favour of __Retrieve Income Transactions V2__\n> - Deprecated the __Retrieve Salary Information__ endpoint in favour of __Retrieve Income Transactions V2__\n\n**Version 2.8.5: 19/07/2023**\n> - Added the __Category Totals V2__ endpoint.\n> - Added the __Category Totals V2__ trends endpoint.\n> - Fixed bug in v1 category totals schema.\n\n**Version 2.8.4: 19/07/2023**\n> - Added `mobile_only` flag for providers in the __Retrieve OB Providers__ endpoint.\n\n**Version 2.8.3: 18/07/2023**\n> - Added link to guide to __Create Customers V3__ and __Create Customers V3 (Batch)__.\n> - Added link to guide to __Retrieve Accounts V2__ and __Retrieve Accounts By ID V2__.\n\n**Version 2.8.2: 10/07/2023**\n> - Added `skip_success_screen` to the request body of the __Retrieve Authorisation Gateway URL V2__ endpoint.\n\n**Version 2.8.1: 07/07/2023**\n> - Added `loan` and `pending` tags as part of the __Retrieve Transactions V2__ endpoint.\n> - General bug fixes and improvements across examples and schemas.\n\n**Version 2.8.0: 29/06/2023**\n> - Added the new Characteristics API as part of the Engage product offering.\n\n**Version 2.7.9: 22/06/2023**\n> - Updated __Retrieve Forecasted Transactions V1__ to show descriptive deprecation notice.\n\n**Version 2.7.8: 19/06/2023**\n> - Updated descriptions for Payments related endpoints.\n\n**Version 2.7.7: 07/06/2023**\n> - Updated response parameters for __Ingest First Party Data__ endpoints.\n\n**Version 2.7.6: 01/06/2023**\n> - Updated optional headers for __Reconfirm Consent__ endpoint to include `X-Customer-Ip-Address`.\n\n**Version 2.7.5: 22/05/2023**\n> - Updated the description and examples for the __Retrieve Balances Over Time__ and __Retrieve Balances Over Time By Account__ endpoints.\n> - Updated the description and examples for the __Retrieve Transactions V2__ endpoint.\n> - Updated __Retrieve Accounts__ to show descriptive deprecation notice.\n> - Updated __Retrieve Accounts V2__ response HTTP codes, example transaction ID, `provider` query parameter description.\n\n**Version 2.7.4: 19/05/2023**\n> - Updated the description for the __Ingest Transactions V2__ endpoint.\n\n**Version 2.7.3: 18/05/2023**\n> - Updated the __Retrieve Authorisation Gateway URL (v2)__ endpoint with a new enable_async_connect option.\n> - Updated the __Ingest Transactions V2__ request examples.\n\n**Version 2.7.2: 18/05/2023**\n> - Updated the description for the __Reconfirm Consent__ endpoint.\n\n**Version 2.7.1: 16/05/2023**\n> - Added documentation for __Retrieve Auth Tokens__ endpoint.\n\n**Version 2.7.0: 11/05/2023**\n> - Adds two new endpoints: __Create Customers V3__ and __Create Customers V3 (Batch)__.\n> - Introduces the concept of Hosted Customers, which makes Customer Secrets optional on all endpoints which previously required them.\n\n**Version 2.6.2: 05/05/2023**\n> - Documented default to from case in __Retrieve Financial Products V2__ and __Retrieve Financial Products__.\n> - Fixed documentation for get customers endpoints\n> - Fixed documentation for put customer context endpoints\n\n**Version 2.6.1: 27/04/2023**\n> - Deprecated __Retrieve Financial Products__.\n> - Corrected sample Financial Products in __Retrieve Financial Products V2__.\n\n**Version 2.6.0: 25/04/2023**\n> - Added new __Retrieve Categories V2__ endpoint.\n> - Added new __Retrieve Available Categorisation Models V2__ endpoint.\n> - Deprecated __Retrieve Categories__.\n> - Added `models.categorisation` field to _Customer Context_ models.\n\n**Version 2.5.3: 20/04/2023**\n> - Updated __Retrieve Category Totals__ X-From and X-To parameter descriptions and endpoint description.\n> - Updated __Retrieve Merchant Totals V2__ X-From and X-To parameter descriptions.\n> - Updated __Retrieve Benefits Totals__ X-From and X-To parameter descriptions.\n> - Removed __Retrieve Merchant Totals V1__ following deprecation period.\n\n**Version 2.5.2: 19/04/2023**\n> - Added `format` query parameter to __Retrieve Categories__.\n\n**Version 2.5.1: 30/03/2023**\n> - Fix income types for __Retrieve Income Transactions V2__.\n\n**Version 2.5.0: 28/03/2023**\n> - Deprecated __Retrieve Financial Forecast__.\n> - Deprecated __Create Transaction Rule(s)__.\n> - Renamed __Retrieve Upcoming Transaction__ endpoints (V1 and V2) to __Retrieve Forecasted Transactions__.\n> - Renamed __Recategorise Transaction__ endpoints (V1 and V2) to __Correct Transaction Categories__.\n> - Fix documented required fields for __Recategorise Transaction V1__.\n\n\n**Version 2.4.0: 24/03/2023**\n> - Deprecated __Retrieve Accounts__.\n> - Finalised __Retrieve Accounts V2 (beta)__ to production release as __Retrieve Accounts V2__.\n> - Finalised __Retrieve Account By ID V2 (beta)__ to production release as __Retrieve Account By ID V2__.\n> - Finalised __Retrieve Balances Over Time (Beta)__ to production release as __Retrieve Balances Over Time__.\n> - Finalised __Retrieve Balances Over Time By Account (Beta)__ to production release as __Retrieve Balances Over Time By Account__.\n\n\n**Version 2.3.9: 21/03/2023**\n> - Update merchant descriptions & required fields for **Retrieve Subscriptions**\n> - Standardised description used for dates in __Retrieve Merchant Totals V2__.\n> - Standardised description used for dates in __Retrieve Income Transactions V1__.\n> - Standardised description used for dates in __Retrieve Income Transactions V2__.\n> - Standardised description used for dates in __Retrieve Loan Transactions__.\n> - Standardised description used for dates in __Retrieve Debt Collection Transactions__.\n> - Standardised description used for dates in __Retrieve Benefits Transactions__.\n> - Standardised description used for dates in __Retrieve Benefits Totals__.\n> - Standardised description used for dates in __Retrieve Financial Products__.\n> - Standardised description used for dates in __Retrieve Subscriptions__.\n> - Standardised description used for dates in __Retrieve Upcoming Transactions V1__.\n> - Standardised description used for dates in __Retrieve Salary Information__.\n\n**Version 2.3.8: 21/03/2023**\n> - Update amount descriptions\n\n**Version 2.3.7: 20/03/2023**\n> - Fix the docs for **Retrieve Money Management** correcting the category names for some warning types.\n> - Remove the deprecated `large_expense` and `high_balance` warnings from **Retrieve Money Management**.\n\n**Version 2.3.6: 16/03/2023**\n> - Deprecated __Initiate Energy Payments Discovery__ and __Retrieve Energy Payments__\n\n**Version 2.3.5: 13/03/2023**\n> - Updated holder and holders fields on __List Accounts V2 (beta)__ and __Retrieve Account By ID V2 (beta)__.\n\n**Version 2.3.3: 13/03/2023**\n> - Document `provider_redirect_url` field for **Create Single Payment**\n\n**Version 2.3.2: 13/03/2023**\n> - Document `reconfirm_consent_redirect` field for **Retrieve Authorisation Gateway URL (v2)**\n> - Added the `processor` field to the response from __Retrieve Income Transactions V2__\n\n**Version 2.3.1: 09/03/2023**\nThe changes in this release carry no change to URLs, this is purely the name of the endpoint.\n> - Renamed __Fetch Balance Actionable Insights (Beta)__ to __Retrieve Balance Actionable Insights (Beta)__\n> - Renamed __List OB Providers__ to __Retrieve OB Providers__\n> - Renamed __List Customer Consents__ to __Retrieve Customer Consents__\n> - Renamed __List Categories__ to __Retrieve Categories__\n> - Renamed __Fetch Financial Data__ to __Retrieve Financial Data__\n> - Renamed __List Accounts__ to __Retrieve Accounts__\n> - Renamed __List Transactions__ to __Retrieve Transactions__\n> - Renamed __List Transactions V2__ to __Retrieve Transactions V2__\n> - Renamed __List Accounts V2 (beta)__ to __Retrieve Accounts V2 (beta)__\n> - Renamed __Balances Over Time (Beta)__ to __Retrieve Balances Over Time (Beta)__\n> - Renamed __Balances Over Time By Account (Beta)__ to __Retrieve Balances Over Time By Account (Beta)__\n> - Renamed __Affordability Report__ to __Retrieve Affordability Report__\n> - Renamed __Affordability Transactions__ to __Retrieve Affordability Transactions__\n> - Renamed __Get Financial Products__ to __Retrieve Financial Products__\n> - Renamed __List Providers__ to __Retrieve Providers__\n> - Renamed __List Single Payments__ to __Retrieve Single Payments__\n> - Renamed __List Standing Orders__ to __Retrieve Standing Orders__\n> - Renamed __List Scheduled Payments__ to __Retrieve Scheduled Payments__\n> - Renamed __List Components__ to __Retrieve Components__\n\n**Version 2.3.0: 07/03/2023**\n> - Added new __Get Financial Products V2__ endpoint.\n\n**Version 2.2.0: 28/02/2023**\n> - Added a new __Balances Insights__ beta endpoint to the new Actionable Insights API. Not subject to breaking change restrictions.\n\n**Version 2.1.1: 15/02/2023**\n> - Corrected documented response descriptions and examples for __Get Financial Products__\n\n**Version 2.1.0: 02/02/2023**\n> - Added a new __List Accounts V2 (beta)__ and __Retrieve Account By ID V2 (beta)__ beta endpoints within the Financial Data API.\n\n**Version 2.0.4: 31/01/2023**\n> - Fix the docs for **List Transactions V2** correcting the date format in the example response.\n> - Fix the docs for **Get Financial Products** correcting the expected response data structure.\n> - Fix the docs for **Balances Over Time By Account (Beta)** correcting the endpoint URI.\n\n**Version 2.0.3: 27/01/2023**\n> - Fix the docs for **Retrieve Income Transactions V2** line with fixes for average statistic calculation.\n\n**Version 2.0.2: 23/01/2023**\n> - Make various spelling and grammar corrections to the Financial Review API docs, and additionally specify that the Financial Review API date ranges are to be received as GET parameters rather than headers.\n\n**Version 2.0.0: 23/01/2023**\n> - This major release not only showcases a new look and feel for Bud's API docs, but also some fairly significant changes to the structure of the endpoints across the platform. In a nutshell, Bud's Connect API (formally Open Banking Aggregation API) has a simplified structure with the retrieve data endpoints moving into a dedicated **Financial Data** section. In addition, the various insights endpoints have been broken down to provide a more simplified structure within the **Financial Insights** section.\n> - \\[**BREAKING**\\] Bud's List Transactions (**POST** _/v1/open-banking/transactions_) has now been deprecated given the onsight of the new **List Transactions V2** endpoint (**POST** _/financial/v2/transactions_). Given the number of clients using the V1 endpoint, Bud has increased the deprecation window to six months. As a result, **all support will cease for the V1 List Transactions endpoint on the 1st of August 2023**. Please complete your migration before that date and contact your Bud account manager for further details and any help planning your migration.\n> - Bud's Create Customers (**POST** _/v1/customers_) has now been deprecated. Support for this endpoint will continue, however we recommend clients to mirgate to V2 when possible.\n\n**Version 1.22.3: 18/01/2023**\n> - Improvements to __Ingest Transactions V2__ and __Ingest Transactions Task Status__ examples.\n> - Removed the `provider` field from the __Ingest Transactions V2__ request payload.\n> - Consolidate the List Accounts, V1 List Transactions endpoint and Remove OB Provider endpoints into the Financial Data API (to sit alongside the new V2 List Transactions endpoint).\n\n**Version 1.22.2: 12/01/2023**\n> - \\[**BREAKING**\\] _Balances Over Time_ and _Balances Over Time By Account_ beta endpoints now provide pending and booked balances. Please note this has changed the structure of the response. Please note, as these are beta endpoints, normal deprecation rules don't apply.\n\n**Version 1.22.1: 10/01/2023**\n> - General bug fixes and improvements across examples and schemas\n\n**Version 1.22.0: 21/12/2022**\n> - Bud is looking to undergo some major improvements to the code base of its Rent Recognition service throughout 2023 in order to bring it in line with the other services on the Bud platform. As a result, Bud has removed the current Rent Recognition service from its API documentation. For further details on when the new Rent Recognition service will be available, please contact sales@thisisbud.com or your relevant Bud account manager.\n\n**Version 1.21.1: 15/12/2022**\n> - Fix for Ingest Transactions V2 sync response\n> - Fix for connect and refresh webhook status field\n\n**Version 1.21.0: 15/12/2022**\n> - Added a new __Balances Over Time__ and __Balances Over Time By Account__ beta endpoints within the Financial Data API.\n> - Released __List Transactions V2__ with some additional examples added (the previous beta endpoint __List Transactions (beta)__ has now been removed).\n> - Released the new Ingest Transactions V2 endpoint that enables synchronous processing for smaller payloads and also follows the latest schema for the List Transactions V2 endpoint.\n\n\n**Version 1.20.10: 06/12/2022**\n> - Updates to the __Transactions__ list endpoint (beta) examples, and added enrichments for `location` and `transaction_types`\n\n**Version 1.20.9: 30/11/2022**\n> - Updates to the __Transactions__ list endpoint (beta) which includes renaming the `cdi` field to `credit_debit_indicator`,\nadding the transaction `processor` enrichment, the transaction `status` field and improvements across examples.\n> - Added consent_id field to __Initiate Provider Authorisation__ endpoint to create authorisation URLs for a specific consent by sending the consent ID in the initiating request.\n\n**Version 1.20.8: 15/11/2022**\n> - General bug fixes and improvements across examples and schemas\n\n**Version 1.20.7: 08/11/2022**\n> - Added a new __Recategorise Transactions V2__ endpoint within the Submit Corrections API.\n\n**Version 1.20.6: 07/11/2022**\n>- Added a new field `customer_context` to the __Create Customers V1__ and __Create Customers V2__ endpoints,\nalong with new __Retrieve Customer Context__ and __Update Customer Context__ endpoints.\nThe Customer Context allows for the creation of a better user experience based on better knowledge of the customer themselves.\n\n**Version 1.20.5: 01/11/2022**\n> - General bug fixes and improvements across examples and schemas\n> - Updates to the __Code Ids table__, with a full list of connect error codes\n> - Added schemas for two new webhook callbacks for connect and refresh tasks.\n> - Add payments `provider_types` field\n\n**Version 1.20.4: 28/10/2022**\n> - Added a new __Retrieve Authorisation Gateway URL__ and __Retrieve Authorisation Gateway URL (v2)__ response code.\n\n**Version 1.20.3: 18/10/2022**\n> - General bug fixes and improvements across examples, schemas, endpoints descriptions, names and sectioning titles.\n\n**Version 1.20.2: 13/10/2022**\n> - Added a new __Retrieve Upcoming Transactions V2__ endpoint within the Transactions Insights API.\n\n**Version 1.20.1: 04/10/2022**\n> - General bug fixes and improvements across examples, schemas, endpoints descriptions, names and sectioning titles.\n\n**Version 1.20.0: 03/10/2022**\n> - Added a new Financial Data API, containing a new __Transactions__ list endpoint (beta).\n\n**Version 1.19.0: 30/09/2022**\n> - Added a new __Reconfirm Consent__ endpoint within the Manage OB Connections API.\n> - Added a new field to the V2 Open Banking Authorisation Gateway URL endpoint. The endpoint\nallows clients to direct customers to the reconfirmation of consent journey, where customers can\nextend their consent by 90 days.\n\n**Version 1.18.1: 26/09/2022**\n> - General bug fixes and improvements across examples, schemas, endpoints descriptions, names and sectioning titles.\n\n**Version 1.18.0: 16/09/2022**\n> - Added a new __Subscriptions__ endpoint within the Transactions Insights API.\n\n**Version 1.17.0: 06/09/2022**\n> - Added a new data field to the Retrieve Refresh Status endpoint as part of Bud's Connect (OB\nAggregation) API. The field - `has_new_transactions` describes whether any new transactions have\nbeen obtained as part of the latest refresh, thus providing details on whether you as the Client\nare required to fetch the latest transacitons for that customer.\n> - Deprecated __Retrieve Merchant Totals V1__ in favour of the new __Retrieve Merchant Totals V2__ endpoint.\n> - Added _Buy Now, Pay Later_ support to the __Get Financial Products__ endpoint, identified by\nthe enum value `bnpl`.\n\n**Version 1.16.2: 16/08/2022**\n> - Included a new query parameter within the List Consents endpoint to allow clients\nto view all consents, i.e. those that have been expired/revoked, and those that are\nawaiting authorisation (as well as those that are active).\n> - General bug fixes and improvements across examples, schemas, endpoints descriptions, names and sectioning titles.\n\n**Version 1.16.1: 11/08/2022**\n> - General spelling corrections and improvements across examples\n\n**Version 1.16.0: 01/08/2022**\n> - \\[**BREAKING**\\] The `X-From` and `X-To` date fields will now follow the date format of YYYY-MM for `/v1/affordability/spending-groups`. **Please note that the current date format for `X-From` and `X-To` will no longer be supported in three months time on the 1st November 2022**. All clients with existing integrations will be contacted via email by their relevant account manager to inform them of this change. This should provide clients with enough time adjust their integration before the change coming into force. Please contact `help@thisisbud.com` or your account manager if you have any questions, issues or concerns relating to this update.\n\n**Version 1.15.2: 22/07/2022**\n> - General spelling corrections\n\n**Version 1.15.1: 18/07/2022**\n> - General bug fixes and improvements across examples, schemas, endpoints descriptions, names and sectioning titles.\n\n\n**Version 1.15.0: 29/06/2022**\n> - \\[**BREAKING**\\] The `period` field will have new enum values when calling the `/v1/regular-transactions` and the `/v1/future-transactions` endpoints. **Please note that this change will only come into effect in three months time on the 5th October 2022**. All clients with existing integrations will be contacted via email by their relevant account manager to inform them of this change. This should provide clients with enough time adjust their integration before the change coming into force. Please contact `help@thisisbud.com` or your account manager if you have any questions, issues or concerns relating to this update.\n> - Fixed some inaccuracies with the __Signal Money Management__ docs.\n\n**Version 1.14.0: 27/06/2022**\n> - Added a new __Affordability Report__ endpoint within the Financial Review API.\n> - Added a new __Affordability Transaction__ endpoint within the Financial Review API.\n\n**Version 1.13.2: 22/06/2022**\n> - Fixed doc issues with some __Signal__ warnings (__Money Management__ `regular_monthly_income_change` and __Financial Insights__ `gambling_threshold`)\n\n**Version 1.13.1: 22/06/2022**\n> - Fixed issues with doc site dependencies\n\n**Version 1.13.0: 21/06/2022**\n> - Added a new __Debt Collection Finder__ endpoint within the Transaction Insights section.\n> - Added a new __Product Finder__ endpoint within Transaction Insights which creates a summary of a customer's financial products using their transaction history.\n> - Added Parties to the __List Accounts__ endpoint in the Manage OB Data section\n\n**Version 1.12.2: 24/05/2022**\n> - General bug fixes and improvements across examples, schemas, endpoints descriptions, names and sectioning titles.\n> - Added a new __Income Finder V2__ endpoint within the Transaction Insights section.\n> - Added a new __Loans Finder__ endpoint within the Transaction Insights section.\n\n**Version 1.12.1: 05/05/2022**\n> - Moved __Benefits Finder__ endpoint into the correct section - Transaction Insights.\n\n**Version 1.12.0: 26/04/2022**\n> - Added a new __Benefits Finder__ endpoint within the Transaction Insights section that provides details around any benefit specific transactions a customer might have within their connected accounts.\n> - Fixed typos.\n\n**Version 1.11.3: 14/03/2022**\n> - Deprecated __Enrich Transaction__ endpoints from the Ingest and Enrich API suite.\n> - General improvements across examples, schemas, endpoints descriptions, names and sectioning titles.\n\n**Version 1.11.2: 31/01/2022**\n> - Corrected syntax for Custom Signal endpoints.\n> - Fixed typos.\n\n**Version 1.11.1: 27/01/2022**\n> - Added a better description to the Recategorisation (Customer Corrections) endpoint.\n> - Fixed typos.\n\n**Version 1.11.0: 05/01/2022**\n> - Added a new __Income Finder__ endpoint within the Transaction Insights section that provides details around any income specific transactions that a customer might have within their connected accounts.\n> - Detailed the payload of the callbacks (webhooks) sent to the relevant Client webhook URL when (i) an Open Banking Synchronisation task completes (i.e. after either a Connect or Refresh request has been made by the Client); and (ii)\nwhen the status of a Payment (single, scheduled or stand order) has either completed or failed.\n> - Included a new 400 response example in the Get Authorisation Gateway URL and Initiate Refresh endpoints (within Bud's OB Aggregation API) to detail the response when the selected provider is currently in maintenance mode.\n> - Corrected the documentation of the List Accounts endpoint to ensure that the `account_type` field is shown as nullable.\n\n**Version 1.10.1: 22/11/2021**\n> - Added a new __Custom Signals__ endpoint within the Signal API that allows you to segment and identify customers based on custom criteria.\n\n**Version 1.10.0: 28/10/2021**\n> - Added a new __Delete Provider Data__ endpoint.\n> - Deprecated __Retrieve Authorisation Gateway URL__ endpoint following the introduction of the new `/v2/open-banking/authorisation-gateway-url` endpoint.\n> - Moved `/v1/energy-switching/energy-payments` & `/v1/energy-switching/energy-payments/{task_id}` endpoints from Energy Switching API to the Insights API.\n> - Deprecated remaining endpoints within the __Energy Switching API__.\n> - Deprecated all endpoints within the __Mortgage API__.\n> - Deprecated all endpoints within the __Home Insurance API__.\n> - Deprecated all endpoints within the __Broadband API__.\n\n**Version 1.9.0: 14/10/2021**\n> - Addition of a new endpoint `/v2/open-banking/authorisation-gateway-url` to allow clients to use an updated\nBud Connect flow, allowing their customer's to go through a new Account Connection journey. The v2 journey is\nhighly configurable via the use of different flags within the request payload.\n\n**Version 1.8.3: 06/10/2021**\n> - General bug fixes and improvements across examples, schemas, endpoints descriptions, names and sectioning titles.\n\n**Version 1.8.2: 16/09/2021**\n> - Altered the List Consents endpoint to now take in an optional `X-Customer-Secret` field within the request headers. If done so, each consent object will now return a list of `account_ids` associated with the consent object in addition to a date denoting the date a which a refresh was successfully completed for that given consent object.\n\n**Version 1.8.1: 07/09/2021**\n> - Added a new Submit Authorisation Codes endpoint for use within the Payments flows when using Bud as a technical service provider.\n\n**Version 1.8.0: 01/09/2021**\n> - Deprecated __Warnings__ endpoint within the Signal API\n> - Added a new __Money Management__ endpoint within the Signal API that allows clients to provide more detailed information regarding a customer's financial situation.\n> - Added a new __Customer Characteristics__ endpoint within the Signal API that allows clients to profile based on a customer's transactions.\n> - Added a new __Financial Insight__ endpoint within the Signal API that allows clients to understand a customer's overall financial situation and affordability.\n\n**Version 1.7.10: 06/08/2021**\n> - Updated the List Transaction Response schema to detail the addition of the new carbon tracker enrichment field.\n\n**Version 1.7.9: 03/08/2021**\n> - The `customer_secret` attribute is now a required attribute on the POST Ingest Accounts endpoint.\n> - Updated the List Transaction Response schema to detail those fields that are required and/or nullable.\n> - Created a new Create Transaction Rule(s) endpoint that allows client to set a value of the `client_label` attribute against a set of customer transactions which adhere to the rules specified in the request payload.\n> - Updated API Overview table in the introduction to include latest product set.\n> - Removed deprecated Financial Assistant endpoints.\n\n**Version 1.7.8: 28/05/2021**\n> - Addition of some optional fields to the POST Retrieve Authorisation Gateway URL endpoint. The additional fields allow clients to specify: (i) a single provider, effectively skipping the select provider screen in the customer UI; (ii) a list of providers, allowing clients to configure the list of providers shown to the customer on the select provider screen; and (iii) filter the provider list shown to the customer by the type of provider (e.g. business or personal). In addition, a `connect_more_accounts_button` flag can be configured to show the customer a button at the end of the connection flow that will allow them to connect to another provider without having to return to the client application.\n\n**Version 1.7.7: 15/04/2021**\n> - Updated the examples within Bud's KYC endpoints to make them more usable against Bud's sandbox environment.\n> - Addition of a new GET `/v1/open-banking/account-access-consents` endpoint to allow clients to query the active consents against a given customer (in relation to Bud's OB Aggregation service).\n\n**Version 1.7.6: 17/03/2021**\n> - Addition of a new \"Regular Payment Changed\" Insight to the Warnings Endpoint (that forms part of Bud's Signal Product).\n> - Bugfix: addition of the required `mobile_phone_number` field to the request payload of the Switch Supplier endpoint within the Energy Switching API to align to the implementation of the API itself.\n> - Bugix: the format of the `annual_spend.amount` field within the request payload of the kWh Estimation endpoint now states that is should be a number (as opposed to a string) to align to the API itself.\n\n**Version 1.7.5: 10/02/2021**\n> - Fixed bug in the List Accounts endpoint for Bud's OB Aggregation service - the response data object now details all the returned fields as expected.\n> - Removed the deprecated List Account Balances endpoint from the documentation entirely.\n> - Added a new __Ingest Accounts__ endpoint within the Enrichment API that allows clients to provide more detailed information regarding a customer's account.\n\n**Version 1.7.4: 25/01/2021**\n> - Addition of a Know Your Customers (KYC) API allowing clients to perform KYC checks on businesses or their customers.\n> - \\[**BREAKING**\\] The `X-Customer-Secret` is now a required field within the headers of the `/v1/open-banking/authorisation-gateway-url` endpoint. **Please note that this change will only come into effect in three months time on the 1st of May 2021**. All clients with exisitng integrations will be contacted via email by their relevant account manager to inform them of this change. This should provide clients with enough time adjust their integration before the change coming into force. Please contact `help@thisisbud.com` or your account manager if you have any questions, issues or concerns relating to this update.\n\n**Version 1.7.3: 11/01/2021**\n> - Addition of the changelog to the api docs, and further information around updates and versioning.\n> - Documentation Bug Fix: `redirect_url` field is now shown as required within the **POST** `/v1/open-banking/authorisation-url` endpoint. This affects those clients using Bud's TSP Aggregation Service.\n\n**Version 1.7.2: 18/12/2020**\n> - Introduction of a new payment service within Bud's Payment API. Clients are now able to initiate __Scheduled Payments__ from Bud's Payments service. The scheduled payments service is available to those clients using Bud as a TPP (i.e. via Bud Pay) and as a TSP.\n> - Bud have now released their __First Party Transactions Ingestion__ endpoint. This allows clients to simply post Bud some of their customer's transactions, which will then be run through each of Bud's enrichment and insights services and then stored securely. This opens up Bud's plethora of Insights services, Signal, and Financial Review to those clients with first-party transactional data.\n\n**Version 1.7.1: 06/12/2020**\n> - Few changes to the Payments endpoint responses, including:\n>   - the GET providers endpoint, `required_actions` field now becomes an array (as opposed to an object) and is populated with string enums which are now clearly described in the schema.\n>   - the response of the create Single Payment and Standing Order endpoints now includes a `required_action` field as opposed to required_actions (since there will only ever be one next required action). If this field appears within the response then clients must take another action in order to complete the payment flow.\n>   - the payment status endpoint also now includes the `required_action` field, which if not null, clearly indicates that the client is required to perform the necessary action in order for the payment to complete.\n>   - updated the payment service enums within the response of the GET providers endpoint, since each provider can now potentially offer `domestic-single-payment`, `domestic-standing-order` and (soon to be) `domestic-scheduled-payment` services.\n> - Added extra information within the description of various Rent Recognition endpoints. This should provide clients with a much clearer understanding of which endpoints are needed and why in order to integrate the entire RR journey.\n\n**Version 1.7.0: 27/11/2020**\n> - Added a new POST /v2/customers endpoint that allows clients to create up to 200 customers in a single request.\n> - \\[**BREAKING**\\] Deprecated Financial Assistant endpoints (warnings / trends / forecast) and introduced these endpoints under a new API called Signal with updated urls and operation_ids.\n> - Altered description of the OB Aggregation TPP Retrieve Authorisation Gateway URL to include for information into its usage.\n> - Introduction of a new set of Payments based endpoints allowing customers to set up and authorise standing orders from one of Bud’s supported providers. This comes in the form of:\n>   - a new TPP endpoint, where clients can now request a new Bud Pay URL to allows customers to set up a new standing order; and\n>   - a new set of TSP endpoints, allowing clients to integrate Bud APIs to allow their customers to initiate standing orders.\n\n**Version 1.6.5: 10/09/2020**\n> - Addition of the `period` field to the __GET__ `/v1/salary` endpoint to provide an indication into any regulatory associated with a predicted salary transaction.\n\n**Version: 1.6.4: 06/08/2020**\n > - \\[**BREAKING**\\] Deprecated the use of `bank_name` in relevant schemas within Bud’s OB Aggregation API in favour of of the field `provider`\n > - Updated Affordability API title to Financial Review API and provided an updated description of the API.\n > - Updated the product table within the introduction to reflect new titles and descriptions across Bud’s API services.\n\n**Version: 1.6.3 - 20/07/2020**\n > - Added a new endpoint for the OB Aggregation TSP flow - __POST__ `/v1/open-banking/authorisation-codes`. It allows clients to send back the parameters they receive from the bank once the customer has completed the authorisation process. This allows Bud to match the state to the relevant task id, and also provides the relevant code that will allow Bud to start fetching the customer’s data from the provider.\n\n**Version: 1.6.2 - 16/07/2020**\n > - Addition of international updates to payments APIs\n > - Updated energy switching meters example to ensure that it will return meter information for the address given in the example.\n\n**Version: 1.6.0 - 15/06/2020**\n > - Financial Assistant service added to the Insights API. This includes three brand new endpoints that help customers to better manage their financial world.\n >   - _Retrieve Warnings_: provides a list of potential scenarios where a customer might suffer some financial expense (e.g. in their overdraft, cannot cover bills, late payment and late income)\n >   - _Retrieve Trends_: provides the key trends associated with a customer’s transactional data broken down by month\n >   - _Retrieve Forecast_ - provides a list of the regular and predicted transactions over a given period, noting whether they are booked, pending or predicted.\n > - Affordability Service added to the documentation, including a brand new endpoint to help clients to assess their customers affordability. The _Create Spending Groups_ endpoint allows clients to create their own custom group, e.g. Discretionary Spend, where they can select which of Bud’s categories and/or subcategories will make up the group. All transactions for that customer assigned to the categories/subcategories within the group will be bucketed up and the client will be able to see the total income and expenditure in those categories over a given period of time.\n\n**Version: 1.5.3 - 22/05/2020**\n > - Added Payments: List Payment Status endpoint in order to retrieve paginated details of multiple payment ids based on header filters\n > - General bug fixes and improvements across examples, schemas, endpoints descriptions, names and sectioning titles.\n\n**Version: 1.5.0 - 08/04/2020**\n > - Addition of Bud’s Payment Initiation API. The endpoints provide clients with the functionality to allow their customers to make payments from one of their bank accounts, to a chosen recipient. In their first iteration, customers are able to authorise a single payment from one of their UK based bank accounts to another UK bank account.\n > - Addition of a Category Totals endpoint. The endpoint allows clients to retrieve the total amount of money that is moving into and out of their customers' connected bank accounts, broken down by transaction category. The endpoint breaks the totals down by both tier 1 and tier 2 type categories (as is provided by Buds dual layered categorisation engine).\n > - Acceptance of a new transaction schema format for all 1st Party Enrichment Endpoints. All of Bud’s first party data enrichment endpoints (i.e. __POST__`/v1/categorise/double-cat`, __POST__`/v1/regular-payments`, __POST__`/v1/merchants`) are now able to accept the transaction format outputted by TrueLayer. This makes it even easier for those clients who are using TrueLayer as an aggregator to get the use of Bud’s enrichment services.\n\n# Authentication\n\n<SecurityDefinitions />"
+  contact:
+    name: Bud Support
+    email: help@thisisbud.com
+    url: https://www.thisisbud.com/
+  x-logo:
+    url: data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAATAAAABuCAQAAAAKAYdLAAAACXBIWXMAAC4jAAAuIwF4pT92AAAAB3RJTUUH4wQDDggcbXcx7wAABeJJREFUeNrt3W2IFVUcx/HvXRW1VdQedy1bZVfoYX0osVQyfSGElKbRA5oFIaIlhAkWUYm6gvqqDMHMoBeKlhayCCZC2AMRPay7aJrSZmauZhQqaj7t7u1Fi965987s7D1n7pk7/j73zX2Y85//mXt2Zu45Z2ZBREREREREREREREREREREREREREREREREREREREREREREREREROIiZSFGH+YxgsOs5U/X1bFiPDPpQT3bu1DmcaZyg+vErWpjD+s47zoN6Mte0qRJc4Iq18lYMJv2jvosD11mRUeJpD32UO7664BFGQl94DoZY704fbU2rQwKVWYwbc6bQlSPBaYbtMz4K7nP53lpGkK/q8+7MTxUmeEWtmJcGX+j5psmM0I3l9vCirKAV36OuE46QsbfaHL/9opnL9tcpxBf3V0nkAgzWMRj9HadhrH+3Gk7pBqYDZdY3oXfnHE2gc1U2gyoQ6Rk+pKZdgOqgYnXF7TYDGe3gcWgW85QH9cJxMAVm8HsNrBqhhV1U9g33XUCzo1gsM1wdhtYio8ZWsytYdksFrpOwbGhbLYb0PavyLs5wA+c9v28lRa+Zzt/+y5RwwKqaOCdgCjZRvEit/A1a7jou8xwJjOMAb7D+ylqqCmw1imeZ0oCBrv7Mzp+/QofFTDCdZG13Jw3Wi1nOpbZT9+QGUziUkeZ3T49z+P4pqCRuCkhM1jjfMwwqsdG182rsAaWJs0JxuWJ9knGEq+EzODHjDLTcj5NsbjgwehwDazm6vyL5D2MG5i7booKdjE25917M57XhoxUG1hmJUsjrmWtlVl18ZQ2DeCyH6ycT7kpIJ+wuQWVeZJXI69HcpsXHDQN4LajtZIlkcbvzWqn9St1R3nPNIT93wzt/MSZPO+nqKA65699Nos5FdHmgZkMzHnvIj9zLm9+Q7jd0nqP8VtkdSqWNppYxT+u08g+yW8OnKRXw4ac08hnPUscyvjkw5AZXM4os9jzyY6sdZ3h5YC++jLm0lrASf50T5krzEn0QbOLbB8in2FvwKfNPJczCXd0hLV7wPPqL8bybt691//aWWfhkPo2681PjZPDbgP7lYZOl1nNJs9rW4elXD2zfkK8wIFOy2w1XuuWyOpTkuw2sHOhlqrzvIqu59gbuYEdIcqcjSyb65SLX5EHOepgrbuKtJ6nHNQtxtx0U5xM8DoXMkez7K5xM7Tp4iS4WOvszvss5feSP9Fvo5EVnDDfHGJfpd157Y48xFRGmfaEaWcu/qqYZxpCDcxcqR8Mg9xlGkANzNz+BDcx4zEJNTBzv5gPCSeXTvJtmM+3PJqIKdNj6GE3pJsG5mIwOMp1ptnABgd1sq+G7ebnXZncHCKjG3+M1zpLTzMz7AZ00cBG5pmlFb3JmkQTSpPd21HZbWD9Qy21zPPK/zricNH6+B7mvZFreTpEtAFWt0dpsnoWZreBVTG+kyVS1GVN4/vDd9lJVIRY5yzfPdPlrPHHdTwYItr1bkLcTia8M1qPM9F3yRRjcuaYprNmHxzyfNbQyQlnGTM47ynhndFan7WuCywLODz35I2sC9DCXheZHBNpsXvZmu1fkZXs5rjPnPzb8hyAzrIzINr9HOBIwNXat+ZcleS1hame1714izc55jNvbVDBtz7pyWuJuI15P/tnx1F0UwzsQpprO5nil2KIQSZbqcspnwp57+iu2MQT1mMmhNue/MMR3xfwMi8VYRhnmJqXP/MG1lZwyVNMy9l/FR4tf/mdvB553Uz2sXFn+n1YaGCNBZZr5mH25by7xzCb3PKrmM+lgmK1BV4hdc0+2g2zjq8m1wlAOY1dvqXGKep87oZYzUmDW3Vs8+myuIf6Am6AsiT0Nljp/CYl0Twaze9ZaaN3u5w5jAy5L2ylhe/4nAu+S1Qwl+oCsrjCV2wM2KXfwSPUcmPIGv9LPZ91Ye1TEnEb80ztNLE+Dv8MS0RERERERERERERERERERERERERERERERERERERERERERERERERs+Q/rhi5WauEgfQAAAABJRU5ErkJggg==
+servers:
+- url: https://api-sandbox.thisisbud.com
+tags:
+- name: Manage Customers
+  x-displayName: Manage Customers
+  description: 'Manage the number of customers registered onto the Bud platform.
+
+    '
+paths:
+  /platform/v3/customers:
+    post:
+      security:
+      - OAuth2: []
+      tags:
+      - Manage Customers
+      summary: Create Customer V3
+      description: "This endpoint is used to create a new Customer in order for them to consume the Bud services.\n\nWhen we refer to a Customer, we're talking about the end-user of yours and Bud's technology. Customer entities in Bud have unique identifiers and this is used to store the customer data on the Bud platform.\n\nFor more information on how to manage your Bud Customers, please, refer to the following [guide](https://docs.thisisbud.com/docs/setup-customers)\n\n> \U0001F4D8 Note:\n>\n> By specifying a `client_metadata.idempotent_identifier` value, Bud will associate that identifier to a Customer, \n> and in future Bud will return the same Customer entity everytime we receive the same `idempotent_identifier` value.\n>\n> This allows you to associate your internal resource to the concept of the Bud Customer.\n>\n> On subsequent requests for a customer with a given `idempotent_identifier`, Bud will return a 200 status code instead of a 201.\n>\n> Please, make sure the `idempotent_identifier` is immutable on your application.\n"
+      operationId: platform_v3_customers_post
+      parameters:
+      - $ref: '#/components/parameters/ClientId'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              properties:
+                customer_context:
+                  $ref: '#/components/schemas/CustomerContextRequest'
+                client_metadata:
+                  $ref: '#/components/schemas/ClientMetadata'
+            example:
+              customer_context:
+                type: personal
+                region: GB
+                locale: en-GB
+                models:
+                  categorisation: uk-v2
+              client_metadata:
+                idempotent_identifier: your_internal_id
+      responses:
+        '200':
+          description: Returns the existing customer matching the idempotent identifier.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerCreateV3Response'
+              example:
+                operation_id: platform_v3_customers_post
+                data:
+                  customer_id: 360e5821-4f18-4077-83f4-c9a7c1768bea
+                  customer_context:
+                    type: personal
+                    region: GB
+                    locale: en-GB
+                    host_secret: true
+                    models:
+                      categorisation: uk-v2
+                  client_metadata:
+                    idempotent_identifier: your_internal_id
+                metadata:
+                  created_at: '2023-01-01T07:02:11Z'
+        '201':
+          description: The resource has been successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerCreateV3Response'
+              example:
+                operation_id: platform_v3_customers_post
+                data:
+                  customer_id: 360e5821-4f18-4077-83f4-c9a7c1768bea
+                  customer_context:
+                    type: personal
+                    region: GB
+                    locale: en-GB
+                    host_secret: true
+                    models:
+                      categorisation: uk-v2
+                  client_metadata:
+                    idempotent_identifier: your_internal_id
+                metadata:
+                  created_at: '2023-01-01T07:02:11Z'
+        '400':
+          description: The request contains an invalid payload.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestResponse'
+              example:
+                operation_id: platform_v3_customers_post
+                code_id: failed_validation
+                message: invalid body
+                errors:
+                  body: invalid character 'a' looking for beginning of object key string
+        '401':
+          description: An unauthenticated request was received.
+        '405':
+          description: The request uses an unexpected HTTP method.
+        5XX:
+          description: An unexpected error occurred on the server side.
+    get:
+      security:
+      - OAuth2: []
+      tags:
+      - Manage Customers
+      summary: Retrieve Customers V3
+      description: 'This endpoint is used to list customers associated with the current project.
+
+
+        Customers are listed ordered by their ID. Deleted customers will not be included in the list.
+
+
+        The list of customers can be filtered by creation date with the `date_from` and `date_to` query parameters, which expect dates in the RFC3339 format.
+
+
+        If more results pages are available, the response metadata object will contain a  `next_page_token` field which can be used to fetch the next page of results. The token should be provided in the `page_token` query parameter for subsequent requests.
+
+
+        For more information on how to manage your Bud Customers, please, refer to the following [guide](https://docs.thisisbud.com/docs/setup-customers)
+
+        '
+      operationId: platform_v3_customers_get
+      parameters:
+      - $ref: '#/components/parameters/ClientId'
+      - in: query
+        name: date_from
+        schema:
+          type: string
+        example: '2022-05-28T00:00:00Z'
+        description: 'Date (RFC3339) to filter customers created on or after which. To maintain backwards compatibility, dates in the format (YYYY-MM-DD) can also be used and will be assumed to be UTC.
+
+          '
+      - in: query
+        name: date_to
+        schema:
+          type: string
+        example: '2022-05-29T00:00:00Z'
+        description: 'Date (RFC3339) to filter customers created on or before which. To maintain backwards compatibility, dates in the format (YYYY-MM-DD) can also be used and will be assumed to be UTC. Uses the current date by default.
+
+          '
+      - name: page_size
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 1000
+        description: The number of results to return per page. Defaults to 200.
+      - name: page_token
+        in: query
+        schema:
+          type: string
+        description: 'The token required to fetch a specific page of results. Provided by the next_page_token field in the previous request.
+
+          '
+      - name: idempotent_identifier
+        in: query
+        schema:
+          type: string
+        description: 'Filter by the internal client identifier provided in the `client_metadata` object when creating the customer in __Create Customer V3__. Only one customer will be returned if one is found with the given identifier.
+
+          '
+      responses:
+        '200':
+          description: Returns a list of customers.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomersGetAllV3Response'
+              example:
+                operation_id: platform_v3_customers_get
+                data:
+                - customer_id: acbff0b9-299c-4065-b933-4a991e17da6d
+                  idempotent_identifier: acbff0b9-299c-4065-b933-4a991e17da6d
+                  created_at: 2019-02-27T06:11:57+0000
+                - customer_id: ebb50ae5-8c5c-4205-9b61-e93ce84eb467
+                  created_at: 2019-02-27T06:11:57+0000
+                metadata:
+                  next_page_token: eyJwYWdlX3NpemUiOjIsInBhZ2UiOjF9
+                  results: 2
+        '400':
+          description: The request contains an invalid parameter.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestResponse'
+              example:
+                operation_id: platform_v3_customers_get_all
+                code_id: bad_request
+                message: invalid page token
+                errors:
+                  page_token:
+                  - Failed to parse page token
+        '401':
+          description: An unauthenticated request was received.
+        '405':
+          description: The request uses an unexpected HTTP method.
+        5XX:
+          description: An unexpected error occurred on the server side.
+  /platform/v3/customers/batch:
+    post:
+      security:
+      - OAuth2: []
+      tags:
+      - Manage Customers
+      summary: Create Customers V3 (Batch)
+      description: 'This endpoint is used to create a batch of new Customers in order for them to consume the Bud services.
+
+
+        For more information on Customers in the Bud platform, please refer to our handy [guide](https://docs.thisisbud.com/docs/setup-customers).
+
+        '
+      operationId: platform_v3_customers_batch_post
+      parameters:
+      - $ref: '#/components/parameters/ClientId'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomersV3BatchPayload'
+            example:
+              number_of_customers: 2
+              customer_context:
+                type: personal
+                region: GB
+                locale: en-GB
+                models:
+                  categorisation: uk-v2
+      responses:
+        '201':
+          description: The resource has been successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateCustomersV3BatchResponse'
+              example:
+                operation_id: platform_v3_customers_batch_post
+                data:
+                - customer_id: 360e5821-4f18-4077-83f4-c9a7c1768bea
+                  customer_context:
+                    type: personal
+                    region: GB
+                    locale: en-GB
+                    host_secret: true
+                    models:
+                      categorisation: uk-v2
+                - customer_id: 8d3e9cd4-fa92-4252-8725-9b20af307b76
+                  customer_context:
+                    type: personal
+                    region: GB
+                    locale: en-GB
+                    host_secret: true
+                    models:
+                      categorisation: uk-v2
+                metadata:
+                  created_at: '2023-01-01T07:02:11Z'
+        '400':
+          description: The request contains an invalid payload.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestResponse'
+              example:
+                operation_id: customers_create
+                code_id: failed_validation
+                message: Failed validation.
+                errors:
+                  client_id: This value should not be blank
+        '401':
+          description: An unauthenticated request was received.
+        '405':
+          description: The request uses an unexpected HTTP method.
+        5XX:
+          description: An unexpected error occurred on the server side.
+  /platform/v3/customers/{customer_id}:
+    delete:
+      security:
+      - OAuth2: []
+      tags:
+      - Manage Customers
+      summary: Remove Customer V3
+      description: This endpoint is used to delete an existing Customer. Calling this endpoint initiates deleting all data relating to a customer returning a task id that can be used to check the status of the delete task.
+      operationId: platform_v3_customers_delete
+      parameters:
+      - in: path
+        name: customer_id
+        schema:
+          type: string
+        required: true
+        description: The customer identifier.
+      - $ref: '#/components/parameters/ClientId'
+      responses:
+        '202':
+          description: The request was successfully accepted for processing and details of the task was returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerDeleteV3Response'
+              example:
+                operation_id: platform_v3_customers_delete
+                data:
+                  task_id: e74efdd2-bd44-42b0-9562-106286664966
+                metadata:
+                  status: Pending
+                  next_url: /v3/customers/45cecf3f-8436-4b57-8953-cfdfbd2620d4/e74efdd2-bd44-42b0-9562-106286664966
+                  next_url_delay: 50
+        '401':
+          description: An unauthenticated request was received.
+        '404':
+          description: The resource was not found.
+        '405':
+          description: The request uses an unexpected HTTP method.
+        5XX:
+          description: An unexpected error occurred on the server side.
+  /platform/v3/customers/idempotent-identifier/{customer_idempotent_identifier}:
+    delete:
+      security:
+      - OAuth2: []
+      tags:
+      - Manage Customers
+      summary: Remove Customer By Idempotent Identifier V3
+      description: This endpoint is used to delete an existing Customer. Calling this endpoint initiates deleting all data relating to a customer returning a task id that can be used to check the status of the delete task.
+      operationId: platform_v3_customers_idempotent_identifier_delete
+      parameters:
+      - in: path
+        name: customer_idempotent_identifier
+        schema:
+          type: string
+        required: true
+        description: The internal client identifier, provided in the client_metadata object when creating the customer in Create Customer V3.
+      - $ref: '#/components/parameters/ClientId'
+      responses:
+        '202':
+          description: The request was successfully accepted for processing and details of the task was returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerDeleteV3Response'
+              example:
+                operation_id: platform_v3_customers_idempotent_identifier_delete
+                data:
+                  task_id: e74efdd2-bd44-42b0-9562-106286664966
+                metadata:
+                  status: Pending
+                  next_url: /v3/customers/45cecf3f-8436-4b57-8953-cfdfbd2620d4/e74efdd2-bd44-42b0-9562-106286664966
+                  next_url_delay: 50
+        '401':
+          description: An unauthenticated request was received.
+        '404':
+          description: The resource was not found.
+        '405':
+          description: The request uses an unexpected HTTP method.
+        5XX:
+          description: An unexpected error occurred on the server side.
+  /platform/v3/customers/{customer_id}/{task_id}:
+    get:
+      security:
+      - OAuth2: []
+      tags:
+      - Manage Customers
+      summary: Retrieve Remove Customer V3 Status
+      description: 'Check the status and get the result of a Remove Customer V3 task.
+
+        '
+      operationId: platform_v3_customers_delete_status
+      parameters:
+      - in: path
+        name: customer_id
+        schema:
+          type: string
+        required: true
+        description: The customer identifier.
+      - $ref: '#/components/parameters/TaskId'
+      - $ref: '#/components/parameters/ClientId'
+      responses:
+        '200':
+          description: The request was successfully processed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerDeleteV3StatusResponse'
+              examples:
+                complete:
+                  summary: Completed
+                  value:
+                    operation_id: platform_v3_customers_delete_status
+                    data:
+                      task_id: e74efdd2-bd44-42b0-9562-106286664966
+                      result: success
+                    metadata:
+                      status: Completed
+                pending:
+                  summary: Pending
+                  value:
+                    operation_id: platform_v3_customers_delete_status
+                    data:
+                      status: Pending
+                      task_id: 16fa0748-8a6b-455b-9be9-30ae257965d8
+                    metadata:
+                      status: Pending
+                      next_url: /v3/customers/45cecf3f-8436-4b57-8953-cfdfbd2620d4/e74efdd2-bd44-42b0-9562-106286664966
+                      next_url_delay: 50
+                failed:
+                  summary: Failed
+                  value:
+                    operation_id: platform_v3_customers_delete_status
+                    data:
+                      task_id: e74efdd2-bd44-42b0-9562-106286664966
+                      result: failed
+                    metadata:
+                      status: Failed
+        '401':
+          description: An unauthenticated request was received.
+        '404':
+          description: The resource was not found.
+        '405':
+          description: The request uses an unexpected HTTP method.
+        5XX:
+          description: An unexpected error occurred on the server side.
+  /v1/customers:
+    post:
+      security:
+      - OAuth2: []
+      tags:
+      - Manage Customers
+      summary: Create Customer
+      deprecated: true
+      description: 'This endpoint is used to create a new Customer in order for them to consume the Bud services.
+
+
+        **Please note: this endpoint is now deprecated, please migrate to using the POST /v2/customers endpoint.**
+
+        '
+      operationId: customers_create_v1
+      parameters:
+      - $ref: '#/components/parameters/ClientId'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              properties:
+                customer_context:
+                  $ref: '#/components/schemas/CustomerContext'
+            example:
+              customer_context:
+                type: personal
+                region: GB
+                locale: en-GB
+                models:
+                  categorisation: uk-v2
+      responses:
+        '201':
+          description: The resource has been successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerCreateResponse'
+              example:
+                operation_id: customers_create
+                data:
+                  customer_id: 360e5821-4f18-4077-83f4-c9a7c1768bea
+                  customer_secret: 63ae14a67e5cf8c8f7bf5376479d13e9
+                  customer_context:
+                    type: personal
+                    region: GB
+                    locale: en-GB
+                    models:
+                      categorisation: uk-v2
+        '400':
+          description: The request contains an invalid payload.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestResponse'
+              example:
+                operation_id: customers_create
+                code_id: failed_validation
+                message: Failed validation.
+                errors:
+                  client_id: This value should not be blank
+        '401':
+          description: An unauthenticated request was received.
+        '405':
+          description: The request uses an unexpected HTTP method.
+        5XX:
+          description: An unexpected error occurred on the server side.
+  /v2/customers:
+    post:
+      security:
+      - OAuth2: []
+      tags:
+      - Manage Customers
+      summary: Create Customer(s)
+      deprecated: true
+      description: This endpoint is used to create one or many new Customers, in order for them to consume the Bud services.
+      operationId: customers_create_v2
+      parameters:
+      - $ref: '#/components/parameters/ClientId'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomersPayload'
+            example:
+              number_of_customers: 3
+              customer_context:
+                type: personal
+                region: GB
+                locale: en-GB
+                models:
+                  categorisation: uk-v2
+      responses:
+        '201':
+          description: The resource has been successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomersCreateResponse'
+              examples:
+                Multiple Customers:
+                  value:
+                    operation_id: v2_customers_post
+                    data:
+                    - customer_id: 360e5821-4f18-4077-83f4-c9a7c1768bea
+                      customer_secret: 63ae14a67e5cf8c8f7bf5376479d13e9
+                      customer_context:
+                        type: personal
+                        region: GB
+                        locale: en-GB
+                        models:
+                          categorisation: uk-v2
+                    - customer_id: 7788d43e-4eb1-11eb-ae93-0242ac130002
+                      customer_secret: 63ae14a67e5cf8c8f7bf5376479d13e5
+                      customer_context:
+                        type: personal
+                        region: GB
+                        locale: en-GB
+                        models:
+                          categorisation: uk-v2
+                    - customer_id: 8e4b6f88-4eb1-11eb-ae93-0242ac130002
+                      customer_secret: a951d12bf19e2874254cb2833dc5a8c3
+                      customer_context:
+                        type: personal
+                        region: GB
+                        locale: en-GB
+                        models:
+                          categorisation: uk-v2
+                    metadata:
+                      results: 3
+                Single Customer:
+                  value:
+                    operation_id: v2_customers_post
+                    data:
+                    - customer_id: 360e5821-4f18-4077-83f4-c9a7c1768bea
+                      customer_secret: 63ae14a67e5cf8c8f7bf5376479d13e9
+                      customer_context:
+                        type: personal
+                        region: GB
+                        locale: en-GB
+                        models:
+                          categorisation: uk-v2
+                    metadata:
+                      results: 1
+        '400':
+          description: The request contains an invalid payload.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestResponse'
+              example:
+                operation_id: v2_customers_post
+                code_id: failed_validation
+                message: Failed validation.
+                errors:
+                  client_id: This value should not be blank
+        '401':
+          description: An unauthenticated request was received.
+        '405':
+          description: The request uses an unexpected HTTP method.
+        5XX:
+          description: An unexpected error occurred on the server side.
+  /v1/customers/{customer_id}:
+    delete:
+      deprecated: true
+      security:
+      - OAuth2: []
+      tags:
+      - Manage Customers
+      summary: Remove Customer
+      description: 'This endpoint is used to delete an existing Customer. Calling this deletes all data associated with the customer including any Open Banking Consents.
+
+
+        If the customer with the given ID does not exist or has already been deleted, a 404 error is returned.
+
+        '
+      operationId: customers_delete
+      parameters:
+      - $ref: '#/components/parameters/PathCustomerID'
+      - $ref: '#/components/parameters/ClientId'
+      responses:
+        '204':
+          description: The request was successfully processed and no content is returned.
+        '401':
+          description: An unauthenticated request was received.
+        '404':
+          description: No customer was found with the given ID.
+        '405':
+          description: The request uses an unexpected HTTP method.
+        5XX:
+          description: An unexpected error occurred on the server side.
+  /v1/customers/{customer_id}/context:
+    get:
+      security:
+      - OAuth2: []
+      tags:
+      - Manage Customers
+      summary: Retrieve Customer Context
+      description: Retrieve the customer level context, i.e. a set of parameters that defines their language, region and their customer type.
+      operationId: v1_customer_context_get
+      parameters:
+      - $ref: '#/components/parameters/PathCustomerID'
+      - $ref: '#/components/parameters/ClientId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerContextResponse'
+              example:
+                operation_id: v1_customer_context_get
+                data:
+                  type: personal
+                  region: GB
+                  locale: en-GB
+                  models:
+                    categorisation: uk-v2
+        '401':
+          description: An unauthenticated request was received.
+        '404':
+          description: The resource was not found.
+        '405':
+          description: The request uses an unexpected HTTP method.
+        5XX:
+          description: An unexpected error occurred on the server side.
+    put:
+      security:
+      - OAuth2: []
+      tags:
+      - Manage Customers
+      summary: Update Customer Context
+      description: 'Updates the customer context.
+
+        All three body parameters (region, locale, and models) will overwrite any existing values.
+
+        If a parameter is not provided, it''s corresponding context field will be set to empty.
+
+        '
+      operationId: v1_customer_context_put
+      parameters:
+      - $ref: '#/components/parameters/PathCustomerID'
+      - $ref: '#/components/parameters/ClientId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCustomerContextRequest'
+            example:
+              region: GB
+              locale: en-GB
+              models:
+                categorisation: uk-v2
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateCustomerContextResponse'
+              example:
+                operation_id: v1_customer_context_put
+                data:
+                  region: GB
+                  locale: en-GB
+                  models:
+                    categorisation: uk-v2
+        '400':
+          description: Request recieved was invalid.
+        '401':
+          description: An unauthenticated request was received.
+        '404':
+          description: The resource was not found.
+        '405':
+          description: The request uses an unexpected HTTP method.
+        5XX:
+          description: An unexpected error occurred on the server side.
+components:
+  schemas:
+    CustomerCreatedV3:
+      title: Customer Created V3
+      type: object
+      required:
+      - customer_id
+      - customer_context
+      properties:
+        customer_id:
+          description: A unique identifier for a Customer, as registered on Bud's platform
+          type: string
+          format: uuid
+        customer_secret:
+          description: A unique Customer encryption key used to encrypt their data on the Bud platform. Only returned if the secret is *not* hosted on the Bud Platform.
+          type: string
+        customer_context:
+          $ref: '#/components/schemas/CustomerContext'
+        client_metadata:
+          $ref: '#/components/schemas/ClientMetadata'
+    CustomerDeleteV3:
+      title: Customer Delete V3
+      type: object
+      required:
+      - task_id
+      properties:
+        task_id:
+          $ref: '#/components/schemas/TaskId'
+    DeleteResultCodes:
+      type: string
+      description: The result of the operation. Either success or failed.
+      enum:
+      - success
+      - failed
+    TaskCustomerDeleteV3:
+      title: Customer Delete Task Response
+      type: object
+      description: Result of GET customer delete taskId
+      required:
+      - task_id
+      properties:
+        result:
+          $ref: '#/components/schemas/DeleteResultCodes'
+        task_id:
+          $ref: '#/components/schemas/TaskId'
+    CustomerContextType:
+      title: Customer Context Type
+      type: string
+      enum:
+      - personal
+      - business
+      description: 'The type of customer signed up:
+
+
+        | Value      | Description                             |
+
+        |------------|-----------------------------------------|
+
+        | `personal` | Individuals with personal bank accounts |
+
+        | `business` | Businesses with business accounts       |
+
+        '
+    CreateCustomersV3BatchPayload:
+      title: Create Customers V3 Batch Payload
+      type: object
+      properties:
+        number_of_customers:
+          description: The number of customers to create (register) on Bud's platform in a single request.
+          type: integer
+          default: 1
+          maximum: 200
+        customer_context:
+          $ref: '#/components/schemas/CustomerContextRequest'
+    UpdateCustomerContextRequest:
+      title: Update Customer Context Request
+      type: object
+      description: Expected request payload structure.
+      properties:
+        region:
+          $ref: '#/components/schemas/CustomerContextRegion'
+        locale:
+          $ref: '#/components/schemas/CustomerContextLocale'
+        models:
+          $ref: '#/components/schemas/CustomerContextModels'
+    CustomersGetAllV3Response:
+      title: List customers response
+      type: object
+      description: Expected response structure.
+      required:
+      - operation_id
+      - data
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomersGetAllV3DataItem'
+        metadata:
+          $ref: '#/components/schemas/CustomersGetAllV3ResponseMetadata'
+    CustomerCreateResponse:
+      title: Create Customer Response
+      type: object
+      description: Expected response structure.
+      required:
+      - operation_id
+      - data
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          type: object
+          required:
+          - customer_id
+          - customer_secret
+          - customer_context
+          properties:
+            customer_id:
+              description: A unique identifier for a Customer, as registered on Bud's platform.
+              type: string
+              format: uuid
+            customer_secret:
+              description: An unique Customer encryption key used to encrypt their data on the Bud platform. Please note that this key is not held by Bud, and is required in the header of any endpoint that involves reading Customer data stored on the Bud platform.
+              type: string
+            customer_context:
+              $ref: '#/components/schemas/CustomerContext'
+    CustomerContextLocale:
+      title: Customer Context Locale
+      type: string
+      description: The locale/language, based on the region, format defined by BCP 47.
+    AsyncTaskMetadata:
+      title: Async Task Metadata
+      type: object
+      description: Metadata associated with an asynchronous task
+      properties:
+        status:
+          type: string
+          description: The status of the job associated with the specified task id
+          enum:
+          - Completed
+          - Pending
+          - Failed
+        next_url:
+          type: string
+          description: The URL to call to obtain the results of the task
+        next_url_delay:
+          type: number
+          description: The time in milliseconds that the client should wait before polling the relevant GET endpoint with the above task id
+    CustomerContextResponse:
+      title: Customer Context Response
+      description: Customer context response.
+      type: object
+      required:
+      - operation_id
+      - data
+      properties:
+        operation_id:
+          type: string
+        data:
+          $ref: '#/components/schemas/CustomerContext'
+    CustomerContextModels:
+      title: Customer Context Models
+      type: object
+      description: The configuration for Bud's enrichment models.
+      properties:
+        categorisation:
+          type: string
+          description: The name of the categorisation model to use for this customer at enrichment. See *List Categorisation Models V2* for available models.
+    Error:
+      title: Error Object
+      type: object
+      nullable: true
+      description: Contains a field specific error message
+      additionalProperties:
+        type: string
+    CustomerContextRegion:
+      title: Customer Context Region
+      type: string
+      description: The region/country where the customer is located, format defined by ISO 3166 Alpha-2.
+    CustomerCreatedV3Metadata:
+      title: Customer Created V3 Metadata
+      type: object
+      properties:
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time the customer was created. Format ISO 8601.
+    Errors:
+      title: Array of Error Object
+      description: Contains a list of error messages
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          type: string
+    ClientMetadata:
+      title: Client Metadata
+      description: A set of Client Metadata
+      type: object
+      properties:
+        idempotent_identifier:
+          $ref: '#/components/schemas/IdempotentIdentifier'
+    CustomersCreateResponse:
+      title: Create Customers Response
+      type: object
+      description: Expected response structure.
+      required:
+      - operation_id
+      - data
+      - metadata
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          description: An array of Customer Created objects
+          items:
+            $ref: '#/components/schemas/CustomerCreated'
+        metadata:
+          $ref: '#/components/schemas/ResultsMetadata'
+    CustomersGetAllV3ResponseMetadata:
+      type: object
+      description: Metadata that defines token-based pagination of results.
+      required:
+      - results
+      properties:
+        next_page_token:
+          type: string
+          description: Page token for next part of the result set, omitted if there are no other pages.
+        results:
+          type: integer
+          description: The number of results returned.
+    CustomerContextHostSecret:
+      title: Customer Context Host Secret
+      type: boolean
+      description: Determines whether the customer secret key should be stored with Bud, meaning the API consumer does not need to store this and provide it on subsequent API calls related to that customer.
+    BadRequestResponse:
+      title: Bad Request Response
+      type: object
+      description: Expected response structure
+      required:
+      - operation_id
+      - code_id
+      - message
+      - errors
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        code_id:
+          type: string
+          description: A descriptive enough string that is linked to the reason for the error.
+        message:
+          type: string
+        errors:
+          anyOf:
+          - $ref: '#/components/schemas/Error'
+          - $ref: '#/components/schemas/Errors'
+    TaskId:
+      title: Task Id
+      type: string
+      description: Bud Task identifier returned from an async task for the requested action
+    TaskCustomerDeleteV3MetaData:
+      title: Task Status Metadata
+      type: object
+      description: Standard metadata response from the Customer Delete V3
+      required:
+      - status
+      properties:
+        status:
+          type: string
+          description: The status of the job associated with the specified task id
+          enum:
+          - Completed
+          - Pending
+          - Failed
+        next_url:
+          type: string
+          description: The url to try next if the `status` property returned is `Pending`
+        next_url_delay:
+          type: number
+          description: The time in milliseconds that the client should wait before polling the relevant GET endpoint with the above task id if the `status` property returned is `Pending`
+    CreateCustomersPayload:
+      title: Create Customers Payload
+      type: object
+      properties:
+        number_of_customers:
+          description: The number of customers to create (register) on Bud's platform in a single request.
+          type: integer
+          default: 1
+          maximum: 200
+        customer_context:
+          $ref: '#/components/schemas/CustomerContext'
+    CustomerDeleteV3Response:
+      title: Delete Customer V3 Response
+      type: object
+      description: Expected response structure.
+      required:
+      - operation_id
+      - data
+      - metadata
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          $ref: '#/components/schemas/CustomerDeleteV3'
+        metadata:
+          $ref: '#/components/schemas/AsyncTaskMetadata'
+    ResultsMetadata:
+      title: Results Metadata Object
+      type: object
+      description: Metadata associated with the response schema
+      properties:
+        results:
+          type: number
+          description: The number of results returned
+    OperationId:
+      title: Operation Id Field
+      type: string
+      description: A unique identifier/reference associated with a given endpoint/operation
+    CreateCustomersV3BatchResponse:
+      title: Create Customers V3 Batch Response
+      type: object
+      description: Expected response structure.
+      required:
+      - operation_id
+      - data
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          description: An array of Customer Created objects.
+          items:
+            $ref: '#/components/schemas/CustomerCreatedV3'
+        metadata:
+          $ref: '#/components/schemas/CustomerCreatedV3Metadata'
+    UpdateCustomerContextResponse:
+      title: Customer Context Update Response
+      description: Customer context update response.
+      type: object
+      required:
+      - operation_id
+      - data
+      properties:
+        operation_id:
+          type: string
+        data:
+          title: Updated Customer Context
+          type: object
+          properties:
+            region:
+              $ref: '#/components/schemas/CustomerContextRegion'
+            locale:
+              $ref: '#/components/schemas/CustomerContextLocale'
+            models:
+              $ref: '#/components/schemas/CustomerContextModels'
+    CustomerCreated:
+      title: Customer Created
+      type: object
+      required:
+      - customer_id
+      - customer_secret
+      - customer_context
+      properties:
+        customer_id:
+          description: A unique identifier for a Customer, as registered on Bud's platform
+          type: string
+          format: uuid
+        customer_secret:
+          description: An unique Customer encryption key used to encrypt their data on the Bud platform. Please note that this key is not held by Bud, and is required in the header of any endpoint that involves reading Customer data stored on the Bud platform.
+          type: string
+        customer_context:
+          $ref: '#/components/schemas/CustomerContext'
+    CustomerDeleteV3StatusResponse:
+      title: Customer Delete Status Response
+      type: object
+      description: Expected response structure
+      required:
+      - operation_id
+      - metadata
+      - data
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          $ref: '#/components/schemas/TaskCustomerDeleteV3'
+        metadata:
+          $ref: '#/components/schemas/TaskCustomerDeleteV3MetaData'
+    CustomersGetAllV3DataItem:
+      type: object
+      description: Representation of a Customer.
+      required:
+      - customer_id
+      - created_at
+      properties:
+        customer_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          description: Date and time at which the Customer has been registered (ISO 8601).
+        idempotent_identifier:
+          type: string
+          description: Client-assigned idempotent customer identifier (omitted if not present).
+    CustomerCreateV3Response:
+      title: Create Customer V3 Response
+      type: object
+      description: Expected response structure.
+      required:
+      - operation_id
+      - data
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          $ref: '#/components/schemas/CustomerCreatedV3'
+        metadata:
+          $ref: '#/components/schemas/CustomerCreatedV3Metadata'
+    CustomerContext:
+      title: Customer Context
+      description: The context in which a customer is processed throughout the Bud platform.
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/CustomerContextType'
+        region:
+          $ref: '#/components/schemas/CustomerContextRegion'
+        locale:
+          $ref: '#/components/schemas/CustomerContextLocale'
+        host_secret:
+          $ref: '#/components/schemas/CustomerContextHostSecret'
+        models:
+          $ref: '#/components/schemas/CustomerContextModels'
+    CustomerContextRequest:
+      title: Customer Context
+      description: The context in which a customer is processed throughout the Bud platform.
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/CustomerContextType'
+        region:
+          $ref: '#/components/schemas/CustomerContextRegion'
+        locale:
+          $ref: '#/components/schemas/CustomerContextLocale'
+        models:
+          $ref: '#/components/schemas/CustomerContextModels'
+    IdempotentIdentifier:
+      title: Idempotent Identifier
+      description: An internal client identifier. If specified will ensure we only have one customer id per identifier.
+      type: string
+  parameters:
+    TaskId:
+      in: path
+      name: task_id
+      schema:
+        type: string
+        format: uuid
+      required: true
+      description: Bud Task identifier returned from an async task for the requested action
+    PathCustomerID:
+      in: path
+      name: customer_id
+      schema:
+        type: string
+        format: uuid
+      required: true
+      description: A unique identifier for a Customer, as registered on Bud's platform.
+      example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
+    ClientId:
+      in: header
+      name: X-Client-Id
+      schema:
+        type: string
+      required: true
+      description: The API Client Identifier (Service Application Identifier).
+      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
+  securitySchemes:
+    Basic:
+      type: http
+      scheme: basic
+    OAuth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: /v1/oauth/token
+          scopes: {}
+      description: "\nAuthentication flow:\n\n1. Perform OAuth2 Client Credentials authentication using API Credentials (`client_id`,`client_secret`) to obtain an `access_token` against `/v1/oauth/token` endpoint,\n2. Use `access_token` as Bearer Authorisation for every other API request,\n3. Include `X-Client-Id` (=client_id) within the header of every API request,\n4. Note that some of the requests may also require `X-Customer-Id` to be provided within the request header.\n\n### Examples\nObtain OAuth2 `access_token` and `refresh_token` using `grant_type=client_credentials` and HTTP Basic auth header\n\n```\ncurl --basic --user {{client_id}}:{{client_secret}} \\\n  -X POST https://api-sandbox.thisisbud.com/v1/oauth/token \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -d grant_type=client_credentials\n```\n\nSuccessful response:\n```\n{\n  \"operation_id\": \"oauth_token_post\",\n  \"data\": {\n    \"access_token\": \"dd0c17e3fd6d2ce94aa091257a3ea393b4f9b5cf3d3e998f07dc9826da86ff15\",\n    \"token_type\": \"bearer\",\n    \"expires_in\": 3600,\n    \"refresh_token\": \"fac32cca7559d9f6e8f1dfe9a99c71fa1dcfeb482bedf287d7934d2667ae54b3\"\n  }\n}\n```\n\nRefresh `access_token` token using `refresh_token` against `/v1/oauth/token` endpoint with `grant_type=refresh_token`\n\n```\ncurl -X POST \\\n  https://api-sandbox.thisisbud.com/v1/oauth/token \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'X-Client-Id: {{client_id}}' \\\n  -d 'grant_type=refresh_token&refresh_token={{refresh_token}}'\n```\n\nSuccessful response:\n```\n{\n    \"operation_id\": \"oauth_token_post\",\n    \"data\": {\n        \"access_token\": \"cc0c17e3fd6d2ce94aa091257a3ea393b4f9b5cf3d3e998f07dc9826da86ff94\",\n        \"token_type\": \"bearer\",\n        \"expires_in\": 3600,\n        \"refresh_token\": \"ffc30cca7559d9f6e8f1dfe9a99c71fa1dcfeb482bedf287d7934d2667ae54b3\"\n    }\n}\n```\n"
+x-tagGroups:
+- name: ''
+  tags:
+  - OAuth2
+  - Authentication
+- name: ''
+  tags:
+  - Create a Connection
+  - Manage a Connection
+  - Ingest First Party Data
+  - Connect API
+- name: ''
+  tags:
+  - Manage Customers
+  - Customers API
+- name: ''
+  tags:
+  - Enrichment Resources
+  - Enrichment Totals
+  - Enrichment API
+- name: ''
+  tags:
+  - Retrieve Financial Data
+  - Manage Financial Data
+  - Correct Financial Data
+  - Financial Data API
+- name: ''
+  tags:
+  - Spending Budgets
+  - Savings Goals V2
+  - Goals API
+- name: ''
+  tags:
+  - Regular Payments Finder
+  - Income Finder
+  - Loan Finder
+  - Debt Collection Finder
+  - Product Finder
+  - Subscription Finder
+  - Smart Finders API
+- name: ''
+  tags:
+  - Transaction Search
+  - Intelligent Search API
+- name: ''
+  tags:
+  - Customer Applications
+  - Customer Application Links
+  - Aggregation Buckets
+  - Retrieve Affordability Report V2
+  - Retrieve Affordability Report
+  - Retrieve Affordability Risk Insights
+  - Assess API
+- name: ''
+  tags:
+  - Initiate Payment - Bud license
+  - Initiate Payment - Client license
+  - Manage Payments
+  - Payments API
+- name: ''
+  tags:
+  - Retrieve Customer Characteristics
+  - Characteristics API
+- name: ''
+  tags:
+  - Retrieve Actionable Insights
+  - Custom Insights
+  - Frontend Widgets
+  - Insights API
