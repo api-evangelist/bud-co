@@ -1,4 +1,18 @@
 aid: bud-co
+accessModel:
+  pricing: unknown
+  onboarding: self-serve
+  trial: false
+  try_now: false
+  public: false
+  label: Self-serve signup
+  confidence: high
+  source:
+  - plans
+  - authentication
+  generated: '2026-07-22'
+  method: derived
+image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/bud-co.png
 url: https://raw.githubusercontent.com/api-evangelist/bud-co/refs/heads/main/apis.yml
 name: Bud Financial
 description: >-
@@ -47,227 +61,642 @@ common:
   - url: https://docs.thisisbud.com/llms.txt
     type: LlmsText
 apis:
-  - aid: bud-co:bud-connect-api
-    name: Bud Connect API
-    tags:
-      - Open Banking
-      - AISP
-      - Account Aggregation
-      - Consent
-    humanURL: https://docs.thisisbud.com
-    baseURL: https://api-sandbox.thisisbud.com
-    properties:
-      - url: https://docs.thisisbud.com
-        type: Documentation
-      - url: openapi/bud-platform-openapi.yml
-        type: OpenAPI
-    description: >-
-      Open Banking aggregation API providing unified access to UK and EU ASPSP connections. Initiate consents through
-      Bud's hosted Bud Connect gateway or build a native flow with the underlying authorisation, refresh, consent
-      management, and reconfirmation endpoints. Bud handles the heterogeneity of ASPSP integrations behind a single set
-      of asynchronous task-based endpoints, with webhook callbacks for connection, refresh, and consent events.
-  - aid: bud-co:bud-ingestion-api
-    name: Bud First-Party Ingestion API
-    tags:
-      - Ingestion
-      - Transactions
-      - Accounts
-    humanURL: https://docs.thisisbud.com
-    baseURL: https://api-sandbox.thisisbud.com
-    properties:
-      - url: https://docs.thisisbud.com
-        type: Documentation
-      - url: openapi/bud-platform-openapi.yml
-        type: OpenAPI
-    description: >-
-      Push your own first-party account and transaction data into the Bud platform for enrichment, categorization, and
-      insights without requiring an Open Banking consent. Supports synchronous and asynchronous ingestion, account
-      open/close/reopen, and transaction book/decline lifecycle events.
-  - aid: bud-co:bud-customers-platform-api
-    name: Bud Customers Platform API
-    tags:
-      - Customers
-      - Identity
-      - Platform
-    humanURL: https://docs.thisisbud.com
-    baseURL: https://api-sandbox.thisisbud.com
-    properties:
-      - url: https://docs.thisisbud.com
-        type: Documentation
-      - url: openapi/bud-platform-openapi.yml
-        type: OpenAPI
-    description: >-
-      Create, retrieve, batch-create, and manage end-user customer records on the Bud platform. Supports V1, V2, and V3
-      customer endpoints, idempotent identifiers, customer context configuration, and asynchronous task tracking.
-  - aid: bud-co:bud-financial-data-api
-    name: Bud Financial Data API
-    tags:
-      - Accounts
-      - Transactions
-      - Balances
-      - Enrichment
-    humanURL: https://docs.thisisbud.com
-    baseURL: https://api-sandbox.thisisbud.com
-    properties:
-      - url: https://docs.thisisbud.com
-        type: Documentation
-      - url: openapi/bud-platform-openapi.yml
-        type: OpenAPI
-      - url: json-schema/bud-transaction-schema.json
-        type: JSONSchema
-      - url: json-schema/bud-account-schema.json
-        type: JSONSchema
-      - url: json-ld/bud-co-context.jsonld
-        type: JSONLD
-    description: >-
-      Retrieve enriched accounts, transactions, balances, and authorised payments. Bud's AI/ML enrichment engine
-      attaches category, merchant, geolocation, and recurrence metadata to every transaction. Financial V3 endpoints
-      expose the latest enriched schema with transaction-date ranges and per-account balance history.
-  - aid: bud-co:bud-enrichment-api
-    name: Bud Enrichment API
-    tags:
-      - Enrichment
-      - Categorization
-      - Merchants
-      - Aggregations
-    humanURL: https://docs.thisisbud.com
-    baseURL: https://api-sandbox.thisisbud.com
-    properties:
-      - url: https://docs.thisisbud.com
-        type: Documentation
-      - url: openapi/bud-platform-openapi.yml
-        type: OpenAPI
-    description: >-
-      Access Bud's enrichment resources: category models, category and merchant taxonomies, aggregated category and
-      merchant totals, essential-spending statistics, and correction endpoints for re-labelling categories and merchants
-      on individual transactions. Custom buckets let you group categories or merchants into your own reporting
-      groupings.
-  - aid: bud-co:bud-financial-insights-api
-    name: Bud Financial Insights API
-    tags:
-      - Insights
-      - Analytics
-      - Recurring Payments
-      - Subscriptions
-      - Income
-    humanURL: https://docs.thisisbud.com
-    baseURL: https://api-sandbox.thisisbud.com
-    properties:
-      - url: https://docs.thisisbud.com
-        type: Documentation
-      - url: openapi/bud-platform-openapi.yml
-        type: OpenAPI
-    description: >-
-      Generate deep insights from transaction data: actionable balance, income, and spending insights; custom insight
-      management; subscription and recurring-transaction detection; income finder; future-transaction forecasting;
-      benefit transactions; loan and debt-collection identification; and the Insights Product Finder.
-  - aid: bud-co:bud-search-api
-    name: Bud Intelligent Search API
-    tags:
-      - Search
-      - AI
-      - Natural Language
-      - Beta
-    humanURL: https://docs.thisisbud.com
-    baseURL: https://api-sandbox.thisisbud.com
-    properties:
-      - url: https://docs.thisisbud.com
-        type: Documentation
-      - url: openapi/bud-platform-openapi.yml
-        type: OpenAPI
-    description: >-
-      Beta intelligent search across transactions with AI-generated insights. Submit a natural language query, retrieve
-      matching transactions and a derived narrative insight referencing the matched set.
-  - aid: bud-co:bud-affordability-api
-    name: Bud Affordability and Assess API
-    tags:
-      - Affordability
-      - Lending
-      - Assess
-      - Risk
-    humanURL: https://docs.thisisbud.com
-    baseURL: https://api-sandbox.thisisbud.com
-    properties:
-      - url: https://docs.thisisbud.com
-        type: Documentation
-      - url: openapi/bud-platform-openapi.yml
-        type: OpenAPI
-    description: >-
-      Pre-fill affordability forms and power lending decisions with structured income and expenditure breakdowns.
-      Generate affordability reports (V1 and V2), drill into affordability transactions, retrieve beta risk insights
-      (income-expenditure, merchants, unauthorised overdraft, income-health), and manage Assess customer applications
-      with linked customer references.
-  - aid: bud-co:bud-characteristics-api
-    name: Bud Customer Characteristics API
-    tags:
-      - Characteristics
-      - Risk
-      - Credit
-      - Lending
-    humanURL: https://docs.thisisbud.com
-    baseURL: https://api-sandbox.thisisbud.com
-    properties:
-      - url: https://docs.thisisbud.com
-        type: Documentation
-      - url: openapi/bud-platform-openapi.yml
-        type: OpenAPI
-    description: >-
-      Retrieve derived behavioural characteristics for a customer across credit card, loan, overdraft, and saver lenses.
-      Designed to feed lending models and risk decisioning with explainable feature sets calculated from enriched
-      transaction history.
-  - aid: bud-co:bud-goals-api
-    name: Bud Goals and Budgets API
-    tags:
-      - Budgets
-      - Savings
-      - Goals
-      - Money Management
-    humanURL: https://docs.thisisbud.com
-    baseURL: https://api-sandbox.thisisbud.com
-    properties:
-      - url: https://docs.thisisbud.com
-        type: Documentation
-      - url: openapi/bud-platform-openapi.yml
-        type: OpenAPI
-    description: >-
-      Manage savings goals (V2) and spending budgets (V1) for end customers. Create, retrieve, list, and delete goals,
-      attach contributing transactions to a budget, and track progress against a target amount and time horizon.
-  - aid: bud-co:bud-payments-api
-    name: Bud Payments API
-    tags:
-      - Payments
-      - PISP
-      - Open Banking
-      - Standing Orders
-    humanURL: https://docs.thisisbud.com
-    baseURL: https://api-sandbox.thisisbud.com
-    properties:
-      - url: https://docs.thisisbud.com
-        type: Documentation
-      - url: openapi/bud-platform-openapi.yml
-        type: OpenAPI
-    description: >-
-      Initiate authorised single payments, scheduled payments, and standing orders directly from a customer's bank
-      account using Bud's PISP service. Either redirect users to a Bud-hosted Bud Pay URL or drive the flow yourself
-      with native authorisation-code, confirmation, and status endpoints.
-  - aid: bud-co:bud-widgets-api
-    name: Bud Embedded Widgets API
-    tags:
-      - Widgets
-      - Embeddable
-      - UI
-      - Frontend
-    humanURL: https://docs.thisisbud.com
-    baseURL: https://api-sandbox.thisisbud.com
-    properties:
-      - url: https://docs.thisisbud.com
-        type: Documentation
-      - url: openapi/bud-platform-openapi.yml
-        type: OpenAPI
-    description: >-
-      Request signed URLs for Bud's embeddable frontend widgets - accounts, balances over time, financial calendar,
-      insight summary, intelligent search, recurring and forecasted transactions, savings goals, spending analysis, and
-      spending budgets - drop them into your app without rebuilding the UI.
+- aid: bud-co:bud-co-aggregation-buckets-api
+  name: Bud Financial Aggregation Buckets API
+  description: >-
+    Manage virtual "buckets" for grouping and aggregating transactions by their
+
+    underlying categories.
+
+
+    Use this for retrieving financial data for customers of the Assess Dashboard
+
+    (where the `bucket_id` is `assess-dashboard`) as it appears in said dashboard.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Aggregation Buckets
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-aggregation-buckets-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-correct-financial-data-api
+  name: Bud Financial Correct Financial Data API
+  description: >-
+    Manipulate Transactions held on the Bud platform by finding similar transactions and submitting corrections.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Correct Financial Data
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-correct-financial-data-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-create-a-connection-api
+  name: Bud Financial Create a Connection API
+  description: >-
+    Create a new connection to an Open Banking provider by using either: (i) Bud's configurable frontend
+    UI (__Bud Connect__), built to maximise conversion; or (ii) Bud's individual API endpoints to help
+    you build your own connect flow.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Create a Connection
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-create-a-connection-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-custom-insights-api
+  name: Bud Financial Custom Insights API
+  description: >-
+    Understand and target messaging to your customers more effectively by defining your own custom insights.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Custom Insights
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-custom-insights-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-customer-application-links-api
+  name: Bud Financial Customer Application Links API
+  description: >-
+    Create a link for a customer to follow, which will allow them to connect
+
+    their bank accounts and submit their financial data for the application.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Customer Application Links
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-customer-application-links-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-customer-applications-api
+  name: Bud Financial Customer Applications API
+  description: >-
+    Create, retrieve and manage financial applications for customers using the
+
+    Assess product. Applications created on this platform can be viewed using
+
+    the Assess Dashboard to observe application statuses.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Customer Applications
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-customer-applications-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-debt-collection-finder-api
+  name: Bud Financial Debt Collection Finder API
+  description: Find information regarding your customer's debts.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Debt Collection Finder
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-debt-collection-finder-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-enrichment-resources-api
+  name: Bud Financial Enrichment Resources API
+  description: Obtain greater context to Bud's enrichment services.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Enrichment Resources
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-enrichment-resources-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-enrichment-totals-api
+  name: Bud Financial Enrichment Totals API
+  description: >-
+    Breakdown your customer's income and expenditure based on Bud's enrichments to help orientate their
+    financial world.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Enrichment Totals
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-enrichment-totals-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-frontend-widgets-api
+  name: Bud Financial Frontend Widgets API
+  description: A collection of frontend widgets representing customer financial data.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Frontend Widgets
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-frontend-widgets-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-income-finder-api
+  name: Bud Financial Income Finder API
+  description: Find information regarding your customer's income.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Income Finder
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-income-finder-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-ingest-first-party-data-api
+  name: Bud Financial Ingest First Party Data API
+  description: >-
+    Initiate the asynchronous process of pushing a customer's account information (i.e. first party data)
+    onto the Bud platform. These asynchronous requests create a task to store the given accounts or transactions
+    against the specified customers. The Task ID returned by this request can be used to verify the current
+    status of the process.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Ingest First Party Data
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-ingest-first-party-data-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-initiate-payment-bud-license-api
+  name: Bud Financial Initiate Payment - Bud license API
+  description: >-
+    Authenticates and securely creates a new payment from a customer’s chosen account(s) using Bud's regulatory
+    licence as a
+
+    [Third Party Provider (TPP)](https://www.openbanking.org.uk/providers/third-party-providers/) of Payment
+    Initiation Services.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Initiate Payment - Bud license
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-initiate-payment-bud-license-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-initiate-payment-client-license-api
+  name: Bud Financial Initiate Payment - Client license API
+  description: >-
+    Authenticates and securely creates a new payment from a customer’s chosen account(s) using your organisation's
+    regulatory
+
+    permission as a Payment Initiation Service Provider (PISP).
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Initiate Payment - Client license
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-initiate-payment-client-license-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-loan-finder-api
+  name: Bud Financial Loan Finder API
+  description: Find information regarding your customer's loans.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Loan Finder
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-loan-finder-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-manage-a-connection-api
+  name: Bud Financial Manage a Connection API
+  description: >-
+    Different endpoints that allow to to manage an existing customer connection. This includes the ability
+    to:
+      (i) Refresh the data associated with a given connection, pulling in the latest account
+          information into the Bud platform;
+      (ii) Renew an existing consent  by-passing the need to go through Strong Customer
+          Authentication (SCA) with their bank;
+      (iii) Revoke a consent, removing the ability for Bud to fetch any further data associated
+          with that consent.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Manage a Connection
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-manage-a-connection-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-manage-customers-api
+  name: Bud Financial Manage Customers API
+  description: Manage the number of customers registered onto the Bud platform.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Manage Customers
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-manage-customers-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-manage-financial-data-api
+  name: Bud Financial Manage Financial Data API
+  description: >-
+    Manipulate Transactions held on the Bud platform by removing data, submitting corrections, or adding
+    tags through different rulesets.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Manage Financial Data
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-manage-financial-data-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-manage-payments-api
+  name: Bud Financial Manage Payments API
+  description: Manage payments to initiated through Bud's Payments API
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Manage Payments
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-manage-payments-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-oauth2-api
+  name: Bud Financial OAuth2 API
+  description: >-
+    Retrieve and manage access and refresh tokens to authenticate to the Bud platform via OAuth2 protocol.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - OAuth2
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-oauth2-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-product-finder-api
+  name: Bud Financial Product Finder API
+  description: Find information regarding your customer's financial products.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Product Finder
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-product-finder-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-regular-payments-finder-api
+  name: Bud Financial Regular Payments Finder API
+  description: >-
+    Find information relating to any regularity found across certain groups of transactions within your
+    customer's accounts.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Regular Payments Finder
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-regular-payments-finder-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-retrieve-actionable-insights-api
+  name: Bud Financial Retrieve Actionable Insights API
+  description: Retrieve a customer's actionable insights generated from their financial data.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Retrieve Actionable Insights
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-retrieve-actionable-insights-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-retrieve-affordability-report-api
+  name: Bud Financial Retrieve Affordability Report API
+  description: >-
+    Breakdown your customer's transactions by fixed/flexible spend and discretionary vs non discretionary
+    high-level totals.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Retrieve Affordability Report
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-retrieve-affordability-report-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-retrieve-affordability-report-v2-api
+  name: Bud Financial Retrieve Affordability Report V2 API
+  description: >-
+    Breakdown your customer's transactions by fixed/flexible spend and discretionary vs non discretionary
+    high-level totals.
+
+    Retrieve Affordability Report V2 endpoints are designed to closely reflect the assess dashboard aggregations/definitions.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Retrieve Affordability Report V2
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-retrieve-affordability-report-v2-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-retrieve-affordability-risk-insights-api
+  name: Bud Financial Retrieve Affordability Risk Insights API
+  description: >-
+    Retrieve a customer's report insights generated from their financial data. In contrast to the alert
+    style actionable insights,
+
+    these insights should be used more as a summary.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Retrieve Affordability Risk Insights
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-retrieve-affordability-risk-insights-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-retrieve-customer-characteristics-api
+  name: Bud Financial Retrieve Customer Characteristics API
+  description: >-
+    Retrieve Characteristics associated with an individual Customer based on their financial data.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Retrieve Customer Characteristics
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-retrieve-customer-characteristics-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-retrieve-financial-data-api
+  name: Bud Financial Retrieve Financial Data API
+  description: Retrieve a customer's financial data from a range of sources.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Retrieve Financial Data
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-retrieve-financial-data-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-savings-goals-v2-api
+  name: Bud Financial Savings Goals V2 API
+  description: Savings goals management API V2.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Savings Goals V2
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-savings-goals-v2-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-spending-budgets-api
+  name: Bud Financial Spending Budgets API
+  description: Spending budgets management API.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Spending Budgets
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-spending-budgets-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-subscription-finder-api
+  name: Bud Financial Subscription Finder API
+  description: Find information regarding your customer's subscriptions.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Subscription Finder
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-subscription-finder-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-transaction-search-api
+  name: Bud Financial Transaction Search API
+  description: Allows customers to search & ask questions about their financial transactions.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - Transaction Search
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-transaction-search-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
 maintainers:
   - FN: Kin Lane
     email: info@apievangelist.com
