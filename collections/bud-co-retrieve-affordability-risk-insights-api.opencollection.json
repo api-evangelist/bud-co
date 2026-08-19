@@ -1,0 +1,522 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Bud API Services: Documentation Aggregation Buckets Retrieve Affordability Risk Insights API",
+    "version": "2.10.10"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Retrieve Affordability Risk Insights",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Retrieve income/expenditure break down reports",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/insights/beta/report/income-expenditure",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "enabled_insights",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "from",
+                "value": "",
+                "type": "query",
+                "description": "A start time to check financial data for insights from. Configures the earliest financial data which may be used to generate insights. If omitted, defaults to the start of the sixth complete month prior to the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates."
+              },
+              {
+                "name": "to",
+                "value": "",
+                "type": "query",
+                "description": "An end time to check financial data for insights up to. Configures the latest financial data which may be used to generate insights. If omitted, defaults to the date of the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates. Insights relating to potential future events, such as cannot_cover_bills, may forecast them up to a month after this point."
+              },
+              {
+                "name": "currency",
+                "value": "",
+                "type": "query",
+                "description": "Used to limit the insight reports returned, to only those in the specified currency. The value should represent\na valid ISO currency code. an example would be \"GBP\" or \"EUR\".\n\nPlease refer to https://www.iso.org/iso-4217-currency-codes.html for more details.\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Retrieve income/expenditure break down reports. Each report is presented as a total expenditure vs income break\ndown to give a high level overview of a customers spending's in comparison to income. \n\nFor transactional analysis of particular aggregate, please refer to the transactions reference found within the\n`_links` properties.\n"
+        },
+        {
+          "info": {
+            "name": "Retrieve transactions relating to a specific insight report section.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/insights/beta/report/income-expenditure/transactions/:reference",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "from",
+                "value": "",
+                "type": "query",
+                "description": "A start time to check financial data for insights from. Configures the earliest financial data which may be used to generate insights. If omitted, defaults to the start of the sixth complete month prior to the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates."
+              },
+              {
+                "name": "to",
+                "value": "",
+                "type": "query",
+                "description": "An end time to check financial data for insights up to. Configures the latest financial data which may be used to generate insights. If omitted, defaults to the date of the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates. Insights relating to potential future events, such as cannot_cover_bills, may forecast them up to a month after this point."
+              },
+              {
+                "name": "currency",
+                "value": "",
+                "type": "query",
+                "description": "Used to limit the insight reports returned, to only those in the specified currency. The value should represent\na valid ISO currency code. an example would be \"GBP\" or \"EUR\".\n\nPlease refer to https://www.iso.org/iso-4217-currency-codes.html for more details.\n"
+              },
+              {
+                "name": "reference",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Each report, where appropriate will have a unique reference for that specific aggregated section of the report.\nusing the same parameters used in the call to `insights_beta_report_income_expenditure_get`,\nin combination with the unique reference, will return the raw transactions\nlist used to produce that aggregation. This is useful if requiring further investigation or analysis.\nThe reference can be found in the `_links` section of the insight reports.\n\nNOTE:\nAlterations to the `to`/`from` query"
+        },
+        {
+          "info": {
+            "name": "Retrieve merchant-specific breakdown reports.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/insights/beta/report/merchants",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "enabled_insights",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "from",
+                "value": "",
+                "type": "query",
+                "description": "A start time to check financial data for insights from. Configures the earliest financial data which may be used to generate insights. If omitted, defaults to the start of the sixth complete month prior to the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates."
+              },
+              {
+                "name": "to",
+                "value": "",
+                "type": "query",
+                "description": "An end time to check financial data for insights up to. Configures the latest financial data which may be used to generate insights. If omitted, defaults to the date of the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates. Insights relating to potential future events, such as cannot_cover_bills, may forecast them up to a month after this point."
+              },
+              {
+                "name": "currency",
+                "value": "",
+                "type": "query",
+                "description": "Used to limit the insight reports returned, to only those in the specified currency. The value should represent\na valid ISO currency code. an example would be \"GBP\" or \"EUR\".\n\nPlease refer to https://www.iso.org/iso-4217-currency-codes.html for more details.\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Endpoint is responsible for returning merchant based aggregated transaction breakdowns. The reports are presented in\na way that allows for a high level overview of a customers spending habits with specific merchants.\n\nFor transactional analysis of particular aggregate, please refer to the transactions reference found within the\n`_links` properties.\n"
+        },
+        {
+          "info": {
+            "name": "Retrieve transactions relating to a specific insight report section.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/insights/beta/report/merchants/transactions/:reference",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "from",
+                "value": "",
+                "type": "query",
+                "description": "A start time to check financial data for insights from. Configures the earliest financial data which may be used to generate insights. If omitted, defaults to the start of the sixth complete month prior to the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates."
+              },
+              {
+                "name": "to",
+                "value": "",
+                "type": "query",
+                "description": "An end time to check financial data for insights up to. Configures the latest financial data which may be used to generate insights. If omitted, defaults to the date of the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates. Insights relating to potential future events, such as cannot_cover_bills, may forecast them up to a month after this point."
+              },
+              {
+                "name": "currency",
+                "value": "",
+                "type": "query",
+                "description": "Used to limit the insight reports returned, to only those in the specified currency. The value should represent\na valid ISO currency code. an example would be \"GBP\" or \"EUR\".\n\nPlease refer to https://www.iso.org/iso-4217-currency-codes.html for more details.\n"
+              },
+              {
+                "name": "reference",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Each report, where appropriate will have a unique reference for that specific aggregated section of the report.\nusing the same parameters used in the call to `insights_beta_report_merchants_get`,\nin combination with the unique reference, will return the raw transactions\nlist used to produce that aggregation. This is useful if requiring further investigation or analysis.\nThe reference can be found in the `_links` section of the insight reports.\n\nNOTE:\nAlterations to the `to`/`from` query properti"
+        },
+        {
+          "info": {
+            "name": "Retrieve a report on a customers unauthorised overdraft.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/insights/beta/report/balance/unauthorised-overdraft",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "enabled_insights",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "from",
+                "value": "",
+                "type": "query",
+                "description": "A start time to check financial data for insights from. Configures the earliest financial data which may be used to generate insights. If omitted, defaults to the start of the sixth complete month prior to the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates."
+              },
+              {
+                "name": "to",
+                "value": "",
+                "type": "query",
+                "description": "An end time to check financial data for insights up to. Configures the latest financial data which may be used to generate insights. If omitted, defaults to the date of the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates. Insights relating to potential future events, such as cannot_cover_bills, may forecast them up to a month after this point."
+              },
+              {
+                "name": "currency",
+                "value": "",
+                "type": "query",
+                "description": "Used to limit the insight reports returned, to only those in the specified currency. The value should represent\na valid ISO currency code. an example would be \"GBP\" or \"EUR\".\n\nPlease refer to https://www.iso.org/iso-4217-currency-codes.html for more details.\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Endpoint is responsible for returning balance based aggregated transaction breakdowns and insights.\nThe reports are presented in a way that allows for a high level overview of a customers balances. \nThis particular route focuses on customer accounts with unauthorised overdrafts.\n\nFor transactional analysis of particular aggregate, please refer to the transactions reference found within the\n`_links` properties.\n"
+        },
+        {
+          "info": {
+            "name": "Retrieve transactions relating to a specific insight report section.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/insights/beta/report/balance/unauthorised-overdraft/transactions/:reference",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "from",
+                "value": "",
+                "type": "query",
+                "description": "A start time to check financial data for insights from. Configures the earliest financial data which may be used to generate insights. If omitted, defaults to the start of the sixth complete month prior to the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates."
+              },
+              {
+                "name": "to",
+                "value": "",
+                "type": "query",
+                "description": "An end time to check financial data for insights up to. Configures the latest financial data which may be used to generate insights. If omitted, defaults to the date of the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates. Insights relating to potential future events, such as cannot_cover_bills, may forecast them up to a month after this point."
+              },
+              {
+                "name": "currency",
+                "value": "",
+                "type": "query",
+                "description": "Used to limit the insight reports returned, to only those in the specified currency. The value should represent\na valid ISO currency code. an example would be \"GBP\" or \"EUR\".\n\nPlease refer to https://www.iso.org/iso-4217-currency-codes.html for more details.\n"
+              },
+              {
+                "name": "reference",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Each report, where appropriate will have a unique reference for that specific aggregated section of the report.\nusing the same parameters used in the call to `insights_beta_report_balance_unauthorised_overdraft_get`,\nin combination with the unique reference, will return the raw transactions\nlist used to produce that aggregation. This is useful if requiring further investigation or analysis.\nThe reference can be found in the `_links` section of the insight reports.\n\nNOTE:\nAlterations to the `to`/"
+        },
+        {
+          "info": {
+            "name": "Retrieve a health report on a customers financial profile.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/insights/beta/report/income-health",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "enabled_insights",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "from",
+                "value": "",
+                "type": "query",
+                "description": "A start time to check financial data for insights from. Configures the earliest financial data which may be used to generate insights. If omitted, defaults to the start of the sixth complete month prior to the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates."
+              },
+              {
+                "name": "to",
+                "value": "",
+                "type": "query",
+                "description": "An end time to check financial data for insights up to. Configures the latest financial data which may be used to generate insights. If omitted, defaults to the date of the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates. Insights relating to potential future events, such as cannot_cover_bills, may forecast them up to a month after this point."
+              },
+              {
+                "name": "currency",
+                "value": "",
+                "type": "query",
+                "description": "Used to limit the insight reports returned, to only those in the specified currency. The value should represent\na valid ISO currency code. an example would be \"GBP\" or \"EUR\".\n\nPlease refer to https://www.iso.org/iso-4217-currency-codes.html for more details.\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Retrieve a list of insights that reflect various health reports based on a customers ingested data. \nReports found within this grouping reflect aggregations against a customers income sources.\nWhere feasible, deep aggregate analysis is provided to allow for further insight. \n\nFor transactional analysis of particular aggregate, please refer to the transactions reference found within the\n`_links` properties.\n"
+        },
+        {
+          "info": {
+            "name": "Retrieve transactions relating to a specific insight report section.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/insights/beta/report/income-health/transactions/:reference",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "from",
+                "value": "",
+                "type": "query",
+                "description": "A start time to check financial data for insights from. Configures the earliest financial data which may be used to generate insights. If omitted, defaults to the start of the sixth complete month prior to the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates."
+              },
+              {
+                "name": "to",
+                "value": "",
+                "type": "query",
+                "description": "An end time to check financial data for insights up to. Configures the latest financial data which may be used to generate insights. If omitted, defaults to the date of the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates. Insights relating to potential future events, such as cannot_cover_bills, may forecast them up to a month after this point."
+              },
+              {
+                "name": "currency",
+                "value": "",
+                "type": "query",
+                "description": "Used to limit the insight reports returned, to only those in the specified currency. The value should represent\na valid ISO currency code. an example would be \"GBP\" or \"EUR\".\n\nPlease refer to https://www.iso.org/iso-4217-currency-codes.html for more details.\n"
+              },
+              {
+                "name": "reference",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Each report, where appropriate will have a unique reference for that specific aggregated section of the report.\nusing the same parameters used in the call to `insights_beta_report_balance_unauthorised_overdraft_get`,\nin combination with the unique reference, will return the raw transactions\nlist used to produce that aggregation. This is useful if requiring further investigation or analysis.\nThe reference can be found in the `_links` section of the insight reports.\n\nNOTE:\nAlterations to the `to`/"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

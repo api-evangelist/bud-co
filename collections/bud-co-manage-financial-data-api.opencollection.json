@@ -1,0 +1,110 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Bud API Services: Documentation Aggregation Buckets Manage Financial Data API",
+    "version": "2.10.10"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Manage Financial Data",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Remove Account Data V2",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api-sandbox.thisisbud.com/financial/v2/accounts/:account_id",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "account_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier of the account to be deleted."
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Delete all data (including transactions and balances) related to the specified account.\n"
+        },
+        {
+          "info": {
+            "name": "Remove Provider Data",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api-sandbox.thisisbud.com/v1/provider/:provider",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "provider",
+                "value": "",
+                "type": "path",
+                "description": "Name of the provider (banking institution)"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Delete all data (transactions, enrichments, accounts) related to the specified provider.\n"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

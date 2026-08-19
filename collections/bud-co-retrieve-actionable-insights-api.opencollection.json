@@ -1,0 +1,505 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Bud API Services: Documentation Aggregation Buckets Retrieve Actionable Insights API",
+    "version": "2.10.10"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Retrieve Actionable Insights",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Retrieve Balances Actionable Insights",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/insights/v1/actionable/balances",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "from",
+                "value": "",
+                "type": "query",
+                "description": "A start time to check financial data for insights from. Configures the earliest financial data which may be used to generate insights. If omitted, defaults to the start of the sixth complete month prior to the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates."
+              },
+              {
+                "name": "to",
+                "value": "",
+                "type": "query",
+                "description": "An end time to check financial data for insights up to. Configures the latest financial data which may be used to generate insights. If omitted, defaults to the date of the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates. Insights relating to potential future events, such as cannot_cover_bills, may forecast them up to a month after this point."
+              },
+              {
+                "name": "enabled_insights",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "close_to_credit_limit.percentage_utilisation_threshold",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "low_balance.balance_threshold",
+                "value": "",
+                "type": "query"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Generate balances actionable insights.\n\n> 📘 Note:\n>\n> For more information about Actionable Insights, please refer to our [guide](https://docs.thisisbud.com/docs/actionable-insights).\n"
+        },
+        {
+          "info": {
+            "name": "Retrieve Balances Actionable Insight Details",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/insights/v1/actionable/balances/:type/:id/details",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "from",
+                "value": "",
+                "type": "query",
+                "description": "A start time to check financial data for insights from. Configures the earliest financial data which may be used to generate insights. If omitted, defaults to the start of the sixth complete month prior to the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates."
+              },
+              {
+                "name": "to",
+                "value": "",
+                "type": "query",
+                "description": "An end time to check financial data for insights up to. Configures the latest financial data which may be used to generate insights. If omitted, defaults to the date of the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates. Insights relating to potential future events, such as cannot_cover_bills, may forecast them up to a month after this point."
+              },
+              {
+                "name": "type",
+                "value": "",
+                "type": "path"
+              },
+              {
+                "name": "id",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Retrieve insight-specific details and transaction and account data responsible for the triggered balances insight of the given type and ID.\n\n> 📘 Note:\n>\n> For more information about Actionable Insights, please refer to our [guide](https://docs.thisisbud.com/docs/actionable-insights).\n"
+        },
+        {
+          "info": {
+            "name": "Retrieve Income Actionable Insights",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/insights/v1/actionable/income",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "from",
+                "value": "",
+                "type": "query",
+                "description": "A start time to check financial data for insights from. Configures the earliest financial data which may be used to generate insights. If omitted, defaults to the start of the sixth complete month prior to the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates."
+              },
+              {
+                "name": "to",
+                "value": "",
+                "type": "query",
+                "description": "An end time to check financial data for insights up to. Configures the latest financial data which may be used to generate insights. If omitted, defaults to the date of the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates. Insights relating to potential future events, such as cannot_cover_bills, may forecast them up to a month after this point."
+              },
+              {
+                "name": "enabled_insights",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "gambling_income.minimum_monthly_threshold",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "gambling_income.minimum_percentage_total_threshold",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "late_income.minimum_value_threshold",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "late_income.minimum_days_late_threshold",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "pension_income.minimum_monthly_threshold",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "pension_income.minimum_percentage_total_threshold",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "regular_income_changed.minimum_absolute_change_threshold",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "regular_income_changed.minimum_percentage_change_threshold",
+                "value": "",
+                "type": "query"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Generate income actionable insights.\n\n> 📘 Note:\n>\n> For more information about Actionable Insights, please refer to our [guide](https://docs.thisisbud.com/docs/actionable-insights).\n"
+        },
+        {
+          "info": {
+            "name": "Retrieve Income Actionable Insight Details",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/insights/v1/actionable/income/:type/:id/details",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "from",
+                "value": "",
+                "type": "query",
+                "description": "A start time to check financial data for insights from. Configures the earliest financial data which may be used to generate insights. If omitted, defaults to the start of the sixth complete month prior to the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates."
+              },
+              {
+                "name": "to",
+                "value": "",
+                "type": "query",
+                "description": "An end time to check financial data for insights up to. Configures the latest financial data which may be used to generate insights. If omitted, defaults to the date of the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates. Insights relating to potential future events, such as cannot_cover_bills, may forecast them up to a month after this point."
+              },
+              {
+                "name": "type",
+                "value": "",
+                "type": "path"
+              },
+              {
+                "name": "id",
+                "value": "",
+                "type": "path"
+              },
+              {
+                "name": "gambling_income.minimum_monthly_threshold",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "gambling_income.minimum_percentage_total_threshold",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "late_income.minimum_value_threshold",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "late_income.minimum_days_late_threshold",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "pension_income.minimum_monthly_threshold",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "pension_income.minimum_percentage_total_threshold",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "regular_income_changed.minimum_absolute_change_threshold",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "regular_income_changed.minimum_percentage_change_threshold",
+                "value": "",
+                "type": "query"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Retrieve insight-specific details and transaction and account data responsible for the triggered income insight of the given type and ID.\n\n> 📘 Note:\n>\n> For more information about Actionable Insights, please refer to our [guide](https://docs.thisisbud.com/docs/actionable-insights).\n"
+        },
+        {
+          "info": {
+            "name": "Retrieve Spending Actionable Insights",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/insights/v1/actionable/spending",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "from",
+                "value": "",
+                "type": "query",
+                "description": "A start time to check financial data for insights from. Configures the earliest financial data which may be used to generate insights. If omitted, defaults to the start of the sixth complete month prior to the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates."
+              },
+              {
+                "name": "to",
+                "value": "",
+                "type": "query",
+                "description": "An end time to check financial data for insights up to. Configures the latest financial data which may be used to generate insights. If omitted, defaults to the date of the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates. Insights relating to potential future events, such as cannot_cover_bills, may forecast them up to a month after this point."
+              },
+              {
+                "name": "enabled_insights",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "late_payment.minimum_value_threshold",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "late_payment.minimum_days_late_threshold",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "regular_payment_changed.minimum_absolute_change_threshold",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "regular_payment_changed.minimum_percentage_change_threshold",
+                "value": "",
+                "type": "query"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Generate spending actionable insights.\n\n> 📘 Note:\n>\n> For more information about Actionable Insights, please refer to our [guide](https://docs.thisisbud.com/docs/actionable-insights).\n"
+        },
+        {
+          "info": {
+            "name": "Retrieve Spending Actionable Insight Details",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/insights/v1/actionable/spending/:type/:id/details",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "from",
+                "value": "",
+                "type": "query",
+                "description": "A start time to check financial data for insights from. Configures the earliest financial data which may be used to generate insights. If omitted, defaults to the start of the sixth complete month prior to the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates."
+              },
+              {
+                "name": "to",
+                "value": "",
+                "type": "query",
+                "description": "An end time to check financial data for insights up to. Configures the latest financial data which may be used to generate insights. If omitted, defaults to the date of the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates. Insights relating to potential future events, such as cannot_cover_bills, may forecast them up to a month after this point."
+              },
+              {
+                "name": "type",
+                "value": "",
+                "type": "path"
+              },
+              {
+                "name": "id",
+                "value": "",
+                "type": "path"
+              },
+              {
+                "name": "late_payment.minimum_value_threshold",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "late_payment.minimum_days_late_threshold",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "regular_payment_changed.minimum_absolute_change_threshold",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "regular_payment_changed.minimum_percentage_change_threshold",
+                "value": "",
+                "type": "query"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Retrieve insight-specific details and transaction and account data responsible for the triggered income insight of the given type and ID.\n\n> 📘 Note:\n>\n> For more information about Actionable Insights, please refer to our [guide](https://docs.thisisbud.com/docs/actionable-insights).\n"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

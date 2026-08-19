@@ -1,0 +1,292 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Bud API Services: Documentation Aggregation Buckets Spending Budgets API",
+    "version": "2.10.10"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Spending Budgets",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Retrieve Spending Budgets",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/goals/v1/spending-budgets",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "account_id",
+                "value": "RxsYshVGded4JeilkXgWKdXA",
+                "type": "query",
+                "description": "Use this parameter to filter the results on data associated with the given account id.\n\nExample: `RxsYshVGded4JeilkXgWKdXA`\n"
+              },
+              {
+                "name": "day",
+                "value": "2019-02-29T12:23:00Z",
+                "type": "query",
+                "description": "The day for which results are to be retrieved in the format [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339).\n\nExamples:\n  - `2023-01-17T17:29:51Z`\n  - `2023-01-17T17:29:51-08:00`\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Retrieve all spending budgets.\n\nAccounts IDs can be supplied as part of the URL query to return budgets with values filtered to the accounts IDs supplied. These budgets'\nspent amounts will only consider transactions associated with the specified accounts.\nIf no account IDs are specified, the returned budgets will have a value combined from transactions across all of the customer's accounts.\n"
+        },
+        {
+          "info": {
+            "name": "Create Spending Budget",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api-sandbox.thisisbud.com/goals/v1/spending-budgets",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Create a spending budget.\n"
+        },
+        {
+          "info": {
+            "name": "Delete all Spending Budgets",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api-sandbox.thisisbud.com/goals/v1/spending-budgets",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Delete all of a customers' spending budgets.\n"
+        },
+        {
+          "info": {
+            "name": "Patch a Spending Budget",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api-sandbox.thisisbud.com/goals/v1/spending-budgets/:budget_id",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "budget_id",
+                "value": "81a68821-dca6-4771-80d4-002c7fce412e",
+                "type": "path",
+                "description": "The ID of the spending budget.\n\nExample: `81a68821-dca6-4771-80d4-002c7fce412e`\n"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Update a Spending Budget with a given `budget_id`.\n"
+        },
+        {
+          "info": {
+            "name": "Delete a Spending Budget",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api-sandbox.thisisbud.com/goals/v1/spending-budgets/:budget_id",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "budget_id",
+                "value": "81a68821-dca6-4771-80d4-002c7fce412e",
+                "type": "path",
+                "description": "The ID of the spending budget.\n\nExample: `81a68821-dca6-4771-80d4-002c7fce412e`\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Delete a specific spending budget with the given `budget_id`\n"
+        },
+        {
+          "info": {
+            "name": "Retrieve Spending Budget Transactions",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/goals/v1/spending-budgets/:budget_id/transactions",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "budget_id",
+                "value": "81a68821-dca6-4771-80d4-002c7fce412e",
+                "type": "path",
+                "description": "The ID of the spending budget.\n\nExample: `81a68821-dca6-4771-80d4-002c7fce412e`\n"
+              },
+              {
+                "name": "day",
+                "value": "2019-02-29T12:23:00Z",
+                "type": "query",
+                "description": "The day for which results are to be retrieved in the format [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339).\n\nExamples:\n  - `2023-01-17T17:29:51Z`\n  - `2023-01-17T17:29:51-08:00`\n"
+              },
+              {
+                "name": "page_token",
+                "value": "b21055a9a9f46fc794a2e6855c65abd7e317181039fc6930daabac5822911d14a84895ecd947e2b5abdcb22e4fcc2c594e1f661dc63e34b9ba88760724047990896f7581a0786c2605dce19c6a9d80d1044f963b74fea0a929c0a4465a6e67378a74dce38ec5e26ae4cc804b62fd666d5df4cf2e7f524bd99e5523bc5d471768065c036dc0c73122705b280817fbbd7d9aa31f271d72cd3877d999dcb9a5b1c0be0c05",
+                "type": "query",
+                "description": "Use this paramater to fetch a specific page of results. Provided by the next_page_token field in the previous request."
+              },
+              {
+                "name": "page_size",
+                "value": "200",
+                "type": "query",
+                "description": "Use this parameter to set the maximum number of results to be returned. This defaults to 100, and has a maximum of 200."
+              },
+              {
+                "name": "account_id",
+                "value": "RxsYshVGded4JeilkXgWKdXA",
+                "type": "query",
+                "description": "Use this parameter to filter the results on data associated with the given account id.\n\nExample: `RxsYshVGded4JeilkXgWKdXA`\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Retrieve all of the transactions associated with a spending budget. The results of this endpoint are paginated with a default page size of `100` and a maximum of `200`. \nThe page size is configurable by the `page_size` query parameter.\nThe next page of results can be retrieved using the `page_token` query parameter.\n\nAccount IDs can be supplied as part of the URL query to filter transactions to those only associated with the specified accounts.\nIf no account IDs are specified, we will return tra"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

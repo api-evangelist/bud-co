@@ -1,0 +1,306 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Bud API Services: Documentation Aggregation Buckets Transaction Search API",
+    "version": "2.10.10"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Transaction Search",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Search customer transactions.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/search/beta/transactions",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Timezone",
+                "value": ""
+              },
+              {
+                "name": "Accept",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "user_input",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "merchant_name",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "category_l1",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "category_l2",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "description",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "tag",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "account_id",
+                "value": "RxsYshVGded4JeilkXgWKdXA",
+                "type": "query",
+                "description": "Account id used to filter results. If multiple account ids are supplied, transactions from all of the supplied accounts will be included in results.\n"
+              },
+              {
+                "name": "credit_debit_indicator",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "amount_min",
+                "value": "",
+                "type": "query",
+                "description": "Include transactions with an amount value greater than or equal to the specified value\n"
+              },
+              {
+                "name": "amount_max",
+                "value": "",
+                "type": "query",
+                "description": "Include transactions with an amount value less than or equal to the specified value. Must be greater than 0.\n"
+              },
+              {
+                "name": "from",
+                "value": "2019-02-29T12:23:00Z",
+                "type": "query",
+                "description": "The date from when results are to be retrieved in the format [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339).\n\nExamples:\n  - `2023-01-17T17:29:51Z`\n  - `2023-01-17T17:29:51-08:00`\n"
+              },
+              {
+                "name": "to",
+                "value": "2019-02-29T12:23:00Z",
+                "type": "query",
+                "description": "The date up to when results are to be retrieved in the format [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339).\n\nExamples:\n  - `2023-03-17T17:29:51Z`\n  - `2023-03-17T17:29:51-08:00`\n"
+              },
+              {
+                "name": "page_token",
+                "value": "eyJoZWxsbyI6ICJ3b3JsZCJ9Cg==",
+                "type": "query",
+                "description": "Use this parameter to fetch a specific page of results. Provided by the next_page_token field in the previous request."
+              },
+              {
+                "name": "page_size",
+                "value": "25",
+                "type": "query",
+                "description": "Use this parameter to set the maximum number of results to be returned. This defaults to 25, and has a maximum of 100."
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Finds the most relevant transactions matching the `user_input` text.\n\nAn initial free text search will then suggest `suggested_searches` which use structured data e.g. `category_l1` or `merchant_name`.\n\nAt most one of the following query parameters can be used per request, if multiple are set the endpoint will return a `Bad Request` response (if none are set, transactions will be returned with no filtering to facilitate showing an initial transaction list to the user):\n  - `user_input`\n  - `merc"
+        },
+        {
+          "info": {
+            "name": "Get transaction search by ID.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/search/beta/transactions/:search_id",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Timezone",
+                "value": ""
+              },
+              {
+                "name": "Accept",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "search_id",
+                "value": "2f6c8ebe-b408-43f8-9152-80e2275deec5",
+                "type": "path"
+              },
+              {
+                "name": "page_token",
+                "value": "eyJoZWxsbyI6ICJ3b3JsZCJ9Cg==",
+                "type": "query",
+                "description": "Use this parameter to fetch a specific page of results. Provided by the next_page_token field in the previous request."
+              },
+              {
+                "name": "page_size",
+                "value": "25",
+                "type": "query",
+                "description": "Use this parameter to set the maximum number of results to be returned. This defaults to 25, and has a maximum of 100."
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Retrieves an existing transaction search by its search ID.\n\n**📘 Note: Searches are transient. After the search expires (see `metadata.expires_in`), this endpoint will return a `Not Found` response. The recommended behaviour in this case is to resubmit the desired search using the `Search customer transactions` endpoint.**"
+        },
+        {
+          "info": {
+            "name": "Get transaction search insight.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/search/beta/transactions/:search_id/insight",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Timezone",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "search_id",
+                "value": "2f6c8ebe-b408-43f8-9152-80e2275deec5",
+                "type": "path"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Retrieves an AI-generated insight to enrich the output, or answer the question asked in the input to the transaction search. There is no multi-currency support in insights, so the default currency for the customer's region will be assumed.\n\nThis insight can take some time to generate, so the `status` property can be used in combination with the `Retry-After` response header to poll until the insight is generated (at which point the status will be `success`).\n\n**📘 Note: Searches are transient. A"
+        },
+        {
+          "info": {
+            "name": "Get transactions used by the search insight.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/search/beta/transactions/:search_id/insight/transactions",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Timezone",
+                "value": ""
+              },
+              {
+                "name": "Accept",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "search_id",
+                "value": "2f6c8ebe-b408-43f8-9152-80e2275deec5",
+                "type": "path"
+              },
+              {
+                "name": "page_token",
+                "value": "eyJoZWxsbyI6ICJ3b3JsZCJ9Cg==",
+                "type": "query",
+                "description": "Use this parameter to fetch a specific page of results. Provided by the next_page_token field in the previous request."
+              },
+              {
+                "name": "page_size",
+                "value": "25",
+                "type": "query",
+                "description": "Use this parameter to set the maximum number of results to be returned. This defaults to 25, and has a maximum of 100."
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Retrieves transactions used to calculate the AI-generated transaction search insight, to provide explainability for the insight.\n\nThis insight can take some time to generate, so until the insight is generated (use the insight endpoint to check status), this endpoint will return a `Not Found` response.\n\n**📘 Note: Searches are transient. After the search expires (see `metadata.expires_in`), this endpoint will return a `Not Found` response. The recommended behaviour in this case is to resubmit the"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

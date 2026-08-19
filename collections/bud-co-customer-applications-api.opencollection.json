@@ -1,0 +1,170 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Bud API Services: Documentation Aggregation Buckets Customer Applications API",
+    "version": "2.10.10"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Customer Applications",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Retrieve Customer Applications",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/assess/v1/customer-applications",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              }
+            ],
+            "params": [
+              {
+                "name": "metadata.{field_name}",
+                "value": "",
+                "type": "query",
+                "description": "Search by exact-match on the `field_name` of `metadata` properties.\nExample: `metadata.loan_product_code=credit_card_1234` will limit results to all\ncustomer applications that have the following metadata contained:\n\n```json\n{\n  \"metadata\": {\n    \"loan_product_code\": \"credit_card_1234\"\n  }\n}\n```\n"
+              },
+              {
+                "name": "page_token",
+                "value": "",
+                "type": "query",
+                "description": "Token provided in the `metadata` blob of a response, in order to find\nthe next page in a collection, e.g.\n\n```json\n{\n  \"metadata\": {\n    \"next_page_token\": \"4jmBrvVn9r\"\n  }\n}\n```\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Retrieve a list of all your customer applications.\n"
+        },
+        {
+          "info": {
+            "name": "Create Customer Application",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api-sandbox.thisisbud.com/assess/v1/customer-applications",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Create a new customer application.\n\nApplications can hold more data than just the standard Bud Customer\ninformation, such as:\n\n- Applicant First Name\n- Applicant Last Name\n- Names for Secondary Applicants (if this is a joint application)\n- Key-value pairs for additional metadata you may want to associate to\n  this application (e.g. if the customer is applying for finance, your\n  system may have a product code for the relevant finance product).\n"
+        },
+        {
+          "info": {
+            "name": "Retrieve Customer Application",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/assess/v1/customer-applications/:application_id",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              }
+            ],
+            "params": [
+              {
+                "name": "application_id",
+                "value": "",
+                "type": "path"
+              },
+              {
+                "name": "timezone",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "date_range_end",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "date_range_durations",
+                "value": "",
+                "type": "query",
+                "description": "Used with `timezone` and `date_range_end` to determine the list of `date_ranges` that appear in the\nmetadata of the response. Use this to configure the specific periods of time that you wish to assess\na customer's application data over.\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Retrieve an individual customer's application.\n"
+        },
+        {
+          "info": {
+            "name": "Delete Customer Application",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api-sandbox.thisisbud.com/assess/v1/customer-applications/:application_id",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              }
+            ],
+            "params": [
+              {
+                "name": "application_id",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Delete an individual customer's application, and all financial data\nassociated with it.\n"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

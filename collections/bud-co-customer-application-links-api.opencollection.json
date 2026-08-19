@@ -1,0 +1,55 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Bud API Services: Documentation Aggregation Buckets Customer Application Links API",
+    "version": "2.10.10"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Customer Application Links",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Retrieve Customer Application URL",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api-sandbox.thisisbud.com/assess/v1/customer-applications/:application_id/customer-links",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              }
+            ],
+            "params": [
+              {
+                "name": "application_id",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Allow customers to share their account information in relation to a\nspecific application. A URL is provided in the response, which is to be\ngiven to the customer for them to follow in order to share their\ninformation.\n\nIf a valid email is specified in the request, Bud will automatically\nsend an email to the customer with the link embedded, and with\ninstructions for the customer to proceed.\n\nThis email will also override/set the `metadata.customer_email` property\non the customer application.\n"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

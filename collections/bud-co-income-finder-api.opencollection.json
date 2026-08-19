@@ -1,0 +1,156 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Bud API Services: Documentation Aggregation Buckets Income Finder API",
+    "version": "2.10.10"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Income Finder",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Retrieve Income Transactions V2",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/v2/income",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              },
+              {
+                "name": "X-From",
+                "value": ""
+              },
+              {
+                "name": "X-To",
+                "value": ""
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Provides a list of a customer's income based transactions found within their connected accounts, and predicts whether each income transaction is related to a customer's `salary_or_wages`. Any income which is not salary or wages is given the type `other_incoming`, which can include other income sources such as investments or pension income.\n\nWhen `X-From` is omitted from the request, a default value of 9 months from before today's date will be used.\nWhen `X-To` is omitted from the request, a defa"
+        },
+        {
+          "info": {
+            "name": "Retrieve Benefits Transactions",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/v1/benefits",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              },
+              {
+                "name": "X-From",
+                "value": ""
+              },
+              {
+                "name": "X-To",
+                "value": ""
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Provides a list of a customer's benefits based transactions found within their connected accounts.\n\nWhen `X-From` is omitted from the request, a default value of 30 days from before today's date will be used.\nWhen `X-To` is omitted from the request, a default value of today's date will be used.\n"
+        },
+        {
+          "info": {
+            "name": "Retrieve Benefits Totals",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/v1/benefits/totals",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              },
+              {
+                "name": "X-From",
+                "value": ""
+              },
+              {
+                "name": "X-To",
+                "value": ""
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Provides a customers' total income under each detected benefit type.\n\nWhen `X-From` is omitted from the request, a default value of 30 days from before today's date will be used.\nWhen `X-To` is omitted from the request, a default value of today's date will be used.\n"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

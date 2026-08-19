@@ -1,0 +1,750 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Bud API Services: Documentation Aggregation Buckets Retrieve Financial Data API",
+    "version": "2.10.10"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Retrieve Financial Data",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Retrieve Accounts V3",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/financial/v3/accounts",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "currency",
+                "value": "GBP",
+                "type": "query",
+                "description": "Use this parameter to filter the results returned on the `currency` associated with each result. Multiple values are accepted. If this parameter is not provided then results of any `currency` will be returned."
+              },
+              {
+                "name": "provider",
+                "value": "BankOfBud",
+                "type": "query",
+                "description": "Use this parameter to filter the results returned on the `provider` associated with each result. Multiple values are accepted. If this parameter is not provided then results of any `provider` will be returned."
+              },
+              {
+                "name": "account_type",
+                "value": "current_account",
+                "type": "query",
+                "description": "Use this parameter to filter the results returned on the `account_type` associated with each result. Multiple values are accepted. If this parameter is not provided then results of any `account_type` will be returned.\nCurrently supported values include (but are not necessarily limited to):\n  - `auto_loan`\n  - `boat_loan`\n  - `brokerage`\n  - `business_loan`\n  - `certificate_of_deposit`\n  - `charge_card`\n  - `checking_account`\n  - `credit_card`\n  - `current_account`\n  - `disability_insurance`\n  - `e_money`\n  - `health_insurance`\n  - `home_equity_loan`\n  - `investment`\n  - `ira`\n  - `liability_insurance`\n  - `life_insurance`\n  - `line_of_credit`\n  - `loan`\n  - `money_market`\n  - `mortgage`\n  - `other`\n  - `personal_loan`\n  - `pre_paid_card`\n  - `property_insurance`\n  - `roth`\n  - `rv_loan`\n  - `savings`\n  - `student_loan`\n  - `travel_insurance`\n  - `vehicle_insurance`\n"
+              },
+              {
+                "name": "usage_type",
+                "value": "personal",
+                "type": "query",
+                "description": "Use this parameter to filter the results returned on the `usage_type` associated with each result. Multiple values are accepted. If this parameter is not provided then results of any `usage_type` will be returned.\nCurrently supported values include (but are not necessarily limited to):\n  - `personal`\n  - `business`\n"
+              },
+              {
+                "name": "holder_relationship_type",
+                "value": "joint",
+                "type": "query",
+                "description": "Use this parameter to filter the results returned on the `holder_relationship_type` associated with each result. Multiple values are accepted. If this parameter is not provided then results of any `holder_relationship_type` will be returned.\nCurrently supported values include (but are not necessarily limited to):\n  - `sole`\n  - `joint`\n  - `delegate`\n  - `unknown`\n"
+              },
+              {
+                "name": "include_all_balances",
+                "value": "true",
+                "type": "query",
+                "description": "Use this parameter to include all balances associated with each account.  If this parameter is not provided then only the pending and booked balance will be returned where available.\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Retrieves a list of a customer's connected accounts. The result can be filtered using the parameters outlined below.\n> 📘 Note: > > For more information on the Account object, please refer to our handy [guide](https://docs.thisisbud.com/docs/accounts).\n"
+        },
+        {
+          "info": {
+            "name": "Retrieve Account By ID V3",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/financial/v3/accounts/:account_id",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "account_id",
+                "value": "",
+                "type": "path",
+                "description": "The account ID to retrieve data for."
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Retrieves a customer's connected account by its ID.\n> 📘 Note: > > For more information on the Account object, please refer to our handy [guide](https://docs.thisisbud.com/docs/accounts).\n"
+        },
+        {
+          "info": {
+            "name": "Retrieve Account Transaction Dates",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/financial/v3/accounts/transaction-dates",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Retrieves a summary listing the first and last transaction per customer's accounts.\n"
+        },
+        {
+          "info": {
+            "name": "Retrieve Balances Over Time V3",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/financial/v3/balances",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "from",
+                "value": "2019-02-29T12:23:00Z",
+                "type": "query",
+                "description": "The date from when results are to be retrieved in the format [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339).\n\nExamples:\n  - `2023-01-17T17:29:51Z`\n  - `2023-01-17T17:29:51-08:00`\n"
+              },
+              {
+                "name": "to",
+                "value": "2019-02-29T12:23:00Z",
+                "type": "query",
+                "description": "The date up to when results are to be retrieved in the format [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339).\n\nExamples:\n  - `2023-03-17T17:29:51Z`\n  - `2023-03-17T17:29:51-08:00`\n"
+              },
+              {
+                "name": "granularity",
+                "value": "daily",
+                "type": "query",
+                "description": "Specifies in what interval the balance over time should be retrieved.\nCurrently supported values include (but are not necessarily limited to):\n  - `daily`\n  - `weekly`\n  - `biweekly`\n  - `monthly`\n  - `quarterly`\n  - `six_monthly`\n  - `annually`\n\nDefaults to `weekly`.\n"
+              },
+              {
+                "name": "date-field",
+                "value": "date_time",
+                "type": "query",
+                "description": "Specifies which date field as returned from the `/financial/v2/transactions` endpoint should be used in the calculation of balance over time.\n\nCurrently supported values include (but are not necessarily limited to):\n  - `date_time`\n  - `posted_date_time`\n\nDefaults to `date_time`.\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "List the balances of each bank account for a customer across all ingestion sources. Ordered by balance date.\nIt calculates the balance for each date, by iterating from the date the account was last refreshed to the `to`  and `from` dates provided. It then checks all the transactions within this range, calculating the balance at  the end of each day.\nThis endpoint limits the date from which it gets balances by the oldest `transaction_window` on the  account. If `transaction_windows` are not prese"
+        },
+        {
+          "info": {
+            "name": "Retrieve Balances Over Time By Account V3",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/financial/v3/accounts/:account_id/balances",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "from",
+                "value": "2019-02-29T12:23:00Z",
+                "type": "query",
+                "description": "The date from when results are to be retrieved in the format [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339).\n\nExamples:\n  - `2023-01-17T17:29:51Z`\n  - `2023-01-17T17:29:51-08:00`\n"
+              },
+              {
+                "name": "to",
+                "value": "2019-02-29T12:23:00Z",
+                "type": "query",
+                "description": "The date up to when results are to be retrieved in the format [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339).\n\nExamples:\n  - `2023-03-17T17:29:51Z`\n  - `2023-03-17T17:29:51-08:00`\n"
+              },
+              {
+                "name": "account_id",
+                "value": "",
+                "type": "path",
+                "description": "The account ID to retrieve data for."
+              },
+              {
+                "name": "granularity",
+                "value": "daily",
+                "type": "query",
+                "description": "Specifies in what interval the balance over time should be retrieved.\nCurrently supported values include (but are not necessarily limited to):\n  - `daily`\n  - `weekly`\n  - `biweekly`\n  - `monthly`\n  - `quarterly`\n  - `six_monthly`\n  - `annually`\n\nDefaults to `weekly`.\n"
+              },
+              {
+                "name": "date-field",
+                "value": "date_time",
+                "type": "query",
+                "description": "Specifies which date field as returned from the `/financial/v2/transactions` endpoint should be used in the calculation of balance over time.\n\nCurrently supported values include (but are not necessarily limited to):\n  - `date_time`\n  - `posted_date_time`\n\nDefaults to `date_time`.\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "List the balances of a specific bank account for a customer across all ingestion sources. Ordered by balance  date.\nIt calculates the balance for each date, by iterating from the date the account was last refreshed to the `to`  and `from` dates provided. It then checks all the transactions within this range, calculating the balance at  the end of each day.\nThis endpoint limits the date from which it gets balances by the oldest `transaction_window` on the  account. If `transaction_windows` are no"
+        },
+        {
+          "info": {
+            "name": "Retrieve Transactions V2",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/financial/v2/transactions",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "date_from",
+                "value": "2022-05-28T00:00:00Z",
+                "type": "query",
+                "description": "Date (RFC3339) from which the transactions should be returned from. To maintain backwards compatibility,  dates in the format (YYYY-MM-DD) can also be used and will be assumed to be UTC.\n"
+              },
+              {
+                "name": "date_to",
+                "value": "2022-05-29T00:00:00Z",
+                "type": "query",
+                "description": "Date (RFC3339) from which the transactions should be returned to. To maintain backwards compatibility,  dates in the format (YYYY-MM-DD) can also be used and will be assumed to be UTC. Uses the current date by default.\n"
+              },
+              {
+                "name": "page_size",
+                "value": "100",
+                "type": "query",
+                "description": "Maximum number of results to be returned. Defaults to 100, maximum is 200. \nNote: When using the `exclude_tags` filter, the response may contain more transactions than the specified  `page_size` to ensure complete filtering. Always use the presence of `next_page_token` to determine if  additional pages are available.\n"
+              },
+              {
+                "name": "page_token",
+                "value": "eyJvZmZzZXQiOjEwMH0",
+                "type": "query",
+                "description": "The token required to fetch a specific page of results. Provided by the `next_page_token` field in the previous request."
+              },
+              {
+                "name": "account_id",
+                "value": "5bd9ecaf31fc2d5172fd89cb61b89fc6",
+                "type": "query",
+                "description": "Identifier of the accounts from which transactions should be returned."
+              },
+              {
+                "name": "merchant",
+                "value": "netflix",
+                "type": "query",
+                "description": "Human readable identifier of the merchants for which associated transactions should be returned."
+              },
+              {
+                "name": "category_l1",
+                "value": "bills",
+                "type": "query",
+                "description": "Identifier of the Category Level 1 for which associated transactions should be returned."
+              },
+              {
+                "name": "category_l2",
+                "value": "tv_and_broadband",
+                "type": "query",
+                "description": "Identifier of the Category Level 2 for which associated transactions should be returned."
+              },
+              {
+                "name": "include_tags",
+                "value": "regular-transaction",
+                "type": "query",
+                "description": "Tags for which associated transactions should be returned. See response body example for an exhaustive list of possible tags."
+              },
+              {
+                "name": "exclude_tags",
+                "value": "benefit",
+                "type": "query",
+                "description": "Tags for which associated transactions should not be returned. See response body example for an exhaustive  list of possible tags.\nWhen this filter is applied, the response may include more transactions than the `page_size` to ensure  accurate filtering. Always use the presence of `next_page_token` to determine if  additional pages are available.\n"
+              },
+              {
+                "name": "credit_debit_indicator",
+                "value": "credit",
+                "type": "query",
+                "description": "Credit debit indicator for which associated transactions should be returned."
+              },
+              {
+                "name": "updated_after",
+                "value": "2024-06-01T11:00:00Z",
+                "type": "query",
+                "description": "The `updated_after` parameter lets you retrieve transactions that have been modified since  a specific date and time. This format should follow the RFC3339 standard (e.g., \"2024-06-01T11:00:00Z\").\nThis parameter is particularly useful for keeping local copies of transactions up-to-date. By storing the  timestamp of your last successful fetch, you can request only transactions updated after that point during  subsequent retrievals. \nThis approach ensures you only fetch the latest changes, making the process more streamlined.\n"
+              },
+              {
+                "name": "status",
+                "value": "booked",
+                "type": "query",
+                "description": "Statuses of transactions to be returned. This parameter can be supplied multiple times to fetch transactions with a combination of statuses.\n\nBy default, declined transactions are excluded from the results.\nNote: Transactions ingested via Open Banking will only come as `booked` or `pending`.\nThe `declined` status is only applicable to transactions ingested through our `Ingest First Party Data` endpoint.\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "List the Transactions for a customer across all ingestion sources and accounts. Ordered by `date_time` and then  `transaction_id` descending.\n        \nThey are also provided with Enrichments - contextual information generated by Bud's artificial intelligence  models. Enrichments are optional because not all Enrichments are relevant to all Transactions, or because they did not have enough information to generate enrichments (e.g. pending Transactions).\nThe Enrichment process also generates tags, "
+        },
+        {
+          "info": {
+            "name": "Retrieve Authorised Payments V2",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/financial/v2/authorised-payments",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "account_id",
+                "value": "",
+                "type": "query",
+                "description": "Identifier of the accounts from which transactions should be returned.\nExample: \"5bd9ecaf31fc2d5172fd89cb61b89fc6\"\n"
+              },
+              {
+                "name": "page_size",
+                "value": "100",
+                "type": "query",
+                "description": "Maximum number of results to be returned. Defaults to 100, maximum is 200.\nExample: 100\n"
+              },
+              {
+                "name": "page_token",
+                "value": "eyJvZmZzZXQiOjEwMH0",
+                "type": "query",
+                "description": "The token required to fetch a specific page of results. Provided by the `next_page_token` field in the previous request. Example: `eyJvZmZzZXQiOjEwMH0`\n"
+              },
+              {
+                "name": "status",
+                "value": "active",
+                "type": "query",
+                "description": "Use this parameter to filter the results returned on the `status` associated with each result. If this parameter is not provided then results of any `status` will be returned.\n\n Currently supported values include (but are not necessarily limited to):\n  - `active``\n  - `inactive`\n  - `cancelled`\n  - `expired`\n  - `suspended`\n  - `unknown`\n"
+              },
+              {
+                "name": "type",
+                "value": "direct_debit",
+                "type": "query",
+                "description": "Use this parameter to filter the results returned on the `type` associated with each result. If this parameter is not provided then results of any `type` will be returned.\nCurrently supported values include (but are not necessarily limited to):\n  - `direct_debit`\n  - `standing_order`\n  - `scheduled_payment`\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Retrieves a list of a customer's authorised payments. Currently supported authorised payment types include (but are not necessarily limited to): - direct debits - standing orders - scheduled payments\n> 📘 Note: > > Not all providers support authorised payments\n"
+        },
+        {
+          "info": {
+            "name": "Retrieve Accounts V2",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/financial/v2/accounts",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "currency",
+                "value": "GBP",
+                "type": "query",
+                "description": "Use this parameter to filter the results returned on the `currency` associated with each result. Multiple values are accepted. If this parameter is not provided then results of any `currency` will be returned."
+              },
+              {
+                "name": "provider",
+                "value": "BankOfBud",
+                "type": "query",
+                "description": "Use this parameter to filter the results returned on the `provider` associated with each result. Multiple values are accepted. If this parameter is not provided then results of any `provider` will be returned."
+              },
+              {
+                "name": "account_type",
+                "value": "current_account",
+                "type": "query",
+                "description": "Use this parameter to filter the results returned on the `account_type` associated with each result. Multiple values are accepted. If this parameter is not provided then results of any `account_type` will be returned.\nCurrently supported values include (but are not necessarily limited to):\n  - `charge_card`\n  - `credit_card`\n  - `current_account`\n  - `e_money`\n  - `investment`\n  - `loan`\n  - `mortgage`\n  - `other`\n  - `pre_paid_card`\n  - `savings`\n"
+              },
+              {
+                "name": "usage_type",
+                "value": "personal",
+                "type": "query",
+                "description": "Use this parameter to filter the results returned on the `usage_type` associated with each result. Multiple values are accepted. If this parameter is not provided then results of any `usage_type` will be returned.\nCurrently supported values include (but are not necessarily limited to):\n  - `personal`\n  - `business`\n"
+              },
+              {
+                "name": "holder_relationship_type",
+                "value": "joint",
+                "type": "query",
+                "description": "Use this parameter to filter the results returned on the `holder_relationship_type` associated with each result. Multiple values are accepted. If this parameter is not provided then results of any `holder_relationship_type` will be returned.\nCurrently supported values include (but are not necessarily limited to):\n  - `sole`\n  - `joint`\n  - `delegate`\n  - `unknown`\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Retrieves a list of a customer's connected accounts. The result can be filtered using the parameters outlined below.\n\n> ❗️ Deprecation:\n>\n> Support will cease for this endpoint on the 1st of April 2025 - please complete your migration to the Retrieve Accounts V3 endpoint by that point in time. For further details, contact your Bud account manager or email help@thisisbud.com.\n"
+        },
+        {
+          "info": {
+            "name": "Retrieve Account By ID V2",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/financial/v2/accounts/:account_id",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "account_id",
+                "value": "",
+                "type": "path",
+                "description": "The account ID to retrieve data for."
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Retrieves a customer's connected account by its ID.\n\n> ❗️ Deprecation:\n>\n> Support will cease for this endpoint on the 1st of April 2025 - please complete your migration to the Retrieve Accounts V3 endpoint by that point in time. For further details, contact your Bud account manager or email help@thisisbud.com.\n"
+        },
+        {
+          "info": {
+            "name": "Retrieve Balances Over Time",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/financial/v2/balances",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "from",
+                "value": "2019-02-29T12:23:00Z",
+                "type": "query",
+                "description": "The date from when results are to be retrieved in the format [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339).\n\nExamples:\n  - `2023-01-17T17:29:51Z`\n  - `2023-01-17T17:29:51-08:00`\n"
+              },
+              {
+                "name": "to",
+                "value": "2019-02-29T12:23:00Z",
+                "type": "query",
+                "description": "The date up to when results are to be retrieved in the format [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339).\n\nExamples:\n  - `2023-03-17T17:29:51Z`\n  - `2023-03-17T17:29:51-08:00`\n"
+              },
+              {
+                "name": "granularity",
+                "value": "daily",
+                "type": "query",
+                "description": "Specifies in what interval the balance over time should be retrieved.\nCurrently supported values include (but are not necessarily limited to):\n  - `daily`\n  - `weekly`\n  - `biweekly`\n  - `monthly`\n  - `quarterly`\n  - `six_monthly`\n  - `annually`\n\nDefaults to `weekly`.\n"
+              },
+              {
+                "name": "date-field",
+                "value": "date_time",
+                "type": "query",
+                "description": "Specifies which date field as returned from the `/financial/v2/transactions` endpoint should be used in the calculation of balance over time.\n\nCurrently supported values include (but are not necessarily limited to):\n  - `date_time`\n  - `posted_date_time`\n\nDefaults to `date_time`.\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "> ❗️ Deprecation:\n>\n> Support will cease for this endpoint on the 1st of April 2025 - please complete your migration to the Retrieve Balances Over Time V3 endpoint by that point in time. For further details, contact your Bud account manager or email help@thisisbud.com.\n\nList the balances of each bank account for a customer across all ingestion sources. Ordered by balance date.\n\nIt calculates the balance for each date, by iterating from the date the account was last refreshed to the `to` \nand `fr"
+        },
+        {
+          "info": {
+            "name": "Retrieve Balances Over Time By Account",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/financial/v2/accounts/:account_id/balances",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "from",
+                "value": "2019-02-29T12:23:00Z",
+                "type": "query",
+                "description": "The date from when results are to be retrieved in the format [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339).\n\nExamples:\n  - `2023-01-17T17:29:51Z`\n  - `2023-01-17T17:29:51-08:00`\n"
+              },
+              {
+                "name": "to",
+                "value": "2019-02-29T12:23:00Z",
+                "type": "query",
+                "description": "The date up to when results are to be retrieved in the format [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339).\n\nExamples:\n  - `2023-03-17T17:29:51Z`\n  - `2023-03-17T17:29:51-08:00`\n"
+              },
+              {
+                "name": "account_id",
+                "value": "",
+                "type": "path",
+                "description": "The account ID to retrieve data for."
+              },
+              {
+                "name": "granularity",
+                "value": "daily",
+                "type": "query",
+                "description": "Specifies in what interval the balance over time should be retrieved.\nCurrently supported values include (but are not necessarily limited to):\n  - `daily`\n  - `weekly`\n  - `biweekly`\n  - `monthly`\n  - `quarterly`\n  - `six_monthly`\n  - `annually`\n\nDefaults to `weekly`.\n"
+              },
+              {
+                "name": "date-field",
+                "value": "date_time",
+                "type": "query",
+                "description": "Specifies which date field as returned from the `/financial/v2/transactions` endpoint should be used in the calculation of balance over time.\n\nCurrently supported values include (but are not necessarily limited to):\n  - `date_time`\n  - `posted_date_time`\n\nDefaults to `date_time`.\n"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "> ❗️ Deprecation:\n>\n> Support will cease for this endpoint on the 1st of April 2025 - please complete your migration to the Retrieve Balances Over Time By Account V3 endpoint by that point in time. For further details, contact your Bud account manager or email help@thisisbud.com.\n\nList the balances of a specific bank account for a customer across all ingestion sources. Ordered by balance \ndate.\n\nIt calculates the balance for each date, by iterating from the date the account was last refreshed to"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

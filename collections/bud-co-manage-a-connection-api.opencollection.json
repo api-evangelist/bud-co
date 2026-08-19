@@ -1,0 +1,370 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Bud API Services: Documentation Aggregation Buckets Manage a Connection API",
+    "version": "2.10.10"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Manage a Connection",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Initiate Refresh",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api-sandbox.thisisbud.com/v1/open-banking/refresh",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Ip-Address",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Instruct Bud to retrieve the latest account information for a customer. Refresh the accounts from a single provider with an existing connection.\n\nBy default this task will retrieve transactions since the last pull of transactions less seven days. This can be overridden using the `from` body parameter to a maximum of 90 days previously.\n\nAfter initiating this long running process, make sure to check the status of the it till completion before trying to access the Customer's data or initiating ano"
+        },
+        {
+          "info": {
+            "name": "Retrieve Refresh Status",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/v1/open-banking/refresh/:task_id",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "task_id",
+                "value": "",
+                "type": "path",
+                "description": "Bud Task identifier returned from an async task for the requested action"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Check the status of an account information refresh task. If the task is not yet completed, the status will be shown as pending.\nIf the status is completed, then the data is ready to be collected via the [Retrieve Financial Data](/reference/retrieve-financial-data) endpoints.\nSuccessful requests will include `step` (1-4) and associated `text` values to indicate the current progress of the refresh task.\n\nMake sure to check the status of the task till completion before trying to access the Customer"
+        },
+        {
+          "info": {
+            "name": "Initiate Refresh V2",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api-sandbox.thisisbud.com/open-banking/v2/refresh",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Ip-Address",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Instruct Bud to retrieve the latest account information for a customer. Refresh the accounts from all providers with an existing connection.\n\nBy default this task will retrieve transactions since the last pull of transactions less seven days. This can be overridden using the `from` body parameter to a maximum of 90 days previously.\nOn completion of this task Bud will send a webhook to your configured endpoint including details of the refresh completed and the status of the refresh for each provi"
+        },
+        {
+          "info": {
+            "name": "Retrieve Refresh Status V2",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/open-banking/v2/refresh/:task_id",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "task_id",
+                "value": "",
+                "type": "path",
+                "description": "Bud Task identifier returned from an async task for the requested action"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Check the status of an account information refresh task. If the task is not yet completed, the status will be shown as pending. \nIf the status is completed, then the data is ready to be collected via the [Retrieve Financial Data](/reference/retrieve-financial-data) endpoints. \n\nTo monitor the status of a refresh task we provide two methods. The preferred approach is to utilise the webhook functionality within the Bud platform where Bud will send a webhook to your configured endpoint when the tas"
+        },
+        {
+          "info": {
+            "name": "Retrieve Customer Consents",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/v1/open-banking/account-access-consents",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "status",
+                "value": "",
+                "type": "query",
+                "description": "By default this endpoint only returns `active` Authorised connections. To retrieve `all` consents, add this query param with the value of `all`. To retrieve consents where reconfirmation is required add this query param with the value of `reconfirm_due`."
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Retrieve the list of all available Open Banking consents granted by the customer.\n\n> 📘 Note:\n>\n> For more information about Consents, please refer to our [guide](https://docs.thisisbud.com/docs/consents).\n"
+        },
+        {
+          "info": {
+            "name": "Initiate Revoke Consent",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api-sandbox.thisisbud.com/v1/open-banking/account-access-consent/revoke",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Start a task to remove consent and remove Bud’s ability to download further information for a specified customer account.\n\nThis will revoke `all` the consents for the specified provider associated to the customer.\n\nTo check the status of this task, use the `Retrieve Revoke Consent Status` using the returned `task_id`.\n\nAlternatively, there is a `Open Banking Consent Revoked` webhook that will trigger per consent successfully revoked. As such this task could generate multiple of these.\n"
+        },
+        {
+          "info": {
+            "name": "Retrieve Revoke Consent Status",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/v1/open-banking/account-access-consent/revoke/:task_id",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "task_id",
+                "value": "",
+                "type": "path",
+                "description": "Bud Task identifier returned from an async task for the requested action"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Check the status and result of a Revoke Consent task.\n\nUse the `task_id` taken from a successful `Initiate Revoke Consent` request.\n"
+        },
+        {
+          "info": {
+            "name": "Reconfirm Consent",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api-sandbox.thisisbud.com/v1/open-banking/account-access-consents/:consent_id/reconfirm",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Ip-Address",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "consent_id",
+                "value": "",
+                "type": "path",
+                "description": "Bud Consent identifier"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Reconfirm a customer's consent to extend the expiration date by 90 days. If the provider requires SCA authentication or the consent status is not showing \"Authorised\" or the consent is expired, the `reconnect_required` flag will show as true.\nIf true, you should make a call to the Retrieve Authoirsation Gateway URL endpoint with the `reconfirm_consent` flag set to true to direct your customer to the reconfirm consent journey.\nIf false, the consent has been extended.\n\n> 📘 Note:\n>\n> This endpoint"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

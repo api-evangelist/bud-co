@@ -1,0 +1,286 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Bud API Services: Documentation Aggregation Buckets Initiate Payment - Client license API",
+    "version": "2.10.10"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Initiate Payment - Client license",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Retrieve Providers",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/v1/payments/providers",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              }
+            ],
+            "params": [
+              {
+                "name": "country",
+                "value": "GBR,DEU",
+                "type": "query",
+                "description": "Country filter as a comma separated list of country codes following the ISO 3166 alpha-3 code format."
+              },
+              {
+                "name": "product",
+                "value": "",
+                "type": "query",
+                "description": "Product filter as a comma separated list of bud supported products"
+              },
+              {
+                "name": "type",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated list of Bud support provider types to be shown. If no filter is applied, all the providers are returned."
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "This endpoint is used list the payment service providers (PSPs) supported via Bud's Payment APIs."
+        },
+        {
+          "info": {
+            "name": "Create Single Payment",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api-sandbox.thisisbud.com/v1/payments/single",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Create a unique single payment identifier and retrieve the authorisation url for the specific payment provider. Please note that this endpoint can only be used in the event that you are using Bud as a Technical Service Provider (TSP), i.e. you must be regulated as an Payment Initiation Service Provider (PISP)"
+        },
+        {
+          "info": {
+            "name": "Submit Authorisation Codes",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api-sandbox.thisisbud.com/v1/payments/authorisation-codes",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "When using Bud as a TSP (Technical Service Provider) and doing full app-to-app authorisation, the customer is returned from the provider directly back to your app. Your app will then need to send all the query and hash fragment parameters to Bud so that we can continue with the payment flow.\n\nQuery and fragment parameters should be merged with query taking precedence. If you receive a request /path?a=1#a=2&b=3 then you should perform this request with {\"a\":\"1\",\"b\":\"3\"}. Given the nature of the f"
+        },
+        {
+          "info": {
+            "name": "Confirm Single Payment",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api-sandbox.thisisbud.com/v1/payments/single/:payment_id/confirm",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              }
+            ],
+            "params": [
+              {
+                "name": "payment_id",
+                "value": "",
+                "type": "path",
+                "description": "Bud Payment Identifier"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Confirm and execute payment order for a specific payment."
+        },
+        {
+          "info": {
+            "name": "Create Standing Order",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api-sandbox.thisisbud.com/v1/payments/standing-order",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Create a new Standing Order payment identifier and retrieve the authorisation url for the specific payment provider. Please note that this endpoint can only be used in the event that you are using Bud as a Technical Service Provider (TSP), i.e. you must be regulated as an Payment Initiation Service Provider (PISP)"
+        },
+        {
+          "info": {
+            "name": "Confirm Standing Order",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api-sandbox.thisisbud.com/v1/payments/standing-order/:payment_id/confirm",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              }
+            ],
+            "params": [
+              {
+                "name": "payment_id",
+                "value": "",
+                "type": "path",
+                "description": "Bud Payment Identifier"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Confirm and execute a Standing Order for a specific payment id."
+        },
+        {
+          "info": {
+            "name": "Create Scheduled Payment",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api-sandbox.thisisbud.com/v1/payments/scheduled",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Create a new scheduled payment identifier and retrieve the authorisation url for the specific payment provider. Please note that this endpoint can only be used in the event that you are using Bud as a Technical Service Provider (TSP), i.e. you must be regulated as an Payment Initiation Service Provider (PISP)"
+        },
+        {
+          "info": {
+            "name": "Confirm Scheduled Payment",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api-sandbox.thisisbud.com/v1/payments/scheduled/:payment_id/confirm",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              }
+            ],
+            "params": [
+              {
+                "name": "payment_id",
+                "value": "",
+                "type": "path",
+                "description": "Bud Payment Identifier"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Confirm and execute a Scheduled Payment for a specific payment id."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

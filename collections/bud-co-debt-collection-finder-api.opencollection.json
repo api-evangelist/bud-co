@@ -1,0 +1,64 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Bud API Services: Documentation Aggregation Buckets Debt Collection Finder API",
+    "version": "2.10.10"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Debt Collection Finder",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Retrieve Debt Collection Transactions",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/v1/debt-collection",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              },
+              {
+                "name": "X-From",
+                "value": ""
+              },
+              {
+                "name": "X-To",
+                "value": ""
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Provides a list of a customers' outgoing debt collection transactions found within their connected accounts.\n\nWhen `X-From` is omitted from the request, a default value of 30 days from before today's date will be used.\nWhen `X-To` is omitted from the request, a default value of today's date will be used.\n\n**Notes:**\n- Transactions with multiple currencies are supported, but the statistics are currently only calculated for one currency. \n  The endpoint takes the currency of the first transaction "
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

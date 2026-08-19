@@ -1,0 +1,52 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Bud API Services: Documentation Aggregation Buckets OAuth2 API",
+    "version": "2.10.10"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "OAuth2",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "OAuth2",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api-sandbox.thisisbud.com/v1/oauth/token",
+            "headers": [
+              {
+                "name": "Content-Type",
+                "value": ""
+              },
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "authorization",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "form-urlencoded",
+              "data": []
+            },
+            "auth": {
+              "type": "basic",
+              "username": "{{username}}",
+              "password": "{{password}}"
+            }
+          },
+          "docs": "This endpoint is used to create access and refresh tokens. \n\nThe access token is used as a bearer token to authenticate requests to Bud endpoints; \nthe refresh token is used to generate a new access token without the need to supply your client credentials again.\n\nThe access token usually expires after the `expires_in` time (in seconds) has elapsed. \nHowever this is not guaranteed, so it is recomended to integrate such as to handle the `401` response code and refresh the token when it this respon"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

@@ -1,0 +1,308 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Bud API Services: Documentation Aggregation Buckets Create a Connection API",
+    "version": "2.10.10"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Create a Connection",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Retrieve OB Providers",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/v1/open-banking/providers",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              }
+            ],
+            "params": [
+              {
+                "name": "types",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated list of Bud support provider types to be shown. If no filter is applied, all the providers are returned."
+              },
+              {
+                "name": "region",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated list of Bud regions to be shown. If no filter is applied, all the providers are returned."
+              },
+              {
+                "name": "scopes",
+                "value": "",
+                "type": "query",
+                "description": "A comma separated list of Bud ob scopes to be shown. If no filter is applied, all the providers are returned."
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "List the available account providers with their name, icon and maintenance status.\n"
+        },
+        {
+          "info": {
+            "name": "Retrieve Authorisation Gateway URL (v2)",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api-sandbox.thisisbud.com/v2/open-banking/authorisation-gateway-url",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Allow customers to authorise with, and connect to, a provider, using Bud’s __Bud Connect__. Bud Connect is a UI component hosted by Bud that can be integrated into any mobile or web experience, and\nallows your customers to connect to and authorise with their chosen provider, allowing Bud to pull their account information using Bud's AISP license.\n\nUsing the different configuration options that can be set through the request body you can personalize the experience for your Customer. Please, refer"
+        },
+        {
+          "info": {
+            "name": "Initiate Provider Authorisation",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api-sandbox.thisisbud.com/v1/open-banking/authorisation-url",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              },
+              {
+                "name": "X-Customer-Secret",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Request a new Open Banking authorisation url for a specific Customer and provider. This endpoint should be used when using Bud as a Technical Service Provider(TSP). This means that Bud will be using your license (as a registered Account Information Service Provider (AISP)). This will allow you to use your own interface to connect new account(s).\n\nA generated consent has a 90 day expiry, to allow for re-authentication to extend this expiry the id of the customers previous consent can be included "
+        },
+        {
+          "info": {
+            "name": "Retrieve Authorisation URL",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/v1/open-banking/authorisation-url/:task_id",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "task_id",
+                "value": "",
+                "type": "path",
+                "description": "Bud Task identifier returned from an async task for the requested action"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Check the status and get the result of an Initiate Provider Authorisation URL task. If the task is not yet completed, the data element will be null.\n\nOnce the customer has successfully authorised with the ASPSP, Bud will create a task to fetch the relevant data from the ASPSP. The task id created will be passed back within the supplied re-direct url. Please refer to the Check Connection Status endpoint for updates on this fetching process using the task id provided in the redirect URL.\n"
+        },
+        {
+          "info": {
+            "name": "Submit Authorisation Codes",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api-sandbox.thisisbud.com/v1/open-banking/authorisation-codes",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "When using Bud as a TSP (Technical Service Provider) and doing full app-to-app authorisation, the customer is returned from the provider directly back to your app. Your app will then need to send all the query and hash fragment parameters to Bud so that we can complete the connection.\n\nQuery and fragment parameters should be merged with query taking precedence. If you receive a request `/path?a=1#a=2&b=3` then you should perform this request with `{\"a\":\"1\",\"b\":\"3\"}`. Given the nature of the frag"
+        },
+        {
+          "info": {
+            "name": "Submit Authorisation Codes V2",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api-sandbox.thisisbud.com/v2/open-banking/authorisation-codes",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "When using Bud as a TSP (Technical Service Provider) and doing full app-to-app authorisation, the customer is returned from the provider directly back to your app. Your app will then need to send all the query and hash fragment parameters to Bud so that we can complete the connection.\n\nQuery and fragment parameters should be merged with query taking precedence. If you receive a request `/path?a=1#a=2&b=3` then you should perform this request with `{\"a\":\"1\",\"b\":\"3\"}`. Given the nature of the frag"
+        },
+        {
+          "info": {
+            "name": "Retrieve Connection Status",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api-sandbox.thisisbud.com/v1/open-banking/connect/:connection_task_id",
+            "headers": [
+              {
+                "name": "X-Client-Id",
+                "value": "8711bbef-b357-4c2d-97ca-0d9df4206e9a"
+              },
+              {
+                "name": "X-Customer-Id",
+                "value": "c3339af9-2426-44d4-9c4d-ddb8fd281e23"
+              },
+              {
+                "name": "X-Customer-Idempotent-Identifier",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "connection_task_id",
+                "value": "",
+                "type": "path",
+                "description": "Unique identifier related to a specific connection task"
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "/v1/oauth/token",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Check the status of an account connection task. If the task is not yet completed, the status will be shown as pending. If the status is completed, then the data is ready to be ingested.\n\nThe __connection_task_id__ is provided as a parameter in the redirect url after the Customer has undergone a successful authorisation with a relevant Open Banking provider.\n"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
