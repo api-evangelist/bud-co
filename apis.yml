@@ -34,6 +34,19 @@ tags:
   - AISP
   - PISP
   - Financial Data
+  - Fintech
+  - UK
+  - Artificial Intelligence
+  - Machine-Learning
+tags_raw:
+  - Open Banking
+  - Transaction Enrichment
+  - Categorization
+  - Affordability
+  - Payments
+  - AISP
+  - PISP
+  - Financial Data
   - FinTech
   - UK
   - AI
@@ -457,6 +470,8 @@ apis:
   humanURL: https://docs.thisisbud.com
   baseURL: https://api-sandbox.thisisbud.com
   tags:
+  - Authentication
+  tags_raw:
   - OAuth2
   properties:
   - type: OpenAPI
