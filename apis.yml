@@ -63,6 +63,9 @@ tags_raw:
   - AI
   - Machine Learning
 common:
+  - type: CapabilityMap
+    url: capabilities/bud-co-capability-edges.yml
+    name: Bud Financial Business Capability Map
   - type: AgenticAccess
     url: agentic-access/bud-co-agentic-access.yml
   - type: DomainSecurity

@@ -1,0 +1,26 @@
+slug: bud-co
+provider: Bud Financial
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Software & Technology
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 1
+edges:
+- tag: OAuth2
+  spec_file: bud-co-oauth2-api-openapi.yml
+  capability_id: BC-4270.40
+  capability_id_l1: BC-4270
+  capability_name: Developer Identity & Credential Management
+  confidence: 0.75
+  evidence: POST /v1/oauth/token  oauth_token_post  OAuth2; RetrieveAuthTokenResponse; "create the API
+    Credentials required to obtain an OAuth2 access token"
+  reason: Single endpoint issuing OAuth2 access tokens against developer-console API credentials for third-party
+    developers consuming the public API — Developer Identity & Credential Management. Slight discount
+    because token issuance is also plain authentication plumbing.
