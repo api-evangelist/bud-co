@@ -477,27 +477,6 @@ apis:
     url: json-schema/bud-account-schema.json
   - type: JSONLD
     url: json-ld/bud-co-context.jsonld
-- aid: bud-co:bud-co-oauth2-api
-  name: Bud Financial OAuth2 API
-  description: >-
-    Retrieve and manage access and refresh tokens to authenticate to the Bud platform via OAuth2 protocol.
-  humanURL: https://docs.thisisbud.com
-  baseURL: https://api-sandbox.thisisbud.com
-  tags:
-  - Authentication
-  tags_raw:
-  - OAuth2
-  properties:
-  - type: OpenAPI
-    url: openapi/bud-co-oauth2-api-openapi.yml
-  - type: Documentation
-    url: https://docs.thisisbud.com
-  - type: JSONSchema
-    url: json-schema/bud-transaction-schema.json
-  - type: JSONSchema
-    url: json-schema/bud-account-schema.json
-  - type: JSONLD
-    url: json-ld/bud-co-context.jsonld
 - aid: bud-co:bud-co-product-finder-api
   name: Bud Financial Product Finder API
   description: Find information regarding your customer's financial products.
@@ -719,6 +698,25 @@ apis:
   properties:
   - type: OpenAPI
     url: openapi/bud-co-transaction-search-api-openapi.yml
+  - type: Documentation
+    url: https://docs.thisisbud.com
+  - type: JSONSchema
+    url: json-schema/bud-transaction-schema.json
+  - type: JSONSchema
+    url: json-schema/bud-account-schema.json
+  - type: JSONLD
+    url: json-ld/bud-co-context.jsonld
+- aid: bud-co:bud-co-oauth2-api
+  name: Bud Financial O Auth2 API
+  description: >-
+    Retrieve and manage access and refresh tokens to authenticate to the Bud platform via OAuth2 protocol.
+  humanURL: https://docs.thisisbud.com
+  baseURL: https://api-sandbox.thisisbud.com
+  tags:
+  - OAuth2
+  properties:
+  - type: OpenAPI
+    url: openapi/bud-co-oauth2-api-openapi.yml
   - type: Documentation
     url: https://docs.thisisbud.com
   - type: JSONSchema
