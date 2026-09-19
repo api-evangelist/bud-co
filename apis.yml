@@ -46,7 +46,7 @@ tags:
   - PISP
   - Financial Data
   - Fintech
-  - UK
+  - United Kingdom
   - Artificial Intelligence
   - Machine-Learning
 tags_raw:
@@ -713,6 +713,8 @@ apis:
   humanURL: https://docs.thisisbud.com
   baseURL: https://api-sandbox.thisisbud.com
   tags:
+  - Authentication
+  tags_raw:
   - OAuth2
   properties:
   - type: OpenAPI
