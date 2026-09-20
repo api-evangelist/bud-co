@@ -11,7 +11,7 @@ capability_model:
   attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
     CC BY 4.0
   notice: NOTICE
-edge_count: 5
+edge_count: 6
 edges:
 - tag: Initiate Payment - Client license
   spec_file: bud-co-initiate-payment-client-license-api-openapi.yml
@@ -44,6 +44,18 @@ edges:
   reason: Query and status tracking of initiated single, standing-order and scheduled payments — payment
     lifecycle monitoring. Mapped at L1 (Payments & Card Management) since the surface spans initiation
     status and downstream processing rather than one sub-capability.
+- tag: OAuth2
+  spec_file: bud-co-oauth2-api-openapi.yml
+  capability_id: BC-4270.40
+  capability_id_l1: BC-4270
+  capability_name: Developer Identity & Credential Management
+  confidence: 0.75
+  evidence: POST /v1/oauth/token  oauth_token_post  OAuth2; RetrieveAuthTokenResponse; "create the API
+    Credentials required to obtain an OAuth2 access token"
+  reason: Single endpoint issuing OAuth2 access tokens against developer-console API credentials for third-party
+    developers consuming the public API — Developer Identity & Credential Management. Slight discount
+    because token issuance is also plain authentication plumbing.
+  recovered_from: sweep-20260829T005356Z-edges.json
 - tag: Retrieve Affordability Report
   spec_file: bud-co-retrieve-affordability-report-api-openapi.yml
   capability_id: BC-1320.20
