@@ -820,65 +820,295 @@ paths:
                     option: minimum_value_threshold
                     value: '100.00'
 components:
+  parameters:
+    EnabledInsightsIncomeHealth:
+      in: query
+      name: enabled_insights
+      required: false
+      schema:
+        type: string
+        description: A comma-separated list of insight types to check for. If not specified, a default list will be used, which may be added to over time.
+        enum:
+        - income-health
+    To:
+      in: query
+      name: to
+      required: false
+      description: An end time to check financial data for insights up to. Configures the latest financial data which may be used to generate insights. If omitted, defaults to the date of the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates. Insights relating to potential future events, such as cannot_cover_bills, may forecast them up to a month after this point.
+      schema:
+        $ref: '#/components/schemas/schemas-DateTimeISO8601'
+    Currency:
+      in: query
+      name: currency
+      required: false
+      description: 'Used to limit the insight reports returned, to only those in the specified currency. The value should represent
+
+        a valid ISO currency code. an example would be "GBP" or "EUR".
+
+
+        Please refer to https://www.iso.org/iso-4217-currency-codes.html for more details.
+
+        '
+      schema:
+        type: string
+    TransactionReference:
+      in: path
+      required: true
+      name: reference
+      schema:
+        description: A unique reference used to identify a group of transactions in report for aggregation analysis
+        type: string
+    EnabledInsightsIncomeExpenditure:
+      in: query
+      name: enabled_insights
+      required: false
+      schema:
+        type: string
+        description: A comma-separated list of insight types to check for. If not specified, a default list will be used, which may be added to over time.
+        enum:
+        - income-cash-withdrawal
+        - income-loan
+        - income-gambling
+        - income-debt
+        - income-essential-expenditure
+        - income-all-expenditure
+    CustomerIdempotentIdentifier:
+      in: header
+      name: X-Customer-Idempotent-Identifier
+      schema:
+        type: string
+      description: 'Use the internal client identifier, provided in the `client_metadata` object when creating the customer in __Create Customer V3__, in place of an `X-Customer-Id` header.
+
+        '
+    CustomerId:
+      in: header
+      name: X-Customer-Id
+      schema:
+        type: string
+        format: uuid
+      required: true
+      description: A unique identifier for a Customer, as registered on Bud's platform.
+      example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
+    ClientId:
+      in: header
+      name: X-Client-Id
+      schema:
+        type: string
+      required: true
+      description: The API Client Identifier (Service Application Identifier).
+      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
+    CustomerSecret:
+      in: header
+      name: X-Customer-Secret
+      schema:
+        type: string
+      required: false
+      description: The Bud Customer secret used to encrypt customer data. This is required only if the customer secret is not already stored with Bud.
+    From:
+      in: query
+      name: from
+      required: false
+      description: A start time to check financial data for insights from. Configures the earliest financial data which may be used to generate insights. If omitted, defaults to the start of the sixth complete month prior to the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates.
+      schema:
+        $ref: '#/components/schemas/schemas-DateTimeISO8601'
+    EnabledInsightsBalanceOverdraft:
+      in: query
+      name: enabled_insights
+      required: false
+      schema:
+        type: string
+        description: A comma-separated list of insight types to check for. If not specified, a default list will be used, which may be added to over time.
+        enum:
+        - unauthorised-overdraft
+    EnabledInsightsMerchants:
+      in: query
+      name: enabled_insights
+      required: false
+      schema:
+        type: string
+        description: A comma-separated list of insight types to check for. If not specified, a default list will be used, which may be added to over time.
+        enum:
+        - hcst-credit
   schemas:
-    Merchant:
-      title: Merchant
+    IncomeExpenditureReportResponse:
       type: object
-      description: 'Merchant enrichment associated with a Transaction, as generated using a combination of Bud''s artificial  intelligence models and database of known merchants.
+      required:
+      - operation_id
+      - data
+      - metadata
+      properties:
+        operation_id:
+          type: string
+          enum:
+          - insights_beta_report_income_expenditure_get
+        data:
+          type: object
+          required:
+          - insights
+          properties:
+            insights:
+              type: array
+              items:
+                $ref: '#/components/schemas/IncomeExpenditureAnalysis'
+              description: 'An array of income/expenditure analysis reports (insights). Each object in the list
+
+                represents a single insight.
+
+                '
+        metadata:
+          type: object
+          required:
+          - from
+          - to
+          - options
+          properties:
+            from:
+              $ref: '#/components/schemas/schemas-DateTimeISO8601'
+            to:
+              $ref: '#/components/schemas/schemas-DateTimeISO8601'
+            options:
+              type: array
+              items:
+                $ref: '#/components/schemas/InsightOption'
+    IncomeStability:
+      type: object
+      required:
+      - value
+      - currency
+      properties:
+        value:
+          type: string
+          description: 'A number between 0 to 1 representing how stable a customers income is. The closer the number is
+
+            to 1 represents a higher stability.
+
+            '
+        currency:
+          $ref: '#/components/schemas/BudCurrency'
+    schemas-DateTimeISO8601:
+      title: Date/Time (ISO 8601)
+      type: string
+      description: ISO Date Format
+      example: '2022-03-05T13:34:33Z'
+    Categories:
+      title: Categories
+      type: object
+      description: 'Categories enrichment associated with a Transaction, as generated by Bud''s artificial intelligence models.  Currently two levels of category are supported, with `l1` being a coarse-grained category level and `l2` being more refined.
 
         '
       properties:
-        id:
-          type: string
-          description: UUID corresponding to the merchant, if available. Subject to version control.
-        slug:
-          type: string
-          description: Unique human readable identifier of the merchant. Not subject to version control.
-        display_name:
-          type: string
-          description: UI friendly display name for the merchant.
-        logo:
-          type: string
-          description: URL supplying merchant logo, if available.
-        tokens:
-          type: array
-          description: 'A list of tokens calculated from the transaction model, used to identify the Merchant.  This list is often present even if the merchant details (id, slug, disply_name, logo) are not returned.
-
-            '
-          items:
-            $ref: '#/components/schemas/Token'
-        website:
-          type: string
-          description: URL supplying merchant website, if available.
-        tags:
-          type: array
-          items:
-            type: string
-          description: A list of tags describing the merchant
-    RegularTransactions:
+        l1:
+          $ref: '#/components/schemas/Category'
+          description: Level 1 Category
+        l2:
+          $ref: '#/components/schemas/Category'
+          description: Level 2 Category
+    Frequency:
+      type: string
+      enum:
+      - daily
+      - weekly
+      - biweekly
+      - monthly
+      - quarterly
+      - six_monthly
+      - annually
+      - unknown
+    UnauthorisedOverdraftResponse:
       type: object
       required:
-      - stability
-      - total
-      - monthly_average
-      - transactions_reference
-      - _links
-      - sources
+      - operation_id
+      - data
+      - metadata
       properties:
-        stability:
-          $ref: '#/components/schemas/IncomeStability'
-        total:
-          $ref: '#/components/schemas/BudAmount'
-        monthly_average:
-          $ref: '#/components/schemas/BudAmount'
-        sources:
-          type: array
-          items:
-            $ref: '#/components/schemas/RegularTransactionIncomeGroup'
-        transactions_reference:
-          $ref: '#/components/schemas/TransactionsReference'
-        _links:
-          $ref: '#/components/schemas/schemas-TransactionsLinks'
+        operation_id:
+          type: string
+          enum:
+          - insights_beta_report_balance_unauthorised_overdraft_get
+        data:
+          type: object
+          required:
+          - insights
+          properties:
+            insights:
+              type: array
+              items:
+                $ref: '#/components/schemas/UnauthorisedOverdraftInsight'
+        metadata:
+          type: object
+          required:
+          - from
+          - to
+          - options
+          - currencies
+          properties:
+            from:
+              $ref: '#/components/schemas/schemas-DateTimeISO8601'
+            to:
+              $ref: '#/components/schemas/schemas-DateTimeISO8601'
+            currencies:
+              type: array
+              description: A list of currencies returned in the results. If the currency query parameter is used, this will only contain the specified currency.
+              items:
+                $ref: '#/components/schemas/BudCurrency'
+            options:
+              type: array
+              items:
+                $ref: '#/components/schemas/InsightOption'
+    MerchantsReportResponse:
+      description: "Object represents a set of merchant-related insights generated for the customer inspecting\ntransactions over a given period of time. The insights include:\n  - hcst_credit: Identifies interactions with high-cost short-term credit providers.\n"
+      type: object
+      required:
+      - operation_id
+      - data
+      - metadata
+      properties:
+        operation_id:
+          type: string
+          enum:
+          - insights_beta_report_merchants_get
+        data:
+          type: object
+          required:
+          - insights
+          properties:
+            insights:
+              type: object
+              required:
+              - hcst_credit
+              properties:
+                hcst_credit:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/HCSTCreditAnalysis'
+        metadata:
+          type: object
+          required:
+          - from
+          - to
+          - options
+          properties:
+            from:
+              $ref: '#/components/schemas/schemas-DateTimeISO8601'
+            to:
+              $ref: '#/components/schemas/schemas-DateTimeISO8601'
+            options:
+              type: array
+              items:
+                $ref: '#/components/schemas/InsightOption'
+    Token:
+      title: Token
+      type: object
+      description: The token item.
+      required:
+      - value
+      - confidence
+      properties:
+        value:
+          type: string
+        confidence:
+          type: string
+          description: Degree of belief of correct assignment, expressed as a probability.
     Location:
       title: Location
       type: object
@@ -930,76 +1160,313 @@ components:
           description: A list of substrings from the description identified as being relevant to the transaction location.
           items:
             type: string
-    Category:
-      title: Category
-      type: object
-      description: Category associated with a Transaction
-      required:
-      - slug
-      - confidence
-      properties:
-        slug:
-          type: string
-          description: Unique human readable identifier of the category. Not subject to version control.
-        confidence:
-          type: string
-          description: Degree of belief of correct assignment, expressed as a probability.
-    IncomeStability:
+    schemas-TransactionsLinks:
+      description: URLs for resources related to this report insight
       type: object
       required:
-      - value
-      - currency
+      - transactions
       properties:
-        value:
+        transactions:
           type: string
-          description: 'A number between 0 to 1 representing how stable a customers income is. The closer the number is
+          description: 'An endpoint, including options, to make a GET request to in order to retrieve transactions
 
-            to 1 represents a higher stability.
+            related to the report in question.
+
+            '
+    UnauthorisedOverdraftInsight:
+      type: object
+      required:
+      - type
+      - currency
+      - days_in_unauthorised_overdraft
+      - accounts
+      properties:
+        type:
+          type: string
+          enum:
+          - unauthorised-overdraft
+          description: 'A unique human readable string used to identify a unauthorised overdraft report.
+
+
+            Note, these are subject to change and should not be used to identify a report. These are not unique within
+
+            a result list and are used to identify the type of report.
 
             '
         currency:
           $ref: '#/components/schemas/BudCurrency'
-    UnauthorisedOverdraftResponse:
+        days_in_unauthorised_overdraft:
+          $ref: '#/components/schemas/DaysInUnauthorisedOverdraft'
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/UnauthorisedOverdraftAccount'
+    BudCurrency:
+      title: Currency
+      description: 'The three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) of the monetary amount.
+
+
+        Example: `GBP`
+
+        '
+      type: string
+    UnauthorisedOverdraftAccount:
       type: object
       required:
-      - operation_id
-      - data
-      - metadata
+      - account_id
+      - provider
+      - account_name
+      - days_in_unauthorised_overdraft
+      - unauthorised_overdraft_occurrences
+      - balances
+      - credit_lines
+      - transactions_reference
+      - _links
       properties:
-        operation_id:
+        account_id:
+          type: string
+          description: 'A unique identifier for a specific account. The account_id can be found in the _links section of the insight report.
+
+            '
+        provider:
+          type: string
+          description: 'The name of the provider of the account.
+
+            '
+        account_name:
+          type: string
+          description: 'The name of the account.
+
+            '
+        days_in_unauthorised_overdraft:
+          $ref: '#/components/schemas/DaysInUnauthorisedOverdraft'
+        unauthorised_overdraft_occurrences:
+          description: "This field contains an array of balances for the given account when its suspected the account entered an \nunauthorised overdraft. The items of the array are the account balance at points in time when the customer\nexceeded their credit allowance on the account.\n"
+          type: array
+          items:
+            $ref: '#/components/schemas/UnauthorisedOverdraftDate'
+        balances:
+          type: array
+          description: 'A list of balances for the account. The balances returned here will represent the latest up to date
+
+            ingested balances for the account.
+
+            '
+          items:
+            $ref: '#/components/schemas/balance'
+        credit_lines:
+          type: array
+          description: 'A list of credit lines for the account. The credit lines returned here will represent the latest up to date
+
+            ingested balances for the account. It is possible that an account does not have any registered credit lines.
+
+            '
+          items:
+            $ref: '#/components/schemas/CreditLine'
+        transactions_reference:
+          $ref: '#/components/schemas/TransactionsReference'
+        _links:
+          $ref: '#/components/schemas/schemas-TransactionsLinks'
+    BudMonetaryValue:
+      title: Monetary Value
+      description: "The value of the monetary amount. The value is formatted with the number of decimal places for the respective currency. \n\nExample: `10.98`\n"
+      type: string
+    balance:
+      type: object
+      required:
+      - date
+      - type
+      - amount
+      - credit_debit_indicator
+      properties:
+        date:
+          $ref: '#/components/schemas/schemas-DateTimeISO8601'
+        type:
+          description: 'Type is a string used to represent the type of balance returned, the full descriptions of each can be
+
+            found below:
+
+            https://docs.thisisbud.com/docs/accounts#balances-and-credit-lines
+
+            '
           type: string
           enum:
-          - insights_beta_report_balance_unauthorised_overdraft_get
-        data:
-          type: object
-          required:
-          - insights
-          properties:
-            insights:
-              type: array
-              items:
-                $ref: '#/components/schemas/UnauthorisedOverdraftInsight'
-        metadata:
-          type: object
-          required:
-          - from
-          - to
-          - options
-          - currencies
-          properties:
-            from:
-              $ref: '#/components/schemas/schemas-DateTimeISO8601'
-            to:
-              $ref: '#/components/schemas/schemas-DateTimeISO8601'
-            currencies:
-              type: array
-              description: A list of currencies returned in the results. If the currency query parameter is used, this will only contain the specified currency.
-              items:
-                $ref: '#/components/schemas/BudCurrency'
-            options:
-              type: array
-              items:
-                $ref: '#/components/schemas/InsightOption'
+          - closing_available
+          - closing_booked
+          - closing_cleared
+          - expected
+          - forward_available
+          - information
+          - interim_available
+          - interim_booked
+          - interim_cleared
+          - opening_available
+          - opening_booked
+          - opening_cleared
+          - previously_closed_booked
+        amount:
+          $ref: '#/components/schemas/BudAmount'
+        credit_debit_indicator:
+          $ref: '#/components/schemas/CreditDebitIndicator'
+    InsightsTransaction:
+      title: Transaction
+      type: object
+      description: A financial transaction
+      required:
+      - transaction_id
+      - account_id
+      - description
+      - amount
+      - credit_debit_indicator
+      - status
+      - date_time
+      - suggested_description
+      properties:
+        transaction_id:
+          type: string
+          description: Unique identifier for the transaction. May be mutable depending on original ingestion source.
+        account_id:
+          type: string
+          description: Identifier for the account associated with the transaction.
+        provider:
+          type: string
+          description: Name of the transaction source provider. Optional as it may not have been supplied when using first party data.
+        description:
+          type: string
+          description: Description of the transaction.
+        credit_debit_indicator:
+          type: string
+          description: Credit/Debit Indicator
+          enum:
+          - credit
+          - debit
+        status:
+          type: string
+          description: 'Status of the transaction. Defaults to booked.
+
+
+            Note: declined transactions are only available for transactions ingested by First Party Ingestion endpoints.
+
+            '
+          enum:
+          - booked
+          - pending
+          - declined
+        amount:
+          $ref: '#/components/schemas/BudAmount'
+        date_time:
+          type: string
+          description: Date that the transaction occured compliant with RFC3339.
+        posted_date_time:
+          type: string
+          deprecated: true
+          description: Date the assets involved in the transaction transferred compliant with RFC3339. For credits this is the date that the asset becomes available, for debits this is the date that the asset ceased to be available
+        value_date_time:
+          type:
+          - string
+          - 'null'
+          description: Date and time at which assets become available to the account owner in case of a credit entry, or cease to be available to the account owner in case of a debit transaction entry. ISODateTime. Null if this field is not applicable.
+        suggested_description:
+          type: string
+          description: The description Bud suggests client apps show for a given transaction.
+        suggested_logo:
+          type: string
+          description: The logo Bud suggests client apps show for a given transaction.
+        enrichments:
+          $ref: '#/components/schemas/Enrichments'
+        merchant_category_code:
+          type: string
+          description: Merchant category code conforming to ISO 18245, related to the type of services or goods the merchant provides for the transaction.
+        tags:
+          type: array
+          description: 'A list of potential tags associated with the transaction after contextual enrichment, which can be used for filtering.
+
+
+            Region and client specific.
+
+
+            | Value                   | Description                                               |
+
+            |:------------------------|:----------------------------------------------------------|
+
+            | `benefit`               | A government/non-profit benefit transaction               |
+
+            | `debt-collection`       | A transaction associated with a known debt-collector      |
+
+            | `loan`                  | A transaction associated with a loan                      |
+
+            | `hcst`                  | A transaction associated with a high cost short term loan |
+
+            | `income`                | A transaction associated with income                      |
+
+            | `pending`               | A transaction which has not been booked                   |
+
+            | `regular-transaction`   | A transaction predicted to occur with a regular frequency |
+
+            | `subscription`          | A transaction associated with a subscription service      |
+
+            | `online`                | A transaction associated with an online merchant          |
+
+            '
+          items:
+            type: string
+    RegularTransactions:
+      type: object
+      required:
+      - stability
+      - total
+      - monthly_average
+      - transactions_reference
+      - _links
+      - sources
+      properties:
+        stability:
+          $ref: '#/components/schemas/IncomeStability'
+        total:
+          $ref: '#/components/schemas/BudAmount'
+        monthly_average:
+          $ref: '#/components/schemas/BudAmount'
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/RegularTransactionIncomeGroup'
+        transactions_reference:
+          $ref: '#/components/schemas/TransactionsReference'
+        _links:
+          $ref: '#/components/schemas/schemas-TransactionsLinks'
+    IrregularTransactions:
+      type: object
+      required:
+      - total
+      - monthly_average
+      - transactions_reference
+      - _links
+      properties:
+        total:
+          $ref: '#/components/schemas/BudAmount'
+        monthly_average:
+          $ref: '#/components/schemas/BudAmount'
+        transactions_reference:
+          $ref: '#/components/schemas/TransactionsReference'
+        _links:
+          $ref: '#/components/schemas/schemas-TransactionsLinks'
+    DaysInUnauthorisedOverdraft:
+      description: "Object represents the number of days a customer has been in an unauthorised overdraft. Should be noted that\nthis is a percentage of the total number of days in the report period OR the total number of days ingested for \na given account. The report period is defined by the `from` and `to` parameters.\n"
+      type: object
+      required:
+      - count
+      - ratio
+      properties:
+        count:
+          type: integer
+          description: 'The total number of days a customer has been in an unauthorised overdraft.
+
+            '
+        ratio:
+          type: string
+          description: 'A percentage of the numbers of unauthorised overdraft/total number of days in the report period.
+
+            '
     IncomeExpenditureAnalysis:
       type: object
       description: "Object presents a single expenditure group income analysis report. The focus of this object is to present a \nview of a single expenditure and its impact on a customers income. The report is broken down into financial months\nto help identify spikes in income consumed by the expenditure group.\n\nThe type of report is identified by the `type` field. There are several types of analyses:\n  - income-cash-withdrawal: Identifies the total amount of cash withdrawn from a customers account.\n  - income-debt: Identifies debt payments in the customer's expenses.\n  - income-gambling: Identifies gambling related transactions in the customer's report.\n  - income-loan: Identifies loan related transactions.\n  - income-essential-expenditure: Identifies essential expenditure and compares it against income for the time period\n  - income-all-expenditure: Total debits vs income for a specified time period\n"
@@ -1132,69 +1599,153 @@ components:
           $ref: '#/components/schemas/TransactionsReference'
         _links:
           $ref: '#/components/schemas/schemas-TransactionsLinks'
-    BudCurrency:
-      title: Currency
-      description: 'The three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) of the monetary amount.
-
-
-        Example: `GBP`
+    Merchant:
+      title: Merchant
+      type: object
+      description: 'Merchant enrichment associated with a Transaction, as generated using a combination of Bud''s artificial  intelligence models and database of known merchants.
 
         '
-      type: string
-    MerchantsReportResponse:
-      description: "Object represents a set of merchant-related insights generated for the customer inspecting\ntransactions over a given period of time. The insights include:\n  - hcst_credit: Identifies interactions with high-cost short-term credit providers.\n"
-      type: object
-      required:
-      - operation_id
-      - data
-      - metadata
       properties:
-        operation_id:
+        id:
+          type: string
+          description: UUID corresponding to the merchant, if available. Subject to version control.
+        slug:
+          type: string
+          description: Unique human readable identifier of the merchant. Not subject to version control.
+        display_name:
+          type: string
+          description: UI friendly display name for the merchant.
+        logo:
+          type: string
+          description: URL supplying merchant logo, if available.
+        tokens:
+          type: array
+          description: 'A list of tokens calculated from the transaction model, used to identify the Merchant.  This list is often present even if the merchant details (id, slug, disply_name, logo) are not returned.
+
+            '
+          items:
+            $ref: '#/components/schemas/Token'
+        website:
+          type: string
+          description: URL supplying merchant website, if available.
+        tags:
+          type: array
+          items:
+            type: string
+          description: A list of tags describing the merchant
+    Processor:
+      title: Processor
+      type: object
+      description: 'Processor enrichment associated with a Transaction, as generated using a combination of Bud''s artificial  intelligence models and database of known payment processors.
+
+        '
+      properties:
+        id:
+          type: string
+          description: UUID corresponding to the processor, if available. Subject to version control.
+        slug:
+          type: string
+          description: Unique human readable identifier of the processor. Not subject to version control.
+        display_name:
+          type: string
+          description: UI friendly display name for the processor.
+        logo:
+          type: string
+          description: URL supplying processor logo, if available.
+        tokens:
+          type: array
+          description: 'A list of tokens calculated from the transaction model, used to identify the Merchant.  This list is often present even if the merchant details (id, slug, disply_name, logo) are not returned.
+
+            '
+          items:
+            $ref: '#/components/schemas/Token'
+        website:
+          type: string
+          description: URL supplying merchant website, if available.
+    HCSTCreditAnalysis:
+      type: object
+      description: 'Object represents analysis indicating interactions with high-cost short-term credit providers.
+
+        '
+      required:
+      - type
+      - currency
+      - transactions_count
+      - merchants_count
+      - transactions_reference
+      - _links
+      properties:
+        type:
           type: string
           enum:
-          - insights_beta_report_merchants_get
-        data:
-          type: object
-          required:
-          - insights
-          properties:
-            insights:
-              type: object
-              required:
-              - hcst_credit
-              properties:
-                hcst_credit:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/HCSTCreditAnalysis'
-        metadata:
-          type: object
-          required:
-          - from
-          - to
-          - options
-          properties:
-            from:
-              $ref: '#/components/schemas/schemas-DateTimeISO8601'
-            to:
-              $ref: '#/components/schemas/schemas-DateTimeISO8601'
-            options:
-              type: array
-              items:
-                $ref: '#/components/schemas/InsightOption'
-    Categories:
-      title: Categories
-      type: object
-      description: 'Categories enrichment associated with a Transaction, as generated by Bud''s artificial intelligence models.  Currently two levels of category are supported, with `l1` being a coarse-grained category level and `l2` being more refined.
+          - hcst-credit
+          description: 'A unique human readable string used to identify the report type.
 
-        '
+            '
+        currency:
+          $ref: '#/components/schemas/BudCurrency'
+        transactions_count:
+          type: integer
+          description: 'The number of transactions related to this insight.
+
+            '
+        merchants_count:
+          type: integer
+          description: 'The number of unique merchants related to this insight.
+
+            '
+        transactions_reference:
+          $ref: '#/components/schemas/TransactionsReference'
+        _links:
+          $ref: '#/components/schemas/schemas-TransactionsLinks'
+    InsightOption:
+      title: Insight Option
+      type: object
+      description: An option used to configure the returned insights.
+      required:
+      - insight_type
+      - option
+      - value
       properties:
-        l1:
-          $ref: '#/components/schemas/Category'
-          description: Level 1 Category
-        l2:
-          $ref: '#/components/schemas/Category'
-          description: Level 2 Category
+        insight_type:
+          type: string
+          description: The insight this option is applied to
+        option:
+          type: string
+          description: The name of the option
+        value:
+          type: string
+          description: The value of the option
+    CreditDebitIndicator:
+      type: string
+      enum:
+      - credit
+      - debit
+    Enrichments:
+      title: Enrichments
+      type: object
+      description: Contextual enrichments associated with a Transaction
+      properties:
+        categories:
+          $ref: '#/components/schemas/Categories'
+        merchant:
+          $ref: '#/components/schemas/Merchant'
+        processor:
+          $ref: '#/components/schemas/Processor'
+        regularity:
+          $ref: '#/components/schemas/Regularity'
+        location:
+          $ref: '#/components/schemas/Location'
+        transaction_types:
+          type: array
+          description: Transaction types associated with the transaction
+          items:
+            type: string
+        names:
+          type: array
+          description: Names that were detected in the transaction description
+          items:
+            type: string
     IncomeHealthReportResponse:
       type: object
       required:
@@ -1267,34 +1818,6 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/InsightOption'
-    UnauthorisedOverdraftInsight:
-      type: object
-      required:
-      - type
-      - currency
-      - days_in_unauthorised_overdraft
-      - accounts
-      properties:
-        type:
-          type: string
-          enum:
-          - unauthorised-overdraft
-          description: 'A unique human readable string used to identify a unauthorised overdraft report.
-
-
-            Note, these are subject to change and should not be used to identify a report. These are not unique within
-
-            a result list and are used to identify the type of report.
-
-            '
-        currency:
-          $ref: '#/components/schemas/BudCurrency'
-        days_in_unauthorised_overdraft:
-          $ref: '#/components/schemas/DaysInUnauthorisedOverdraft'
-        accounts:
-          type: array
-          items:
-            $ref: '#/components/schemas/UnauthorisedOverdraftAccount'
     CreditLine:
       type: object
       required:
@@ -1321,87 +1844,6 @@ components:
           - temporary
         amount:
           $ref: '#/components/schemas/BudAmount'
-    IncomeExpenditureReportResponse:
-      type: object
-      required:
-      - operation_id
-      - data
-      - metadata
-      properties:
-        operation_id:
-          type: string
-          enum:
-          - insights_beta_report_income_expenditure_get
-        data:
-          type: object
-          required:
-          - insights
-          properties:
-            insights:
-              type: array
-              items:
-                $ref: '#/components/schemas/IncomeExpenditureAnalysis'
-              description: 'An array of income/expenditure analysis reports (insights). Each object in the list
-
-                represents a single insight.
-
-                '
-        metadata:
-          type: object
-          required:
-          - from
-          - to
-          - options
-          properties:
-            from:
-              $ref: '#/components/schemas/schemas-DateTimeISO8601'
-            to:
-              $ref: '#/components/schemas/schemas-DateTimeISO8601'
-            options:
-              type: array
-              items:
-                $ref: '#/components/schemas/InsightOption'
-    Enrichments:
-      title: Enrichments
-      type: object
-      description: Contextual enrichments associated with a Transaction
-      properties:
-        categories:
-          $ref: '#/components/schemas/Categories'
-        merchant:
-          $ref: '#/components/schemas/Merchant'
-        processor:
-          $ref: '#/components/schemas/Processor'
-        regularity:
-          $ref: '#/components/schemas/Regularity'
-        location:
-          $ref: '#/components/schemas/Location'
-        transaction_types:
-          type: array
-          description: Transaction types associated with the transaction
-          items:
-            type: string
-        names:
-          type: array
-          description: Names that were detected in the transaction description
-          items:
-            type: string
-    BudMonetaryValue:
-      title: Monetary Value
-      description: "The value of the monetary amount. The value is formatted with the number of decimal places for the respective currency. \n\nExample: `10.98`\n"
-      type: string
-    BudAmount:
-      title: Standard Bud Amount
-      type: object
-      description: The monetary amount.
-      required:
-      - value
-      - currency
-      properties:
-        value:
-          $ref: '#/components/schemas/BudMonetaryValue'
-        currency:
-          $ref: '#/components/schemas/BudCurrency'
     UnauthorisedOverdraftDate:
       type: object
       required:
@@ -1415,22 +1857,6 @@ components:
           $ref: '#/components/schemas/BudAmount'
         credit_debit_indicator:
           $ref: '#/components/schemas/CreditDebitIndicator'
-    IrregularTransactions:
-      type: object
-      required:
-      - total
-      - monthly_average
-      - transactions_reference
-      - _links
-      properties:
-        total:
-          $ref: '#/components/schemas/BudAmount'
-        monthly_average:
-          $ref: '#/components/schemas/BudAmount'
-        transactions_reference:
-          $ref: '#/components/schemas/TransactionsReference'
-        _links:
-          $ref: '#/components/schemas/schemas-TransactionsLinks'
     Regularity:
       title: Regularity
       type: object
@@ -1456,6 +1882,18 @@ components:
         group_label:
           type: string
           description: Unique label applied to multiple transactions in the same group.
+    BudAmount:
+      title: Standard Bud Amount
+      type: object
+      description: The monetary amount.
+      required:
+      - value
+      - currency
+      properties:
+        value:
+          $ref: '#/components/schemas/BudMonetaryValue'
+        currency:
+          $ref: '#/components/schemas/BudCurrency'
     RegularTransactionIncomeGroup:
       type: object
       required:
@@ -1493,354 +1931,6 @@ components:
           $ref: '#/components/schemas/TransactionsReference'
         _links:
           $ref: '#/components/schemas/schemas-TransactionsLinks'
-    Processor:
-      title: Processor
-      type: object
-      description: 'Processor enrichment associated with a Transaction, as generated using a combination of Bud''s artificial  intelligence models and database of known payment processors.
-
-        '
-      properties:
-        id:
-          type: string
-          description: UUID corresponding to the processor, if available. Subject to version control.
-        slug:
-          type: string
-          description: Unique human readable identifier of the processor. Not subject to version control.
-        display_name:
-          type: string
-          description: UI friendly display name for the processor.
-        logo:
-          type: string
-          description: URL supplying processor logo, if available.
-        tokens:
-          type: array
-          description: 'A list of tokens calculated from the transaction model, used to identify the Merchant.  This list is often present even if the merchant details (id, slug, disply_name, logo) are not returned.
-
-            '
-          items:
-            $ref: '#/components/schemas/Token'
-        website:
-          type: string
-          description: URL supplying merchant website, if available.
-    schemas-DateTimeISO8601:
-      title: Date/Time (ISO 8601)
-      type: string
-      description: ISO Date Format
-      example: '2022-03-05T13:34:33Z'
-    InsightOption:
-      title: Insight Option
-      type: object
-      description: An option used to configure the returned insights.
-      required:
-      - insight_type
-      - option
-      - value
-      properties:
-        insight_type:
-          type: string
-          description: The insight this option is applied to
-        option:
-          type: string
-          description: The name of the option
-        value:
-          type: string
-          description: The value of the option
-    DaysInUnauthorisedOverdraft:
-      description: "Object represents the number of days a customer has been in an unauthorised overdraft. Should be noted that\nthis is a percentage of the total number of days in the report period OR the total number of days ingested for \na given account. The report period is defined by the `from` and `to` parameters.\n"
-      type: object
-      required:
-      - count
-      - ratio
-      properties:
-        count:
-          type: integer
-          description: 'The total number of days a customer has been in an unauthorised overdraft.
-
-            '
-        ratio:
-          type: string
-          description: 'A percentage of the numbers of unauthorised overdraft/total number of days in the report period.
-
-            '
-    TransactionsReference:
-      type: string
-      description: 'A unique identifier to reference a specific transaction subset used within a section of a report.
-
-        '
-    Frequency:
-      type: string
-      enum:
-      - daily
-      - weekly
-      - biweekly
-      - monthly
-      - quarterly
-      - six_monthly
-      - annually
-      - unknown
-    HCSTCreditAnalysis:
-      type: object
-      description: 'Object represents analysis indicating interactions with high-cost short-term credit providers.
-
-        '
-      required:
-      - type
-      - currency
-      - transactions_count
-      - merchants_count
-      - transactions_reference
-      - _links
-      properties:
-        type:
-          type: string
-          enum:
-          - hcst-credit
-          description: 'A unique human readable string used to identify the report type.
-
-            '
-        currency:
-          $ref: '#/components/schemas/BudCurrency'
-        transactions_count:
-          type: integer
-          description: 'The number of transactions related to this insight.
-
-            '
-        merchants_count:
-          type: integer
-          description: 'The number of unique merchants related to this insight.
-
-            '
-        transactions_reference:
-          $ref: '#/components/schemas/TransactionsReference'
-        _links:
-          $ref: '#/components/schemas/schemas-TransactionsLinks'
-    InsightsTransaction:
-      title: Transaction
-      type: object
-      description: A financial transaction
-      required:
-      - transaction_id
-      - account_id
-      - description
-      - amount
-      - credit_debit_indicator
-      - status
-      - date_time
-      - suggested_description
-      properties:
-        transaction_id:
-          type: string
-          description: Unique identifier for the transaction. May be mutable depending on original ingestion source.
-        account_id:
-          type: string
-          description: Identifier for the account associated with the transaction.
-        provider:
-          type: string
-          description: Name of the transaction source provider. Optional as it may not have been supplied when using first party data.
-        description:
-          type: string
-          description: Description of the transaction.
-        credit_debit_indicator:
-          type: string
-          description: Credit/Debit Indicator
-          enum:
-          - credit
-          - debit
-        status:
-          type: string
-          description: 'Status of the transaction. Defaults to booked.
-
-
-            Note: declined transactions are only available for transactions ingested by First Party Ingestion endpoints.
-
-            '
-          enum:
-          - booked
-          - pending
-          - declined
-        amount:
-          $ref: '#/components/schemas/BudAmount'
-        date_time:
-          type: string
-          description: Date that the transaction occured compliant with RFC3339.
-        posted_date_time:
-          type: string
-          deprecated: true
-          description: Date the assets involved in the transaction transferred compliant with RFC3339. For credits this is the date that the asset becomes available, for debits this is the date that the asset ceased to be available
-        value_date_time:
-          type:
-          - string
-          - 'null'
-          description: Date and time at which assets become available to the account owner in case of a credit entry, or cease to be available to the account owner in case of a debit transaction entry. ISODateTime. Null if this field is not applicable.
-        suggested_description:
-          type: string
-          description: The description Bud suggests client apps show for a given transaction.
-        suggested_logo:
-          type: string
-          description: The logo Bud suggests client apps show for a given transaction.
-        enrichments:
-          $ref: '#/components/schemas/Enrichments'
-        merchant_category_code:
-          type: string
-          description: Merchant category code conforming to ISO 18245, related to the type of services or goods the merchant provides for the transaction.
-        tags:
-          type: array
-          description: 'A list of potential tags associated with the transaction after contextual enrichment, which can be used for filtering.
-
-
-            Region and client specific.
-
-
-            | Value                   | Description                                               |
-
-            |:------------------------|:----------------------------------------------------------|
-
-            | `benefit`               | A government/non-profit benefit transaction               |
-
-            | `debt-collection`       | A transaction associated with a known debt-collector      |
-
-            | `loan`                  | A transaction associated with a loan                      |
-
-            | `hcst`                  | A transaction associated with a high cost short term loan |
-
-            | `income`                | A transaction associated with income                      |
-
-            | `pending`               | A transaction which has not been booked                   |
-
-            | `regular-transaction`   | A transaction predicted to occur with a regular frequency |
-
-            | `subscription`          | A transaction associated with a subscription service      |
-
-            | `online`                | A transaction associated with an online merchant          |
-
-            '
-          items:
-            type: string
-    CreditDebitIndicator:
-      type: string
-      enum:
-      - credit
-      - debit
-    UnauthorisedOverdraftAccount:
-      type: object
-      required:
-      - account_id
-      - provider
-      - account_name
-      - days_in_unauthorised_overdraft
-      - unauthorised_overdraft_occurrences
-      - balances
-      - credit_lines
-      - transactions_reference
-      - _links
-      properties:
-        account_id:
-          type: string
-          description: 'A unique identifier for a specific account. The account_id can be found in the _links section of the insight report.
-
-            '
-        provider:
-          type: string
-          description: 'The name of the provider of the account.
-
-            '
-        account_name:
-          type: string
-          description: 'The name of the account.
-
-            '
-        days_in_unauthorised_overdraft:
-          $ref: '#/components/schemas/DaysInUnauthorisedOverdraft'
-        unauthorised_overdraft_occurrences:
-          description: "This field contains an array of balances for the given account when its suspected the account entered an \nunauthorised overdraft. The items of the array are the account balance at points in time when the customer\nexceeded their credit allowance on the account.\n"
-          type: array
-          items:
-            $ref: '#/components/schemas/UnauthorisedOverdraftDate'
-        balances:
-          type: array
-          description: 'A list of balances for the account. The balances returned here will represent the latest up to date
-
-            ingested balances for the account.
-
-            '
-          items:
-            $ref: '#/components/schemas/balance'
-        credit_lines:
-          type: array
-          description: 'A list of credit lines for the account. The credit lines returned here will represent the latest up to date
-
-            ingested balances for the account. It is possible that an account does not have any registered credit lines.
-
-            '
-          items:
-            $ref: '#/components/schemas/CreditLine'
-        transactions_reference:
-          $ref: '#/components/schemas/TransactionsReference'
-        _links:
-          $ref: '#/components/schemas/schemas-TransactionsLinks'
-    schemas-TransactionsLinks:
-      description: URLs for resources related to this report insight
-      type: object
-      required:
-      - transactions
-      properties:
-        transactions:
-          type: string
-          description: 'An endpoint, including options, to make a GET request to in order to retrieve transactions
-
-            related to the report in question.
-
-            '
-    Token:
-      title: Token
-      type: object
-      description: The token item.
-      required:
-      - value
-      - confidence
-      properties:
-        value:
-          type: string
-        confidence:
-          type: string
-          description: Degree of belief of correct assignment, expressed as a probability.
-    balance:
-      type: object
-      required:
-      - date
-      - type
-      - amount
-      - credit_debit_indicator
-      properties:
-        date:
-          $ref: '#/components/schemas/schemas-DateTimeISO8601'
-        type:
-          description: 'Type is a string used to represent the type of balance returned, the full descriptions of each can be
-
-            found below:
-
-            https://docs.thisisbud.com/docs/accounts#balances-and-credit-lines
-
-            '
-          type: string
-          enum:
-          - closing_available
-          - closing_booked
-          - closing_cleared
-          - expected
-          - forward_available
-          - information
-          - interim_available
-          - interim_booked
-          - interim_cleared
-          - opening_available
-          - opening_booked
-          - opening_cleared
-          - previously_closed_booked
-        amount:
-          $ref: '#/components/schemas/BudAmount'
-        credit_debit_indicator:
-          $ref: '#/components/schemas/CreditDebitIndicator'
     ReportInsightsTransactionResponse:
       type: object
       required:
@@ -1880,115 +1970,25 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/InsightOption'
-  parameters:
-    CustomerId:
-      in: header
-      name: X-Customer-Id
-      schema:
-        type: string
-        format: uuid
-      required: true
-      description: A unique identifier for a Customer, as registered on Bud's platform.
-      example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
-    CustomerSecret:
-      in: header
-      name: X-Customer-Secret
-      schema:
-        type: string
-      required: false
-      description: The Bud Customer secret used to encrypt customer data. This is required only if the customer secret is not already stored with Bud.
-    From:
-      in: query
-      name: from
-      required: false
-      description: A start time to check financial data for insights from. Configures the earliest financial data which may be used to generate insights. If omitted, defaults to the start of the sixth complete month prior to the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates.
-      schema:
-        $ref: '#/components/schemas/schemas-DateTimeISO8601'
-    EnabledInsightsBalanceOverdraft:
-      in: query
-      name: enabled_insights
-      required: false
-      schema:
-        type: string
-        description: A comma-separated list of insight types to check for. If not specified, a default list will be used, which may be added to over time.
-        enum:
-        - unauthorised-overdraft
-    EnabledInsightsIncomeExpenditure:
-      in: query
-      name: enabled_insights
-      required: false
-      schema:
-        type: string
-        description: A comma-separated list of insight types to check for. If not specified, a default list will be used, which may be added to over time.
-        enum:
-        - income-cash-withdrawal
-        - income-loan
-        - income-gambling
-        - income-debt
-        - income-essential-expenditure
-        - income-all-expenditure
-    EnabledInsightsMerchants:
-      in: query
-      name: enabled_insights
-      required: false
-      schema:
-        type: string
-        description: A comma-separated list of insight types to check for. If not specified, a default list will be used, which may be added to over time.
-        enum:
-        - hcst-credit
-    TransactionReference:
-      in: path
-      required: true
-      name: reference
-      schema:
-        description: A unique reference used to identify a group of transactions in report for aggregation analysis
-        type: string
-    EnabledInsightsIncomeHealth:
-      in: query
-      name: enabled_insights
-      required: false
-      schema:
-        type: string
-        description: A comma-separated list of insight types to check for. If not specified, a default list will be used, which may be added to over time.
-        enum:
-        - income-health
-    Currency:
-      in: query
-      name: currency
-      required: false
-      description: 'Used to limit the insight reports returned, to only those in the specified currency. The value should represent
-
-        a valid ISO currency code. an example would be "GBP" or "EUR".
-
-
-        Please refer to https://www.iso.org/iso-4217-currency-codes.html for more details.
+    Category:
+      title: Category
+      type: object
+      description: Category associated with a Transaction
+      required:
+      - slug
+      - confidence
+      properties:
+        slug:
+          type: string
+          description: Unique human readable identifier of the category. Not subject to version control.
+        confidence:
+          type: string
+          description: Degree of belief of correct assignment, expressed as a probability.
+    TransactionsReference:
+      type: string
+      description: 'A unique identifier to reference a specific transaction subset used within a section of a report.
 
         '
-      schema:
-        type: string
-    To:
-      in: query
-      name: to
-      required: false
-      description: An end time to check financial data for insights up to. Configures the latest financial data which may be used to generate insights. If omitted, defaults to the date of the latest ingested financial data. Note that some insights will only be checked for complete months entirely between the `from` and `to` dates. Insights relating to potential future events, such as cannot_cover_bills, may forecast them up to a month after this point.
-      schema:
-        $ref: '#/components/schemas/schemas-DateTimeISO8601'
-    CustomerIdempotentIdentifier:
-      in: header
-      name: X-Customer-Idempotent-Identifier
-      schema:
-        type: string
-      description: 'Use the internal client identifier, provided in the `client_metadata` object when creating the customer in __Create Customer V3__, in place of an `X-Customer-Id` header.
-
-        '
-    ClientId:
-      in: header
-      name: X-Client-Id
-      schema:
-        type: string
-      required: true
-      description: The API Client Identifier (Service Application Identifier).
-      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
   securitySchemes:
     Basic:
       type: http

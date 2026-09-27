@@ -1,14 +1,18 @@
 aid: bud-co
 deliveryModel:
   model: unknown
-  open_source: false
+  license_evidence:
+    not_product:
+    - thisisbud/bud-public-developer-resources
+  open_source: unknown
   commercial: false
   callable_host: true
   label: Delivery model not determined — needs a product licence on record
   confidence: low
   source:
   - openapi
-  generated: '2026-08-28'
+  - repository-not-product
+  generated: '2026-09-25'
   method: derived
 specificationVersion: '0.23'
 accessModel:
@@ -51,7 +55,7 @@ tags:
   - Fintech
   - United Kingdom
   - Artificial Intelligence
-  - Machine-Learning
+  - Machine Learning
 tags_raw:
   - Open Banking
   - Transaction Enrichment
@@ -65,6 +69,7 @@ tags_raw:
   - UK
   - AI
   - Machine Learning
+  - Machine-Learning
 common:
   - type: CapabilityMap
     url: capabilities/bud-co-capability-edges.yml

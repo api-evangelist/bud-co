@@ -163,6 +163,15 @@ paths:
         5XX:
           description: An unexpected error occurred on the server side
 components:
+  parameters:
+    ClientId:
+      in: header
+      name: X-Client-Id
+      schema:
+        type: string
+      required: true
+      description: The API Client Identifier (Service Application Identifier).
+      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
   schemas:
     CategoriesMap:
       title: Category Map
@@ -216,35 +225,6 @@ components:
                   - essential
                   items:
                     type: string
-    GetModelsResponse:
-      title: Models Response
-      required:
-      - operation_id
-      - data
-      properties:
-        operation_id:
-          type: string
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/schemas-CategorisationModel'
-    schemas-CategorisationModel:
-      title: Categorisation Model
-      type: object
-      description: Bud categorisation model.
-      required:
-      - name
-      - description
-      properties:
-        name:
-          type: string
-          description: Name of the model.
-        description:
-          type: string
-          description: Description of the model & use-cases it provides.
-        deprecated:
-          type: boolean
-          description: A flag to mark a particular model version as deprecated (this field is omitted if the model is not deprecated).
     GetCategoriesV2Response:
       title: Categories Response
       type: object
@@ -282,19 +262,39 @@ components:
           description: List of all the available subcategories.
           items:
             type: string
+    GetModelsResponse:
+      title: Models Response
+      required:
+      - operation_id
+      - data
+      properties:
+        operation_id:
+          type: string
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/schemas-CategorisationModel'
     OperationId:
       title: Operation Id Field
       type: string
       description: A unique identifier/reference associated with a given endpoint/operation
-  parameters:
-    ClientId:
-      in: header
-      name: X-Client-Id
-      schema:
-        type: string
-      required: true
-      description: The API Client Identifier (Service Application Identifier).
-      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
+    schemas-CategorisationModel:
+      title: Categorisation Model
+      type: object
+      description: Bud categorisation model.
+      required:
+      - name
+      - description
+      properties:
+        name:
+          type: string
+          description: Name of the model.
+        description:
+          type: string
+          description: Description of the model & use-cases it provides.
+        deprecated:
+          type: boolean
+          description: A flag to mark a particular model version as deprecated (this field is omitted if the model is not deprecated).
   securitySchemes:
     Basic:
       type: http

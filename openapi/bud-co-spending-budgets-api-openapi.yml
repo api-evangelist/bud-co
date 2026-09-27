@@ -383,42 +383,25 @@ paths:
                 $ref: '#/components/schemas/ServerErrorResponse'
 components:
   schemas:
-    RetrieveSpendingBudgetsResponse:
-      title: Retrieve Spending Budgets Response
+    BudNextPageTokenMetadata:
+      title: Next Page Token
       type: object
-      required:
-      - operation_id
-      - data
-      - metadata
       properties:
-        operation_id:
-          title: Operation ID
+        next_page_token:
           type: string
-          enum:
-          - goals_v1_spending_budgets_get
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/SpendingBudget'
-        metadata:
-          allOf:
-          - $ref: '#/components/schemas/BudResultsMetadata'
-          - type: object
-            properties:
-              account_ids:
-                title: Account IDs
-                type: array
-                description: 'An array of account IDs used for filtering in the request.
+          description: 'The token to use to fetch the next page of results. This is only set if there are more results to fetch.
 
-                  '
-                items:
-                  type: string
-                  description: 'An account ID used for filtering in the request.
-
-
-                    Example: `RxsYshVGded4JeilkXgWKdXA`
-
-                    '
+            '
+      example:
+        next_page_token: b21055a9a9f46fc794a2e6855c65abd7e317181039fc6930daabac5822911d14a84895ecd947e2b5abdcb22e4fcc2c594e1f661dc63e34b9ba88760724047990896f7581a0786c2605dce19c6a9d80d1044f963b74fea0a929c0a4465a6e67378a74dce38ec5e26ae4cc804b62fd666d5df4cf2e7f524bd99e5523bc5d471768065c036dc0c73122705b280817fbbd7d9aa31f271d72cd3877d999dcb9a5b1c0be0c05
+    Error:
+      title: Error Object
+      type:
+      - object
+      - 'null'
+      description: Contains a field specific error message
+      additionalProperties:
+        type: string
     UpdateSpendingBudgetResponse:
       title: Update Spending Budget Response
       type: object
@@ -433,150 +416,66 @@ components:
           - goals_v1_spending_budgets_patch
         data:
           $ref: '#/components/schemas/SpendingBudget'
-    Category:
-      title: Category
+    RetrieveSpendingBudgetTransactionsResponse:
+      title: Retrieve Spending Budget Transactions Response
       type: object
-      description: Category associated with a Transaction
       required:
-      - slug
-      - confidence
+      - operation_id
+      - data
+      - metadata
       properties:
+        operation_id:
+          title: Operation ID
+          type: string
+          enum:
+          - goals_v1_spending_budget_transactions_get
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/schemas-Transaction'
+        metadata:
+          allOf:
+          - $ref: '#/components/schemas/BudResultsMetadata'
+          - type: object
+            properties:
+              budget_id:
+                title: Budget ID
+                type: string
+                description: 'The ID of the spending budget the transactions were retrieved for.
+
+
+                  Example: "81a68821-dca6-4771-80d4-002c7fce412e"
+
+                  '
+                example: 81a68821-dca6-4771-80d4-002c7fce412e
+              page_size:
+                $ref: '#/components/schemas/BudPageSizeMetadata'
+          - $ref: '#/components/schemas/BudNextPageTokenMetadata'
+    goals-components_schemas-Merchant:
+      title: Merchant
+      type: object
+      description: 'Merchant enrichment associated with a Transaction, as generated using a combination of Bud''s artificial
+
+        intelligence models and database of known merchants.
+
+        '
+      required:
+      - id
+      - slug
+      - display_name
+      properties:
+        id:
+          type: string
+          description: UUID corresponding to the merchant, if available. Subject to version control.
         slug:
           type: string
-          description: Unique human readable identifier of the category. Not subject to version control.
-        confidence:
+          description: Unique human readable identifier of the merchant. Not subject to version control.
+        display_name:
           type: string
-          description: Degree of belief of correct assignment, expressed as a probability.
-    BaseSpendingBudget:
-      title: Spending Budget
-      type: object
-      required:
-      - name
-      - amount
-      - recurrency
-      properties:
-        name:
-          title: Name
+          description: UI friendly display name for the merchant.
+        logo:
           type: string
-          description: 'The name of the spending budget.
-
-
-            Example: `Travel`
-
-            '
-          example: Travel
-        amount:
-          title: Amount
-          type: object
-          description: 'The amount of money to be budgeted for. Must be greater than 0.
-
-            '
-          required:
-          - value
-          - currency
-          properties:
-            value:
-              $ref: '#/components/schemas/BudMonetaryValue'
-            currency:
-              $ref: '#/components/schemas/BudCurrency'
-        recurrency:
-          title: Recurrency
-          type: object
-          description: 'Whether and/or how often the budget recurs.
-
-
-            The `starting_day` is only required for budgets with a recurring period e.g. `monthly`
-
-
-            New periods may be added without a breaking change notice.
-
-            '
-          required:
-          - period
-          properties:
-            period:
-              title: Period
-              type: string
-              description: 'The period at which a budget recurs (if at all).
-
-
-                Currently supported options are:
-
-                - `one-off`
-
-                - `monthly`
-
-
-                New periods may be added without a breaking change notice.
-
-                '
-            starting_day:
-              title: Starting Day
-              type: integer
-              description: 'The day of which the budget period starts. Not required if a budget is `one-off`.
-
-
-                Must be between 1 and 28 for `monthly` budgets.
-
-                '
-        include:
-          title: Include
-          type: object
-          description: 'The inclusion criteria for transactions to be included in the budget.
-
-            '
-          properties:
-            categories:
-              title: Categories
-              description: "The categories of transactions to be included in the budget. \n\nIf L2 categories are specified, they must be grouped underneath their corresponding L1 category.\n\nAll categories specified must be compatible with the category taxonomy used for that customer.\n"
-              type: array
-              items:
-                required:
-                - l1
-                properties:
-                  l1:
-                    title: L1
-                    type: string
-                    description: 'L1 category to include in the filter. Must be specified if using category filtering.
-
-                      '
-                  l2:
-                    title: L2
-                    type: array
-                    description: 'L2 categories to include in the filter. Must all correspond to the parent L1 category specified.
-
-                      '
-                    items:
-                      type: string
-            merchants:
-              title: Merchants
-              type: object
-              description: 'The merchants of transactions to be included in the budget.
-
-                '
-              properties:
-                slugs:
-                  title: Slugs
-                  type: array
-                  description: 'The slugs of merchants to be included. E.g. `netflix` or `uber`
-
-                    '
-                  items:
-                    type: string
-    schemas-Categories:
-      title: Categories
-      type: object
-      description: "Categories enrichment associated with a Transaction, as generated by Bud's artificial intelligence models. \nCurrently two levels of category are supported, with `l1` being a coarse-grained category level and `l2` being\nmore refined.\n"
-      required:
-      - l1
-      - l2
-      properties:
-        l1:
-          $ref: '#/components/schemas/Category'
-          description: Level 1 Category
-        l2:
-          $ref: '#/components/schemas/Category'
-          description: Level 2 Category
+          description: URL supplying merchant logo, if available.
     BudCurrency:
       title: Currency
       description: 'The three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) of the monetary amount.
@@ -586,10 +485,25 @@ components:
 
         '
       type: string
-    OperationId:
-      title: Operation Id Field
+    BudMonetaryValue:
+      title: Monetary Value
+      description: "The value of the monetary amount. The value is formatted with the number of decimal places for the respective currency. \n\nExample: `10.98`\n"
       type: string
-      description: A unique identifier/reference associated with a given endpoint/operation
+    BudResultsMetadata:
+      title: Metadata
+      type: object
+      required:
+      - results
+      properties:
+        results:
+          type: integer
+          description: 'The number of results returned in the response.
+
+
+            Example: 1
+
+            '
+          example: 1
     SpendingBudget:
       allOf:
       - $ref: '#/components/schemas/BaseSpendingBudget'
@@ -704,82 +618,42 @@ components:
           anyOf:
           - $ref: '#/components/schemas/Error'
           - $ref: '#/components/schemas/Errors'
-    Errors:
-      title: Array of Error Object
-      description: Contains a list of error messages
-      type: object
-      additionalProperties:
-        type: array
-        items:
-          type: string
-    BudMonetaryValue:
-      title: Monetary Value
-      description: "The value of the monetary amount. The value is formatted with the number of decimal places for the respective currency. \n\nExample: `10.98`\n"
-      type: string
-    CreateSpendingBudgetRequest:
-      title: Create Spending Budget Request
-      allOf:
-      - $ref: '#/components/schemas/BaseSpendingBudget'
-    BudAmount:
-      title: Standard Bud Amount
-      type: object
-      description: The monetary amount.
-      required:
-      - value
-      - currency
-      properties:
-        value:
-          $ref: '#/components/schemas/BudMonetaryValue'
-        currency:
-          $ref: '#/components/schemas/BudCurrency'
-    CreateSpendingBudgetResponse:
-      title: Create Spending Budget Response
+    RetrieveSpendingBudgetsResponse:
+      title: Retrieve Spending Budgets Response
       type: object
       required:
       - operation_id
       - data
+      - metadata
       properties:
         operation_id:
           title: Operation ID
           type: string
           enum:
-          - goals_v1_spending_budgets_post
+          - goals_v1_spending_budgets_get
         data:
-          $ref: '#/components/schemas/SpendingBudget'
-    goals-components_schemas-Merchant:
-      title: Merchant
-      type: object
-      description: 'Merchant enrichment associated with a Transaction, as generated using a combination of Bud''s artificial
+          type: array
+          items:
+            $ref: '#/components/schemas/SpendingBudget'
+        metadata:
+          allOf:
+          - $ref: '#/components/schemas/BudResultsMetadata'
+          - type: object
+            properties:
+              account_ids:
+                title: Account IDs
+                type: array
+                description: 'An array of account IDs used for filtering in the request.
 
-        intelligence models and database of known merchants.
+                  '
+                items:
+                  type: string
+                  description: 'An account ID used for filtering in the request.
 
-        '
-      required:
-      - id
-      - slug
-      - display_name
-      properties:
-        id:
-          type: string
-          description: UUID corresponding to the merchant, if available. Subject to version control.
-        slug:
-          type: string
-          description: Unique human readable identifier of the merchant. Not subject to version control.
-        display_name:
-          type: string
-          description: UI friendly display name for the merchant.
-        logo:
-          type: string
-          description: URL supplying merchant logo, if available.
-    schemas-Enrichments:
-      title: Enrichments
-      type: object
-      description: Contextual enrichments associated with a Transaction
-      properties:
-        categories:
-          $ref: '#/components/schemas/schemas-Categories'
-        merchant:
-          $ref: '#/components/schemas/goals-components_schemas-Merchant'
+
+                    Example: `RxsYshVGded4JeilkXgWKdXA`
+
+                    '
     PatchSpendingBudget:
       title: Patch Spending Budget
       type: object
@@ -907,67 +781,42 @@ components:
           anyOf:
           - $ref: '#/components/schemas/Error'
           - $ref: '#/components/schemas/Errors'
-    BudResultsMetadata:
-      title: Metadata
-      type: object
-      required:
-      - results
-      properties:
-        results:
-          type: integer
-          description: 'The number of results returned in the response.
-
-
-            Example: 1
-
-            '
-          example: 1
-    RetrieveSpendingBudgetTransactionsResponse:
-      title: Retrieve Spending Budget Transactions Response
+    CreateSpendingBudgetResponse:
+      title: Create Spending Budget Response
       type: object
       required:
       - operation_id
       - data
-      - metadata
       properties:
         operation_id:
           title: Operation ID
           type: string
           enum:
-          - goals_v1_spending_budget_transactions_get
+          - goals_v1_spending_budgets_post
         data:
-          type: array
-          items:
-            $ref: '#/components/schemas/schemas-Transaction'
-        metadata:
-          allOf:
-          - $ref: '#/components/schemas/BudResultsMetadata'
-          - type: object
-            properties:
-              budget_id:
-                title: Budget ID
-                type: string
-                description: 'The ID of the spending budget the transactions were retrieved for.
-
-
-                  Example: "81a68821-dca6-4771-80d4-002c7fce412e"
-
-                  '
-                example: 81a68821-dca6-4771-80d4-002c7fce412e
-              page_size:
-                $ref: '#/components/schemas/BudPageSizeMetadata'
-          - $ref: '#/components/schemas/BudNextPageTokenMetadata'
-    BudNextPageTokenMetadata:
-      title: Next Page Token
+          $ref: '#/components/schemas/SpendingBudget'
+    Errors:
+      title: Array of Error Object
+      description: Contains a list of error messages
       type: object
-      properties:
-        next_page_token:
+      additionalProperties:
+        type: array
+        items:
           type: string
-          description: 'The token to use to fetch the next page of results. This is only set if there are more results to fetch.
-
-            '
-      example:
-        next_page_token: b21055a9a9f46fc794a2e6855c65abd7e317181039fc6930daabac5822911d14a84895ecd947e2b5abdcb22e4fcc2c594e1f661dc63e34b9ba88760724047990896f7581a0786c2605dce19c6a9d80d1044f963b74fea0a929c0a4465a6e67378a74dce38ec5e26ae4cc804b62fd666d5df4cf2e7f524bd99e5523bc5d471768065c036dc0c73122705b280817fbbd7d9aa31f271d72cd3877d999dcb9a5b1c0be0c05
+    schemas-Categories:
+      title: Categories
+      type: object
+      description: "Categories enrichment associated with a Transaction, as generated by Bud's artificial intelligence models. \nCurrently two levels of category are supported, with `l1` being a coarse-grained category level and `l2` being\nmore refined.\n"
+      required:
+      - l1
+      - l2
+      properties:
+        l1:
+          $ref: '#/components/schemas/Category'
+          description: Level 1 Category
+        l2:
+          $ref: '#/components/schemas/Category'
+          description: Level 2 Category
     schemas-Transaction:
       title: Transaction
       type: object
@@ -1020,14 +869,6 @@ components:
           description: The logo Bud suggests client apps show for a given transaction.
           type: string
           format: uri
-    Error:
-      title: Error Object
-      type:
-      - object
-      - 'null'
-      description: Contains a field specific error message
-      additionalProperties:
-        type: string
     BudPageSizeMetadata:
       title: Page Size
       type: integer
@@ -1038,23 +879,173 @@ components:
 
         '
       example: 100
+    BudAmount:
+      title: Standard Bud Amount
+      type: object
+      description: The monetary amount.
+      required:
+      - value
+      - currency
+      properties:
+        value:
+          $ref: '#/components/schemas/BudMonetaryValue'
+        currency:
+          $ref: '#/components/schemas/BudCurrency'
+    CreateSpendingBudgetRequest:
+      title: Create Spending Budget Request
+      allOf:
+      - $ref: '#/components/schemas/BaseSpendingBudget'
+    BaseSpendingBudget:
+      title: Spending Budget
+      type: object
+      required:
+      - name
+      - amount
+      - recurrency
+      properties:
+        name:
+          title: Name
+          type: string
+          description: 'The name of the spending budget.
+
+
+            Example: `Travel`
+
+            '
+          example: Travel
+        amount:
+          title: Amount
+          type: object
+          description: 'The amount of money to be budgeted for. Must be greater than 0.
+
+            '
+          required:
+          - value
+          - currency
+          properties:
+            value:
+              $ref: '#/components/schemas/BudMonetaryValue'
+            currency:
+              $ref: '#/components/schemas/BudCurrency'
+        recurrency:
+          title: Recurrency
+          type: object
+          description: 'Whether and/or how often the budget recurs.
+
+
+            The `starting_day` is only required for budgets with a recurring period e.g. `monthly`
+
+
+            New periods may be added without a breaking change notice.
+
+            '
+          required:
+          - period
+          properties:
+            period:
+              title: Period
+              type: string
+              description: 'The period at which a budget recurs (if at all).
+
+
+                Currently supported options are:
+
+                - `one-off`
+
+                - `monthly`
+
+
+                New periods may be added without a breaking change notice.
+
+                '
+            starting_day:
+              title: Starting Day
+              type: integer
+              description: 'The day of which the budget period starts. Not required if a budget is `one-off`.
+
+
+                Must be between 1 and 28 for `monthly` budgets.
+
+                '
+        include:
+          title: Include
+          type: object
+          description: 'The inclusion criteria for transactions to be included in the budget.
+
+            '
+          properties:
+            categories:
+              title: Categories
+              description: "The categories of transactions to be included in the budget. \n\nIf L2 categories are specified, they must be grouped underneath their corresponding L1 category.\n\nAll categories specified must be compatible with the category taxonomy used for that customer.\n"
+              type: array
+              items:
+                required:
+                - l1
+                properties:
+                  l1:
+                    title: L1
+                    type: string
+                    description: 'L1 category to include in the filter. Must be specified if using category filtering.
+
+                      '
+                  l2:
+                    title: L2
+                    type: array
+                    description: 'L2 categories to include in the filter. Must all correspond to the parent L1 category specified.
+
+                      '
+                    items:
+                      type: string
+            merchants:
+              title: Merchants
+              type: object
+              description: 'The merchants of transactions to be included in the budget.
+
+                '
+              properties:
+                slugs:
+                  title: Slugs
+                  type: array
+                  description: 'The slugs of merchants to be included. E.g. `netflix` or `uber`
+
+                    '
+                  items:
+                    type: string
+    schemas-Enrichments:
+      title: Enrichments
+      type: object
+      description: Contextual enrichments associated with a Transaction
+      properties:
+        categories:
+          $ref: '#/components/schemas/schemas-Categories'
+        merchant:
+          $ref: '#/components/schemas/goals-components_schemas-Merchant'
+    Category:
+      title: Category
+      type: object
+      description: Category associated with a Transaction
+      required:
+      - slug
+      - confidence
+      properties:
+        slug:
+          type: string
+          description: Unique human readable identifier of the category. Not subject to version control.
+        confidence:
+          type: string
+          description: Degree of belief of correct assignment, expressed as a probability.
+    OperationId:
+      title: Operation Id Field
+      type: string
+      description: A unique identifier/reference associated with a given endpoint/operation
   parameters:
-    QueryDay:
+    parameters-QueryBudPageSize:
       in: query
-      name: day
+      name: page_size
       schema:
-        type: string
-      example: '2019-02-29T12:23:00Z'
-      description: "The day for which results are to be retrieved in the format [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339).\n\nExamples:\n  - `2023-01-17T17:29:51Z`\n  - `2023-01-17T17:29:51-08:00`\n"
-    CustomerId:
-      in: header
-      name: X-Customer-Id
-      schema:
-        type: string
-        format: uuid
-      required: true
-      description: A unique identifier for a Customer, as registered on Bud's platform.
-      example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
+        type: integer
+      example: 200
+      description: Use this parameter to set the maximum number of results to be returned. This defaults to 100, and has a maximum of 200.
     PathSpendingBudgetID:
       name: budget_id
       in: path
@@ -1068,13 +1059,13 @@ components:
 
         '
       example: 81a68821-dca6-4771-80d4-002c7fce412e
-    parameters-QueryBudPageSize:
+    parameters-QueryBudPageToken:
       in: query
-      name: page_size
+      name: page_token
       schema:
-        type: integer
-      example: 200
-      description: Use this parameter to set the maximum number of results to be returned. This defaults to 100, and has a maximum of 200.
+        type: string
+      example: b21055a9a9f46fc794a2e6855c65abd7e317181039fc6930daabac5822911d14a84895ecd947e2b5abdcb22e4fcc2c594e1f661dc63e34b9ba88760724047990896f7581a0786c2605dce19c6a9d80d1044f963b74fea0a929c0a4465a6e67378a74dce38ec5e26ae4cc804b62fd666d5df4cf2e7f524bd99e5523bc5d471768065c036dc0c73122705b280817fbbd7d9aa31f271d72cd3877d999dcb9a5b1c0be0c05
+      description: Use this paramater to fetch a specific page of results. Provided by the next_page_token field in the previous request.
     QueryBudAccountID:
       in: query
       name: account_id
@@ -1095,13 +1086,22 @@ components:
       description: 'Use the internal client identifier, provided in the `client_metadata` object when creating the customer in __Create Customer V3__, in place of an `X-Customer-Id` header.
 
         '
-    parameters-QueryBudPageToken:
-      in: query
-      name: page_token
+    CustomerId:
+      in: header
+      name: X-Customer-Id
       schema:
         type: string
-      example: b21055a9a9f46fc794a2e6855c65abd7e317181039fc6930daabac5822911d14a84895ecd947e2b5abdcb22e4fcc2c594e1f661dc63e34b9ba88760724047990896f7581a0786c2605dce19c6a9d80d1044f963b74fea0a929c0a4465a6e67378a74dce38ec5e26ae4cc804b62fd666d5df4cf2e7f524bd99e5523bc5d471768065c036dc0c73122705b280817fbbd7d9aa31f271d72cd3877d999dcb9a5b1c0be0c05
-      description: Use this paramater to fetch a specific page of results. Provided by the next_page_token field in the previous request.
+        format: uuid
+      required: true
+      description: A unique identifier for a Customer, as registered on Bud's platform.
+      example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
+    QueryDay:
+      in: query
+      name: day
+      schema:
+        type: string
+      example: '2019-02-29T12:23:00Z'
+      description: "The day for which results are to be retrieved in the format [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339).\n\nExamples:\n  - `2023-01-17T17:29:51Z`\n  - `2023-01-17T17:29:51-08:00`\n"
     ClientId:
       in: header
       name: X-Client-Id

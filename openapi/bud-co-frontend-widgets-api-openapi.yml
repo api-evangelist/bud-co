@@ -356,6 +356,35 @@ paths:
           description: An unexpected error occurred on the server side
 components:
   schemas:
+    ColorMode:
+      type: string
+      enum:
+      - system
+      - light
+      - dark
+    GenerateSpendingAnalysisURLResponse:
+      type: object
+      properties:
+        operation_id:
+          type: string
+          enum:
+          - insights_v1_spending_analysis_url_post
+        data:
+          type: object
+          properties:
+            url:
+              type: string
+              format: uri
+        metadata:
+          type: object
+          properties:
+            sufficient_data:
+              type: boolean
+    schemas-DateTimeISO8601:
+      title: Date/Time (ISO 8601)
+      type: string
+      description: ISO Date Format
+      example: '2022-03-05T13:34:33Z'
     GenerateRecurringAndForecastedTransactionsURLRequest:
       type: object
       properties:
@@ -379,6 +408,12 @@ components:
           properties:
             sufficient_data:
               type: boolean
+    SpendingBudgetsQueryParams:
+      allOf:
+      - $ref: '#/components/schemas/GlobalWidgetURLQueryParams'
+    IntelligentSearchQueryParams:
+      allOf:
+      - $ref: '#/components/schemas/GlobalWidgetURLQueryParams'
     GenerateSpendingBudgetsURLResponse:
       type: object
       properties:
@@ -397,52 +432,26 @@ components:
           properties:
             sufficient_data:
               type: boolean
-    GenerateFinancialCalendarURLRequest:
+    GenerateSpendingBudgetsURLRequest:
       type: object
       properties:
         additional_query_params:
-          $ref: '#/components/schemas/FinancialCalendarQueryParams'
+          $ref: '#/components/schemas/SpendingBudgetsQueryParams'
+    BalancesOverTimeQueryParams:
+      allOf:
+      - $ref: '#/components/schemas/GlobalWidgetURLQueryParams'
+    GlobalWidgetURLQueryParams:
+      type: object
+      properties:
+        base_heading_level:
+          $ref: '#/components/schemas/BaseHeadingLevel'
+        color_mode:
+          $ref: '#/components/schemas/ColorMode'
     GenerateBalancesOverTimeURLRequest:
       type: object
       properties:
         additional_query_params:
           $ref: '#/components/schemas/BalancesOverTimeQueryParams'
-    RecurringAndForecastedTransactionsQueryParams:
-      allOf:
-      - $ref: '#/components/schemas/GlobalWidgetURLQueryParams'
-    BalancesOverTimeQueryParams:
-      allOf:
-      - $ref: '#/components/schemas/GlobalWidgetURLQueryParams'
-    BaseHeadingLevel:
-      type: integer
-      minimum: 1
-      maximum: 6
-    SpendingBudgetsQueryParams:
-      allOf:
-      - $ref: '#/components/schemas/GlobalWidgetURLQueryParams'
-    GenerateAccountsURLResponse:
-      type: object
-      properties:
-        operation_id:
-          type: string
-          enum:
-          - insights_v1_accounts_url_post
-        data:
-          type: object
-          properties:
-            url:
-              type: string
-              format: uri
-        metadata:
-          type: object
-          properties:
-            sufficient_data:
-              type: boolean
-    GenerateIntelligentSearchURLRequest:
-      type: object
-      properties:
-        additional_query_params:
-          $ref: '#/components/schemas/IntelligentSearchQueryParams'
     GenerateFinancialCalendarURLResponse:
       type: object
       properties:
@@ -461,6 +470,29 @@ components:
           properties:
             sufficient_data:
               type: boolean
+    GenerateSpendingAnalysisURLRequest:
+      type: object
+      properties:
+        additional_query_params:
+          $ref: '#/components/schemas/SpendingAnalysisQueryParams'
+    GenerateCardSummaryURLRequest:
+      type: object
+      required:
+      - summary_type
+      properties:
+        summary_type:
+          type: string
+          enum:
+          - weekly
+          - monthly
+          - quarterly
+    SavingsGoalsQueryParams:
+      allOf:
+      - $ref: '#/components/schemas/GlobalWidgetURLQueryParams'
+    BaseHeadingLevel:
+      type: integer
+      minimum: 1
+      maximum: 6
     GenerateRecurringAndForecastedTransactionsURLResponse:
       type: object
       properties:
@@ -468,6 +500,55 @@ components:
           type: string
           enum:
           - insights_v1_recurring_and_forecasted_transactions_url_post
+        data:
+          type: object
+          properties:
+            url:
+              type: string
+              format: uri
+        metadata:
+          type: object
+          properties:
+            sufficient_data:
+              type: boolean
+    GenerateAccountsURLResponse:
+      type: object
+      properties:
+        operation_id:
+          type: string
+          enum:
+          - insights_v1_accounts_url_post
+        data:
+          type: object
+          properties:
+            url:
+              type: string
+              format: uri
+        metadata:
+          type: object
+          properties:
+            sufficient_data:
+              type: boolean
+    RecurringAndForecastedTransactionsQueryParams:
+      allOf:
+      - $ref: '#/components/schemas/GlobalWidgetURLQueryParams'
+    GenerateSavingsGoalsURLRequest:
+      type: object
+      properties:
+        additional_query_params:
+          $ref: '#/components/schemas/SavingsGoalsQueryParams'
+    GenerateFinancialCalendarURLRequest:
+      type: object
+      properties:
+        additional_query_params:
+          $ref: '#/components/schemas/FinancialCalendarQueryParams'
+    GenerateIntelligentSearchURLResponse:
+      type: object
+      properties:
+        operation_id:
+          type: string
+          enum:
+          - insights_v1_intelligent_search_url_post
         data:
           type: object
           properties:
@@ -497,95 +578,16 @@ components:
           properties:
             sufficient_data:
               type: boolean
+    GenerateIntelligentSearchURLRequest:
+      type: object
+      properties:
+        additional_query_params:
+          $ref: '#/components/schemas/IntelligentSearchQueryParams'
     GenerateAccountsURLRequest:
       type: object
       properties:
         additional_query_params:
           $ref: '#/components/schemas/SpendingAnalysisQueryParams'
-    GenerateSpendingAnalysisURLResponse:
-      type: object
-      properties:
-        operation_id:
-          type: string
-          enum:
-          - insights_v1_spending_analysis_url_post
-        data:
-          type: object
-          properties:
-            url:
-              type: string
-              format: uri
-        metadata:
-          type: object
-          properties:
-            sufficient_data:
-              type: boolean
-    GenerateIntelligentSearchURLResponse:
-      type: object
-      properties:
-        operation_id:
-          type: string
-          enum:
-          - insights_v1_intelligent_search_url_post
-        data:
-          type: object
-          properties:
-            url:
-              type: string
-              format: uri
-        metadata:
-          type: object
-          properties:
-            sufficient_data:
-              type: boolean
-    FinancialCalendarQueryParams:
-      allOf:
-      - $ref: '#/components/schemas/GlobalWidgetURLQueryParams'
-    schemas-DateTimeISO8601:
-      title: Date/Time (ISO 8601)
-      type: string
-      description: ISO Date Format
-      example: '2022-03-05T13:34:33Z'
-    GenerateSavingsGoalsURLRequest:
-      type: object
-      properties:
-        additional_query_params:
-          $ref: '#/components/schemas/SavingsGoalsQueryParams'
-    GenerateSpendingBudgetsURLRequest:
-      type: object
-      properties:
-        additional_query_params:
-          $ref: '#/components/schemas/SpendingBudgetsQueryParams'
-    IntelligentSearchQueryParams:
-      allOf:
-      - $ref: '#/components/schemas/GlobalWidgetURLQueryParams'
-    ColorMode:
-      type: string
-      enum:
-      - system
-      - light
-      - dark
-    GlobalWidgetURLQueryParams:
-      type: object
-      properties:
-        base_heading_level:
-          $ref: '#/components/schemas/BaseHeadingLevel'
-        color_mode:
-          $ref: '#/components/schemas/ColorMode'
-    SpendingAnalysisQueryParams:
-      allOf:
-      - $ref: '#/components/schemas/GlobalWidgetURLQueryParams'
-    GenerateCardSummaryURLRequest:
-      type: object
-      required:
-      - summary_type
-      properties:
-        summary_type:
-          type: string
-          enum:
-          - weekly
-          - monthly
-          - quarterly
     GenerateCardSummaryURLResponse:
       type: object
       properties:
@@ -610,15 +612,21 @@ components:
               $ref: '#/components/schemas/schemas-DateTimeISO8601'
             summary_from:
               $ref: '#/components/schemas/schemas-DateTimeISO8601'
-    GenerateSpendingAnalysisURLRequest:
-      type: object
-      properties:
-        additional_query_params:
-          $ref: '#/components/schemas/SpendingAnalysisQueryParams'
-    SavingsGoalsQueryParams:
+    FinancialCalendarQueryParams:
+      allOf:
+      - $ref: '#/components/schemas/GlobalWidgetURLQueryParams'
+    SpendingAnalysisQueryParams:
       allOf:
       - $ref: '#/components/schemas/GlobalWidgetURLQueryParams'
   parameters:
+    CustomerIdempotentIdentifier:
+      in: header
+      name: X-Customer-Idempotent-Identifier
+      schema:
+        type: string
+      description: 'Use the internal client identifier, provided in the `client_metadata` object when creating the customer in __Create Customer V3__, in place of an `X-Customer-Id` header.
+
+        '
     CustomerId:
       in: header
       name: X-Customer-Id
@@ -628,14 +636,6 @@ components:
       required: true
       description: A unique identifier for a Customer, as registered on Bud's platform.
       example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
-    CustomerIdempotentIdentifier:
-      in: header
-      name: X-Customer-Idempotent-Identifier
-      schema:
-        type: string
-      description: 'Use the internal client identifier, provided in the `client_metadata` object when creating the customer in __Create Customer V3__, in place of an `X-Customer-Id` header.
-
-        '
     ClientId:
       in: header
       name: X-Client-Id

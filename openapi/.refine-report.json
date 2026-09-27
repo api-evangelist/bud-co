@@ -37,16 +37,13 @@
     "bud-co-subscription-finder-api-openapi.yml",
     "bud-co-transaction-search-api-openapi.yml"
   ],
-  "archived": [
-    "deleted 1 superseded output(s) from the previous generation"
-  ],
+  "archived": [],
   "errors": [],
   "warnings": [],
   "notes": [
     "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
     "bud-platform-openapi.yml: upgraded openapi 3.0.3 -> OpenAPI 3.2.0",
-    "superseded outputs removed: bud-co-o-auth2-api-openapi.yml",
-    "apis.yml register: written (+1 apis, 32 total)"
+    "apis.yml register: already-registered"
   ],
   "skipped": [
     "bud-co-aggregation-buckets-api-openapi.yml: previously refined output, superseded by openapi/_original/",
@@ -68,7 +65,7 @@
     "bud-co-manage-customers-api-openapi.yml: previously refined output, superseded by openapi/_original/",
     "bud-co-manage-financial-data-api-openapi.yml: previously refined output, superseded by openapi/_original/",
     "bud-co-manage-payments-api-openapi.yml: previously refined output, superseded by openapi/_original/",
-    "bud-co-o-auth2-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "bud-co-oauth2-api-openapi.yml: previously refined output, superseded by openapi/_original/",
     "bud-co-product-finder-api-openapi.yml: previously refined output, superseded by openapi/_original/",
     "bud-co-regular-payments-finder-api-openapi.yml: previously refined output, superseded by openapi/_original/",
     "bud-co-retrieve-actionable-insights-api-openapi.yml: previously refined output, superseded by openapi/_original/",

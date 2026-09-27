@@ -237,67 +237,322 @@ paths:
         5XX:
           description: An unexpected error occurred on the server side.
 components:
-  parameters:
-    MetadataFieldName:
-      in: query
-      name: metadata.{field_name}
-      schema:
-        type: string
-      description: "Search by exact-match on the `field_name` of `metadata` properties.\nExample: `metadata.loan_product_code=credit_card_1234` will limit results to all\ncustomer applications that have the following metadata contained:\n\n```json\n{\n  \"metadata\": {\n    \"loan_product_code\": \"credit_card_1234\"\n  }\n}\n```\n"
-    CustomerApplicationID:
-      in: path
-      name: application_id
-      required: true
-      schema:
-        $ref: '#/components/schemas/CustomerApplicationID'
-    Timezone:
-      in: query
-      name: timezone
-      schema:
-        $ref: '#/components/schemas/TimezoneIdentifier'
-    PageToken:
-      in: query
-      name: page_token
-      schema:
-        type: string
-      description: "Token provided in the `metadata` blob of a response, in order to find\nthe next page in a collection, e.g.\n\n```json\n{\n  \"metadata\": {\n    \"next_page_token\": \"4jmBrvVn9r\"\n  }\n}\n```\n"
-    DateRangeDurations:
-      in: query
-      name: date_range_durations
-      style: form
-      explode: false
-      description: 'Used with `timezone` and `date_range_end` to determine the list of `date_ranges` that appear in the
+  schemas:
+    CustomerID:
+      type: string
+      format: uuid
+      description: A unique identifier for a Customer, as registered on Bud's platform.
+      example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
+    DateRange:
+      required:
+      - from
+      - to
+      - duration
+      properties:
+        from:
+          $ref: '#/components/schemas/schemas-DateTimeISO8601'
+        to:
+          $ref: '#/components/schemas/schemas-DateTimeISO8601'
+        duration:
+          $ref: '#/components/schemas/DayOrMonth'
+    schemas-DateTimeISO8601:
+      title: Date/Time (ISO 8601)
+      type: string
+      description: ISO Date Format
+      example: '2022-03-05T13:34:33Z'
+    PrimaryApplicant:
+      title: Primary Applicant
+      allOf:
+      - description: First and last name of the primary applicant.
+      - $ref: '#/components/schemas/Applicant'
+    Metadata:
+      title: Metadata
+      type: object
+      description: 'These fields add additional context to a customer''s application.
 
-        metadata of the response. Use this to configure the specific periods of time that you wish to assess
+        Their visibility and relevance depends on the configuration of the
 
-        a customer''s application data over.
+        dashboard.
 
         '
-      schema:
-        type: array
-        default:
-        - P1M
-        - P3M
-        - P6M
-        - P12M
-        items:
-          $ref: '#/components/schemas/DayOrMonth'
-    DateRangeEnd:
-      in: query
-      name: date_range_end
-      schema:
-        allOf:
-        - $ref: '#/components/schemas/DateRangeEnd'
-        - default: latest_calendar_month
-    ClientId:
-      in: header
-      name: X-Client-Id
-      schema:
+      properties:
+        application_id:
+          type: string
+          description: 'An optional ID to associate with this customer''s application
+
+            with (e.g. if the application is related to another system
+
+            with a different identifier, use that one here).
+
+            '
+        customer_id:
+          type: string
+          description: 'An optional ID to associate with this customer with (e.g. if
+
+            the customer exists on another system with a different
+
+            identifier, use that one here).
+
+            '
+        advisor_name:
+          type: string
+          description: 'Name of the advisor in charge of assessing the customer''s
+
+            application.
+
+            '
+        account_connection_initiator:
+          type: string
+          enum:
+          - customer
+          - advisor
+          description: 'Determines whether the customer''s application requires the
+
+            advisor to upload financial data, or the customer (via a
+
+            generated link).
+
+            '
+      additionalProperties:
         type: string
-      required: true
-      description: The API Client Identifier (Service Application Identifier).
-      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
-  schemas:
+        description: 'Any other additional data you wish to associate to a customer''s
+
+          application. This will not be visible within the dashboard.
+
+          '
+    PostCustomerApplicationsResponse:
+      title: Post Customer Applications Response Object
+      type: object
+      description: Details provided back to the client when a new customer application has been created
+      required:
+      - operation_id
+      - data
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          required:
+          - application_id
+          - customer_id
+          - expires_at
+          properties:
+            application_id:
+              $ref: '#/components/schemas/CustomerApplicationID'
+            customer_id:
+              $ref: '#/components/schemas/CustomerID'
+            expires_at:
+              $ref: '#/components/schemas/DateTimeISO8601'
+    SecondaryApplicants:
+      title: Secondary Applicants
+      type: array
+      description: First and last names of the secondary applicants.
+      items:
+        $ref: '#/components/schemas/Applicant'
+    OneTimeFinancialDataConsentType:
+      type: string
+      enum:
+      - one_time
+      description: "Indicates that data ingestion connections with external providers will be a one-time use only. \nAfter authentication and ingestion, the consent will be automatically revoked. \n\nIf additional data is required, a new connection will need to be established.\n"
+    CustomerApplication:
+      title: Customer Application
+      type: object
+      description: Details relating to a customer's application
+      required:
+      - accounts_connected
+      - application_id
+      - creation_date
+      - customer_id
+      - deletion_date
+      - financial_data_consent
+      - initiator_id
+      - metadata
+      - primary_applicant
+      - review_status
+      - secondary_applicants
+      properties:
+        application_id:
+          $ref: '#/components/schemas/CustomerApplicationID'
+        creation_date:
+          allOf:
+          - description: Date that the application was created on.
+          - $ref: '#/components/schemas/DateTimeISO8601'
+        deletion_date:
+          allOf:
+          - description: Date that the application (and customer data) will be deleted from the platform. May be empty if no date is set.
+          - $ref: '#/components/schemas/DateTimeISO8601'
+        customer_id:
+          type: string
+          format: uuid
+          description: Bud Customer ID (used for fetching associated financial data)
+        initiator_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: ID of the user who initiated the application (if it was created via the dashboard).
+        primary_applicant:
+          allOf:
+          - description: First and last name of the primary applicant.
+          - $ref: '#/components/schemas/Applicant'
+        secondary_applicants:
+          type: array
+          description: First and last names of the secondary applicants.
+          items:
+            $ref: '#/components/schemas/Applicant'
+        accounts_connected:
+          type: integer
+          description: 'Total number of accounts the customer has connected.
+
+            '
+        customer_link:
+          $ref: '#/components/schemas/CustomerLink'
+        review_status:
+          $ref: '#/components/schemas/ReviewStatus'
+        review_date:
+          $ref: '#/components/schemas/DateTimeISO8601'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+        financial_data_consent:
+          $ref: '#/components/schemas/FinancialDataConsentType'
+    TimezoneIdentifier:
+      type: string
+      description: 'Timezone identifier (e.g. `Europe/London`) to make dates relativised to the target location.
+
+
+        In the case of daylight savings in a location, this ensures that the overall start/end date accounts for those shifts.
+
+
+        See [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) for list of valid timezone identifiers under `TZ identifier`.'
+      default: Etc/UTC
+    Applicant:
+      title: Applicant
+      type: object
+      description: 'Applicant associated to a financial application.
+
+        '
+      required:
+      - first_name
+      - last_name
+      properties:
+        first_name:
+          type: string
+          description: First (or "given") name.
+        last_name:
+          type: string
+          description: Last (or "family") name.
+    DateRangeEnd:
+      type: string
+      enum:
+      - latest_calendar_month
+      - latest_date
+      description: 'Determines whether the date range corresponds to a full calendar month or months to the date of the most
+
+        recent account connection.
+
+
+        **Example**: if the customer connects their accounts on `13th July`, then under `latest_calendar_month`, the end date
+
+        taken will be `30th June`, and the months back from there will be full calendar months (e.g. 1 month would be
+
+        `1st June` to `30th June`). Under `latest_date`, the dates would be `14th June` to `13th July`.
+
+        '
+    GetCustomerApplicationsResponse:
+      title: Get Customer Application Response
+      type: object
+      description: Response to the retrieve customer application endpoint
+      required:
+      - operation_id
+      - data
+      - metadata
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerApplication'
+        metadata:
+          type: object
+          required:
+          - results
+          - next_page_token
+          properties:
+            results:
+              type: integer
+              description: 'Total number of applications returned.
+
+                '
+            next_page_token:
+              type: string
+              description: 'Token to pass to the endpoint (with query parameter `page_token`)
+
+                to get the next page of applications in the collection.
+
+
+                This value is empty if this is the last page.
+
+                '
+    DayOrMonth:
+      type: string
+      pattern: ^P[0-9]+M|D$
+      description: 'ISO 8601 date period string representing `n` months or days (e.g. 3 months = `P3M`, 4 days = `P4D`).
+
+        '
+    DateTimeISO8601:
+      title: Date/Time (ISO 8601) - YYYY-MM-DDTHH:MM:SSTZ
+      type: string
+      description: 'A date (and time) in ISO 8601 format.
+
+        '
+      example: '2022-05-11T15:30:39Z'
+    ReviewStatus:
+      title: Review Status
+      type: string
+      description: 'Indicates whether an application has been reviewed or not.
+
+
+        - Empty string indicates it has not been reviewed
+
+        - `reviewed` indicates that it has been reviewed.
+
+
+        Note: this is subject to potentially have more statuses in the future.
+
+        '
+      enum:
+      - ''
+      - reviewed
+    PostCustomerApplicationsRequest:
+      title: Post Customer Application Request
+      type: object
+      description: Details required in order to create a new customer application
+      required:
+      - primary_applicant
+      properties:
+        primary_applicant:
+          $ref: '#/components/schemas/PrimaryApplicant'
+        secondary_applicants:
+          $ref: '#/components/schemas/SecondaryApplicants'
+        financial_data_consent:
+          $ref: '#/components/schemas/FinancialDataConsentType'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+    FinancialDataConsentType:
+      anyOf:
+      - $ref: '#/components/schemas/OneTimeFinancialDataConsentType'
+      description: 'Monitoring type for an application refers to the strategy for ingesting data via a customers financial provider.
+
+        If no monitoring type is provided, the setting will default to the clients configured type.
+
+        '
+    CustomerApplicationID:
+      title: Customer Application ID
+      type: string
+      format: uuid
+      description: 'The unique identifier for a customer application.
+
+        '
     GetCustomerApplicationResponse:
       title: Get Customer Applications Response
       type: object
@@ -399,325 +654,70 @@ components:
             - `expired`: Customer failed to connect all their accounts before the URL became inactive.
 
             '
-    CustomerID:
-      type: string
-      format: uuid
-      description: A unique identifier for a Customer, as registered on Bud's platform.
-      example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
-    FinancialDataConsentType:
-      anyOf:
-      - $ref: '#/components/schemas/OneTimeFinancialDataConsentType'
-      description: 'Monitoring type for an application refers to the strategy for ingesting data via a customers financial provider.
-
-        If no monitoring type is provided, the setting will default to the clients configured type.
-
-        '
-    PostCustomerApplicationsResponse:
-      title: Post Customer Applications Response Object
-      type: object
-      description: Details provided back to the client when a new customer application has been created
-      required:
-      - operation_id
-      - data
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        data:
-          required:
-          - application_id
-          - customer_id
-          - expires_at
-          properties:
-            application_id:
-              $ref: '#/components/schemas/CustomerApplicationID'
-            customer_id:
-              $ref: '#/components/schemas/CustomerID'
-            expires_at:
-              $ref: '#/components/schemas/DateTimeISO8601'
-    CustomerApplicationID:
-      title: Customer Application ID
-      type: string
-      format: uuid
-      description: 'The unique identifier for a customer application.
-
-        '
-    SecondaryApplicants:
-      title: Secondary Applicants
-      type: array
-      description: First and last names of the secondary applicants.
-      items:
-        $ref: '#/components/schemas/Applicant'
     OperationId:
       title: Operation Id Field
       type: string
       description: A unique identifier/reference associated with a given endpoint/operation
-    DateTimeISO8601:
-      title: Date/Time (ISO 8601) - YYYY-MM-DDTHH:MM:SSTZ
-      type: string
-      description: 'A date (and time) in ISO 8601 format.
-
-        '
-      example: '2022-05-11T15:30:39Z'
+  parameters:
     DateRangeEnd:
-      type: string
-      enum:
-      - latest_calendar_month
-      - latest_date
-      description: 'Determines whether the date range corresponds to a full calendar month or months to the date of the most
+      in: query
+      name: date_range_end
+      schema:
+        allOf:
+        - $ref: '#/components/schemas/DateRangeEnd'
+        - default: latest_calendar_month
+    DateRangeDurations:
+      in: query
+      name: date_range_durations
+      style: form
+      explode: false
+      description: 'Used with `timezone` and `date_range_end` to determine the list of `date_ranges` that appear in the
 
-        recent account connection.
+        metadata of the response. Use this to configure the specific periods of time that you wish to assess
 
-
-        **Example**: if the customer connects their accounts on `13th July`, then under `latest_calendar_month`, the end date
-
-        taken will be `30th June`, and the months back from there will be full calendar months (e.g. 1 month would be
-
-        `1st June` to `30th June`). Under `latest_date`, the dates would be `14th June` to `13th July`.
-
-        '
-    TimezoneIdentifier:
-      type: string
-      description: 'Timezone identifier (e.g. `Europe/London`) to make dates relativised to the target location.
-
-
-        In the case of daylight savings in a location, this ensures that the overall start/end date accounts for those shifts.
-
-
-        See [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) for list of valid timezone identifiers under `TZ identifier`.'
-      default: Etc/UTC
-    PrimaryApplicant:
-      title: Primary Applicant
-      allOf:
-      - description: First and last name of the primary applicant.
-      - $ref: '#/components/schemas/Applicant'
-    DayOrMonth:
-      type: string
-      pattern: ^P[0-9]+M|D$
-      description: 'ISO 8601 date period string representing `n` months or days (e.g. 3 months = `P3M`, 4 days = `P4D`).
+        a customer''s application data over.
 
         '
-    CustomerApplication:
-      title: Customer Application
-      type: object
-      description: Details relating to a customer's application
-      required:
-      - accounts_connected
-      - application_id
-      - creation_date
-      - customer_id
-      - deletion_date
-      - financial_data_consent
-      - initiator_id
-      - metadata
-      - primary_applicant
-      - review_status
-      - secondary_applicants
-      properties:
-        application_id:
-          $ref: '#/components/schemas/CustomerApplicationID'
-        creation_date:
-          allOf:
-          - description: Date that the application was created on.
-          - $ref: '#/components/schemas/DateTimeISO8601'
-        deletion_date:
-          allOf:
-          - description: Date that the application (and customer data) will be deleted from the platform. May be empty if no date is set.
-          - $ref: '#/components/schemas/DateTimeISO8601'
-        customer_id:
-          type: string
-          format: uuid
-          description: Bud Customer ID (used for fetching associated financial data)
-        initiator_id:
-          type:
-          - string
-          - 'null'
-          format: uuid
-          description: ID of the user who initiated the application (if it was created via the dashboard).
-        primary_applicant:
-          allOf:
-          - description: First and last name of the primary applicant.
-          - $ref: '#/components/schemas/Applicant'
-        secondary_applicants:
-          type: array
-          description: First and last names of the secondary applicants.
-          items:
-            $ref: '#/components/schemas/Applicant'
-        accounts_connected:
-          type: integer
-          description: 'Total number of accounts the customer has connected.
-
-            '
-        customer_link:
-          $ref: '#/components/schemas/CustomerLink'
-        review_status:
-          $ref: '#/components/schemas/ReviewStatus'
-        review_date:
-          $ref: '#/components/schemas/DateTimeISO8601'
-        metadata:
-          $ref: '#/components/schemas/Metadata'
-        financial_data_consent:
-          $ref: '#/components/schemas/FinancialDataConsentType'
-    Metadata:
-      title: Metadata
-      type: object
-      description: 'These fields add additional context to a customer''s application.
-
-        Their visibility and relevance depends on the configuration of the
-
-        dashboard.
-
-        '
-      properties:
-        application_id:
-          type: string
-          description: 'An optional ID to associate with this customer''s application
-
-            with (e.g. if the application is related to another system
-
-            with a different identifier, use that one here).
-
-            '
-        customer_id:
-          type: string
-          description: 'An optional ID to associate with this customer with (e.g. if
-
-            the customer exists on another system with a different
-
-            identifier, use that one here).
-
-            '
-        advisor_name:
-          type: string
-          description: 'Name of the advisor in charge of assessing the customer''s
-
-            application.
-
-            '
-        account_connection_initiator:
-          type: string
-          enum:
-          - customer
-          - advisor
-          description: 'Determines whether the customer''s application requires the
-
-            advisor to upload financial data, or the customer (via a
-
-            generated link).
-
-            '
-      additionalProperties:
-        type: string
-        description: 'Any other additional data you wish to associate to a customer''s
-
-          application. This will not be visible within the dashboard.
-
-          '
-    ReviewStatus:
-      title: Review Status
-      type: string
-      description: 'Indicates whether an application has been reviewed or not.
-
-
-        - Empty string indicates it has not been reviewed
-
-        - `reviewed` indicates that it has been reviewed.
-
-
-        Note: this is subject to potentially have more statuses in the future.
-
-        '
-      enum:
-      - ''
-      - reviewed
-    Applicant:
-      title: Applicant
-      type: object
-      description: 'Applicant associated to a financial application.
-
-        '
-      required:
-      - first_name
-      - last_name
-      properties:
-        first_name:
-          type: string
-          description: First (or "given") name.
-        last_name:
-          type: string
-          description: Last (or "family") name.
-    schemas-DateTimeISO8601:
-      title: Date/Time (ISO 8601)
-      type: string
-      description: ISO Date Format
-      example: '2022-03-05T13:34:33Z'
-    OneTimeFinancialDataConsentType:
-      type: string
-      enum:
-      - one_time
-      description: "Indicates that data ingestion connections with external providers will be a one-time use only. \nAfter authentication and ingestion, the consent will be automatically revoked. \n\nIf additional data is required, a new connection will need to be established.\n"
-    GetCustomerApplicationsResponse:
-      title: Get Customer Application Response
-      type: object
-      description: Response to the retrieve customer application endpoint
-      required:
-      - operation_id
-      - data
-      - metadata
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomerApplication'
-        metadata:
-          type: object
-          required:
-          - results
-          - next_page_token
-          properties:
-            results:
-              type: integer
-              description: 'Total number of applications returned.
-
-                '
-            next_page_token:
-              type: string
-              description: 'Token to pass to the endpoint (with query parameter `page_token`)
-
-                to get the next page of applications in the collection.
-
-
-                This value is empty if this is the last page.
-
-                '
-    PostCustomerApplicationsRequest:
-      title: Post Customer Application Request
-      type: object
-      description: Details required in order to create a new customer application
-      required:
-      - primary_applicant
-      properties:
-        primary_applicant:
-          $ref: '#/components/schemas/PrimaryApplicant'
-        secondary_applicants:
-          $ref: '#/components/schemas/SecondaryApplicants'
-        financial_data_consent:
-          $ref: '#/components/schemas/FinancialDataConsentType'
-        metadata:
-          $ref: '#/components/schemas/Metadata'
-    DateRange:
-      required:
-      - from
-      - to
-      - duration
-      properties:
-        from:
-          $ref: '#/components/schemas/schemas-DateTimeISO8601'
-        to:
-          $ref: '#/components/schemas/schemas-DateTimeISO8601'
-        duration:
+      schema:
+        type: array
+        default:
+        - P1M
+        - P3M
+        - P6M
+        - P12M
+        items:
           $ref: '#/components/schemas/DayOrMonth'
+    Timezone:
+      in: query
+      name: timezone
+      schema:
+        $ref: '#/components/schemas/TimezoneIdentifier'
+    CustomerApplicationID:
+      in: path
+      name: application_id
+      required: true
+      schema:
+        $ref: '#/components/schemas/CustomerApplicationID'
+    PageToken:
+      in: query
+      name: page_token
+      schema:
+        type: string
+      description: "Token provided in the `metadata` blob of a response, in order to find\nthe next page in a collection, e.g.\n\n```json\n{\n  \"metadata\": {\n    \"next_page_token\": \"4jmBrvVn9r\"\n  }\n}\n```\n"
+    ClientId:
+      in: header
+      name: X-Client-Id
+      schema:
+        type: string
+      required: true
+      description: The API Client Identifier (Service Application Identifier).
+      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
+    MetadataFieldName:
+      in: query
+      name: metadata.{field_name}
+      schema:
+        type: string
+      description: "Search by exact-match on the `field_name` of `metadata` properties.\nExample: `metadata.loan_product_code=credit_card_1234` will limit results to all\ncustomer applications that have the following metadata contained:\n\n```json\n{\n  \"metadata\": {\n    \"loan_product_code\": \"credit_card_1234\"\n  }\n}\n```\n"
   securitySchemes:
     Basic:
       type: http
