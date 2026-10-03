@@ -866,9 +866,55 @@ paths:
           description: An unexpected error occurred on the server side
 components:
   schemas:
-    AuthorisationCodesResponse:
-      title: Authorisation Codes Response Payload
+    IngestResponseStatus:
+      title: Ingest Response Status
+      description: Ingest response status.
+      type: string
+      enum:
+      - Completed
+      - Pending
+      - Failed
+    Errors:
+      title: Array of Error Object
+      description: Contains a list of error messages
       type: object
+      additionalProperties:
+        type: array
+        items:
+          type: string
+    TaskStatusCaps:
+      title: The Task Status
+      type: string
+      description: The general status of a task
+      enum:
+      - Pending
+      - Completed
+      - Failed
+    BadRequestResponse:
+      title: Bad Request Response
+      type: object
+      description: Expected response structure
+      required:
+      - operation_id
+      - code_id
+      - message
+      - errors
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        code_id:
+          type: string
+          description: A descriptive enough string that is linked to the reason for the error.
+        message:
+          type: string
+        errors:
+          anyOf:
+          - $ref: '#/components/schemas/Error'
+          - $ref: '#/components/schemas/Errors'
+    AuthGatewayURLResponse:
+      title: Authorisation Gateweay URL Response
+      type: object
+      description: Expected response structure.
       required:
       - operation_id
       - data
@@ -877,65 +923,14 @@ components:
           $ref: '#/components/schemas/OperationId'
         data:
           type: object
-          description: Details regarding the response object for the authorisation codes response.
+          description: Information related to the unique (customer specific) Authorisation Gateway URL
+          required:
+          - url
           properties:
-            task_id:
-              $ref: '#/components/schemas/TaskId'
-            provider:
+            url:
               type: string
-              description: Name of the provider (banking institution)
-            status:
-              $ref: '#/components/schemas/IngestResponseStatus'
-            result:
-              type: string
-              enum:
-              - success
-              - auth_denied
-              - auth_expired
-              - auth_used
-              - awaiting_authorisation
-              - connection_expired
-              - connection_not_found
-              - connection_permission
-              - connection_reauthenticate
-              - connection_revoked
-              - connection_status
-              - consent_not_found
-              - extension_not_permitted
-              - failed_body_decode
-              - failed_validation
-              - internal_auth_error
-              - internal_error
-              - internal_timeout
-              - internal_transient_error
-              - provider_unauthorised
-              - provider_unavailable
-              - provider_endpoint_deprecated
-              - provider_endpoint_unimplemented
-              - provider_endpoint_unsupported
-              - provider_failure
-              - provider_maintenance
-              - provider_marked_account_invalid
-              - provider_not_found
-              - provider_request_limit
-              - provider_timeout
-              - resource_not_found
-              - task_not_found
-    TaskCreatedResponseOB:
-      title: Task Created Response
-      type: object
-      description: Expected response structure
-      required:
-      - operation_id
-      - data
-      - metadata
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        data:
-          $ref: '#/components/schemas/TaskCreatedView'
-        metadata:
-          $ref: '#/components/schemas/AsyncTaskMetadata'
+              description: An Authorisation Gateway URL, allowing Customers to connect an Open Banking provider via Bud's TPP Connection UI
+              format: url
     TaskAuthoriseResponse:
       title: Open Banking Authorise Request Response
       type: object
@@ -951,212 +946,20 @@ components:
           $ref: '#/components/schemas/TaskAuthorise'
         metadata:
           $ref: '#/components/schemas/TaskManagerMetaData'
-    ConnectResultCodes:
-      type: string
-      description: The result of the operation. Either success or various error codes.
-      enum:
-      - success
-      - auth_denied
-      - auth_expired
-      - auth_used
-      - awaiting_authorisation
-      - connection_expired
-      - connection_not_found
-      - connection_permission
-      - connection_reauthenticate
-      - connection_revoked
-      - connection_status
-      - consent_not_found
-      - extension_not_permitted
-      - failed_body_decode
-      - failed_validation
-      - internal_auth_error
-      - internal_error
-      - internal_timeout
-      - internal_transient_error
-      - provider_unauthorised
-      - provider_unavailable
-      - provider_endpoint_deprecated
-      - provider_endpoint_unimplemented
-      - provider_endpoint_unsupported
-      - provider_failure
-      - provider_maintenance
-      - provider_marked_account_invalid
-      - provider_not_found
-      - provider_request_limit
-      - provider_timeout
-      - resource_not_found
-      - task_not_found
-    OBConnectWebhookBody:
-      title: OB Webhook Payload
-      type: object
-      description: 'The payload sent to the client defined webhook (via the console) when an Open Banking (connect or refresh) task completes.
-
-        '
-      required:
-      - data
-      properties:
-        data:
-          description: Open Banking Task Event Data
-          required:
-          - task_type
-          - customer_id
-          - task_id
-          - status
-          - result
-          properties:
-            task_id:
-              description: The task identifier that the event relates to
-              type: string
-              example: e145c656-4a90-45db-a025-af7765482c8c
-            status:
-              type: string
-              description: The general status of a task
-              enum:
-              - Completed
-              - Failed
-            task_type:
-              type: string
-              enum:
-              - connect
-              - refresh
-              description: The type of task that completed
-            customer_id:
-              description: The customer the event relates to
-              type: string
-              example: 19677d9f-90e7-44a6-a32e-566990623da4
-            result:
-              $ref: '#/components/schemas/ConnectResultCodes'
-            provider:
-              type: string
-              description: Name of the provider (banking institution) the task interacted with
-            consent_id:
-              type: string
-              description: The consent identifier that the event relates to
-    Error:
-      title: Error Object
-      type:
-      - object
-      - 'null'
-      description: Contains a field specific error message
-      additionalProperties:
+    ProviderTypes:
+      title: Provider Types
+      type: array
+      description: One or more provider types that can be used to filter the list of providers that are shown to the customer during the connection flow. If no filter is applied, all types of provider are returned. Note that on Bud's sandbox environment, only sandbox providers will be returned.
+      items:
         type: string
-    OBProvider:
-      title: Open Banking Providers
-      type: object
-      required:
-      - provider
-      - display_name
-      - maintenance_window
-      - maintenance_status
-      - icon
-      - regions
-      - mobile_only
-      properties:
-        provider:
-          type: string
-          description: The name of the available open banking provider used as an identifier throughout Bud's API services
-        display_name:
-          type: string
-          description: The name of the available open banking provider used for display purposes
-        maintenance_window:
-          anyOf:
-          - $ref: '#/components/schemas/MaintenanceWindowObject'
-          - type:
-            - object
-            - 'null'
-        maintenance_status:
-          type: string
-          description: The status of the maintenance window associated with the provider
-          enum:
-          - active
-          - inactive
-        icon:
-          type: string
-          description: A URL for the icon of the corresponding provider
-        regions:
-          type: array
-          description: A list of the different regions (i.e. country codes in ISO 3166 format) associated with the open banking provider
-          items:
-            type: string
-        mobile_only:
-          type: boolean
-          description: If true, the provider is only available on mobile devices and requires a dedicated provider app to be installed on the device
-    GetOBConnectData:
-      title: Open Banking Synchronisation Status
-      type: object
-      description: Status of an Open Banking Aggregation connect or refresh task
-      required:
-      - provider
-      - step
-      - text
-      - task_id
-      properties:
-        provider:
-          type: string
-          description: The name of the provider the task is trying to connect to
-        step:
-          type: integer
-          description: At what step or stage the connection process is at
-          enum:
-          - 1
-          - 2
-          - 3
-          - 4
-        text:
-          type: string
-          description: A description of what stage the connection process is at
-          enum:
-          - Fetching access token
-          - Fetching accounts
-          - Fetching balances and transactions
-          - Completed
-        bank_name:
-          type: string
-          deprecated: true
-          description: The name of the provider the task is trying to connect to. Replaced with `provider`
-        reconnect_required:
-          type: boolean
-          description: If true, the customer must re-connect to the specified provider
-        result:
-          $ref: '#/components/schemas/ConnectResultCodes'
-        status:
-          title: The Task Status
-          type: string
-          description: The general status of a task
-          enum:
-          - Pending
-          - Completed
-          - Failed
-        task_id:
-          $ref: '#/components/schemas/TaskId'
-    IngestResponseStatus:
-      title: Ingest Response Status
-      description: Ingest response status.
+        enum:
+        - business
+        - retail
+        - sandbox
+    OperationId:
+      title: Operation Id Field
       type: string
-      enum:
-      - Completed
-      - Pending
-      - Failed
-    OpenBankingAuthoriseRequest:
-      title: Provider
-      type: object
-      description: Expected request payload structure
-      required:
-      - provider
-      properties:
-        provider:
-          type: string
-          description: The identifier of the ASPSP (bank) the Customer is requesting the authorisation URL for. This should be a provider value returned from a call to [Retrieve OB Providers](#tag/Create-OB-Connection-TSP/operation/open_banking_providers_get)
-        redirect_url:
-          type: string
-          description: This is the url that your Customer will be redirected to when using the Bud Connect product. If you wish to use your own license and callback infrastructure this parameter will have no effect and the provider_redirect_url parameter should be used instead.
-        provider_redirect_url:
-          type: string
-          description: This is the url that your Customer will be redirected to once they have authorised with the relevant provider. This should only be used when using your own license and wish to use the Submit Authorisation Codes endpoint. If you wish to use Bud's call back then the redirect_url must be provided.
-        consent_id:
-          type: string
-          description: Uses the previous consent id of your customer to re-authenticate their consent.
+      description: A unique identifier/reference associated with a given endpoint/operation
     MaintenanceWindowObject:
       title: Maintenance Window Object
       type: object
@@ -1230,87 +1033,6 @@ components:
             consent_id:
               type: string
               description: The consent identifier that the event relates to
-    TaskType:
-      type: string
-      enum:
-      - connect
-      - refresh
-      - revoke
-      - consent-refresh
-      description: The type of task that completed
-    AsyncTaskMetadata:
-      title: Async Task Metadata
-      type: object
-      description: Metadata associated with an asynchronous task
-      properties:
-        status:
-          type: string
-          description: The status of the job associated with the specified task id
-          enum:
-          - Completed
-          - Pending
-          - Failed
-        next_url:
-          type: string
-          description: The URL to call to obtain the results of the task
-        next_url_delay:
-          type: number
-          description: The time in milliseconds that the client should wait before polling the relevant GET endpoint with the above task id
-    BadRequestResponse:
-      title: Bad Request Response
-      type: object
-      description: Expected response structure
-      required:
-      - operation_id
-      - code_id
-      - message
-      - errors
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        code_id:
-          type: string
-          description: A descriptive enough string that is linked to the reason for the error.
-        message:
-          type: string
-        errors:
-          anyOf:
-          - $ref: '#/components/schemas/Error'
-          - $ref: '#/components/schemas/Errors'
-    ResultsMetadata:
-      title: Results Metadata Object
-      type: object
-      description: Metadata associated with the response schema
-      properties:
-        results:
-          type: number
-          description: The number of results returned
-    TaskAuthorise:
-      title: Open Banking Authorise Response
-      type: object
-      description: Result of GET authorise taskId
-      required:
-      - provider
-      - status
-      - task_id
-      properties:
-        provider:
-          type: string
-          description: Name of the provider (banking institution)
-        result:
-          $ref: '#/components/schemas/ConnectResultCodes'
-        status:
-          type: string
-          description: The status of the job associated with the specified task id
-          enum:
-          - Completed
-          - Pending
-          - Failed
-        task_id:
-          $ref: '#/components/schemas/TaskId'
-        url:
-          type: string
-          description: The authentication URL for a given bank
     AuthGatewayURLRequestv2:
       title: Authorisation Gateweay URL Request Payload
       type: object
@@ -1402,24 +1124,24 @@ components:
             **Note**: for some clients, we enforce that customers have access to this consent management feature. In this case, even if `customer_email` is not provided, the customer will be prompted at the start of the Connect flow to provide their email address, so that the URL will still be delivered to them.
 
             '
-    ProviderTypes:
-      title: Provider Types
-      type: array
-      description: One or more provider types that can be used to filter the list of providers that are shown to the customer during the connection flow. If no filter is applied, all types of provider are returned. Note that on Bud's sandbox environment, only sandbox providers will be returned.
-      items:
-        type: string
-        enum:
-        - business
-        - retail
-        - sandbox
-    Errors:
-      title: Array of Error Object
-      description: Contains a list of error messages
+    AsyncTaskMetadata:
+      title: Async Task Metadata
       type: object
-      additionalProperties:
-        type: array
-        items:
+      description: Metadata associated with an asynchronous task
+      properties:
+        status:
           type: string
+          description: The status of the job associated with the specified task id
+          enum:
+          - Completed
+          - Pending
+          - Failed
+        next_url:
+          type: string
+          description: The URL to call to obtain the results of the task
+        next_url_delay:
+          type: number
+          description: The time in milliseconds that the client should wait before polling the relevant GET endpoint with the above task id
     OpenBankingConnectResponse:
       title: Open Banking Connect Response
       type: object
@@ -1444,10 +1166,22 @@ components:
             next_url_delay:
               description: Recommended delay in milliseconds before next call
               type: number
-    TaskId:
-      title: Task Id
+    TaskType:
       type: string
-      description: Bud Task identifier returned from an async task for the requested action
+      enum:
+      - connect
+      - refresh
+      - revoke
+      - consent-refresh
+      description: The type of task that completed
+    ResultsMetadata:
+      title: Results Metadata Object
+      type: object
+      description: Metadata associated with the response schema
+      properties:
+        results:
+          type: number
+          description: The number of results returned
     AuthorisationCodesRequest:
       title: Authorisation Codes Request Payload
       type: object
@@ -1461,39 +1195,174 @@ components:
         code:
           type: string
           description: Code parameter returned in redirect parameters
-    TaskCreatedView:
-      title: Task Created View
-      description: Standard successful task created response.
+    TaskId:
+      title: Task Id
+      type: string
+      description: Bud Task identifier returned from an async task for the requested action
+    GetOBConnectData:
+      title: Open Banking Synchronisation Status
       type: object
+      description: Status of an Open Banking Aggregation connect or refresh task
       required:
-      - task_id
       - provider
+      - step
+      - text
+      - task_id
       properties:
-        task_id:
-          $ref: '#/components/schemas/TaskId'
         provider:
           type: string
-          description: The provider (ASPSP) associated with this task
-    AuthGatewayURLResponse:
-      title: Authorisation Gateweay URL Response
+          description: The name of the provider the task is trying to connect to
+        step:
+          type: integer
+          description: At what step or stage the connection process is at
+          enum:
+          - 1
+          - 2
+          - 3
+          - 4
+        text:
+          type: string
+          description: A description of what stage the connection process is at
+          enum:
+          - Fetching access token
+          - Fetching accounts
+          - Fetching balances and transactions
+          - Completed
+        bank_name:
+          type: string
+          deprecated: true
+          description: The name of the provider the task is trying to connect to. Replaced with `provider`
+        reconnect_required:
+          type: boolean
+          description: If true, the customer must re-connect to the specified provider
+        result:
+          $ref: '#/components/schemas/ConnectResultCodes'
+        status:
+          title: The Task Status
+          type: string
+          description: The general status of a task
+          enum:
+          - Pending
+          - Completed
+          - Failed
+        task_id:
+          $ref: '#/components/schemas/TaskId'
+    TaskAuthorise:
+      title: Open Banking Authorise Response
       type: object
-      description: Expected response structure.
+      description: Result of GET authorise taskId
       required:
-      - operation_id
+      - provider
+      - status
+      - task_id
+      properties:
+        provider:
+          type: string
+          description: Name of the provider (banking institution)
+        result:
+          $ref: '#/components/schemas/ConnectResultCodes'
+        status:
+          type: string
+          description: The status of the job associated with the specified task id
+          enum:
+          - Completed
+          - Pending
+          - Failed
+        task_id:
+          $ref: '#/components/schemas/TaskId'
+        url:
+          type: string
+          description: The authentication URL for a given bank
+    OBConnectWebhookBody:
+      title: OB Webhook Payload
+      type: object
+      description: 'The payload sent to the client defined webhook (via the console) when an Open Banking (connect or refresh) task completes.
+
+        '
+      required:
       - data
       properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
         data:
-          type: object
-          description: Information related to the unique (customer specific) Authorisation Gateway URL
+          description: Open Banking Task Event Data
           required:
-          - url
+          - task_type
+          - customer_id
+          - task_id
+          - status
+          - result
           properties:
-            url:
+            task_id:
+              description: The task identifier that the event relates to
               type: string
-              description: An Authorisation Gateway URL, allowing Customers to connect an Open Banking provider via Bud's TPP Connection UI
-              format: url
+              example: e145c656-4a90-45db-a025-af7765482c8c
+            status:
+              type: string
+              description: The general status of a task
+              enum:
+              - Completed
+              - Failed
+            task_type:
+              type: string
+              enum:
+              - connect
+              - refresh
+              description: The type of task that completed
+            customer_id:
+              description: The customer the event relates to
+              type: string
+              example: 19677d9f-90e7-44a6-a32e-566990623da4
+            result:
+              $ref: '#/components/schemas/ConnectResultCodes'
+            provider:
+              type: string
+              description: Name of the provider (banking institution) the task interacted with
+            consent_id:
+              type: string
+              description: The consent identifier that the event relates to
+    ConnectResultCodes:
+      type: string
+      description: The result of the operation. Either success or various error codes.
+      enum:
+      - success
+      - auth_denied
+      - auth_expired
+      - auth_used
+      - awaiting_authorisation
+      - connection_expired
+      - connection_not_found
+      - connection_permission
+      - connection_reauthenticate
+      - connection_revoked
+      - connection_status
+      - consent_not_found
+      - extension_not_permitted
+      - failed_body_decode
+      - failed_validation
+      - internal_auth_error
+      - internal_error
+      - internal_timeout
+      - internal_transient_error
+      - provider_unauthorised
+      - provider_unavailable
+      - provider_endpoint_deprecated
+      - provider_endpoint_unimplemented
+      - provider_endpoint_unsupported
+      - provider_failure
+      - provider_maintenance
+      - provider_marked_account_invalid
+      - provider_not_found
+      - provider_request_limit
+      - provider_timeout
+      - resource_not_found
+      - task_not_found
+    Error:
+      title: Error Object
+      type:
+      - object
+      - 'null'
+      description: Contains a field specific error message
+      additionalProperties:
+        type: string
     TaskManagerMetaData:
       title: Task Status Metadata
       type: object
@@ -1516,36 +1385,180 @@ components:
         next_url_delay:
           type: number
           description: The time in milliseconds that the client should wait before polling the relevant GET endpoint with the above task id if the `status` property returned is `Pending`
-    OperationId:
-      title: Operation Id Field
-      type: string
-      description: A unique identifier/reference associated with a given endpoint/operation
-    TaskStatusCaps:
-      title: The Task Status
-      type: string
-      description: The general status of a task
-      enum:
-      - Pending
-      - Completed
-      - Failed
+    OpenBankingAuthoriseRequest:
+      title: Provider
+      type: object
+      description: Expected request payload structure
+      required:
+      - provider
+      properties:
+        provider:
+          type: string
+          description: The identifier of the ASPSP (bank) the Customer is requesting the authorisation URL for. This should be a provider value returned from a call to [Retrieve OB Providers](#tag/Create-OB-Connection-TSP/operation/open_banking_providers_get)
+        redirect_url:
+          type: string
+          description: This is the url that your Customer will be redirected to when using the Bud Connect product. If you wish to use your own license and callback infrastructure this parameter will have no effect and the provider_redirect_url parameter should be used instead.
+        provider_redirect_url:
+          type: string
+          description: This is the url that your Customer will be redirected to once they have authorised with the relevant provider. This should only be used when using your own license and wish to use the Submit Authorisation Codes endpoint. If you wish to use Bud's call back then the redirect_url must be provided.
+        consent_id:
+          type: string
+          description: Uses the previous consent id of your customer to re-authenticate their consent.
+    OBProvider:
+      title: Open Banking Providers
+      type: object
+      required:
+      - provider
+      - display_name
+      - maintenance_window
+      - maintenance_status
+      - icon
+      - regions
+      - mobile_only
+      properties:
+        provider:
+          type: string
+          description: The name of the available open banking provider used as an identifier throughout Bud's API services
+        display_name:
+          type: string
+          description: The name of the available open banking provider used for display purposes
+        maintenance_window:
+          anyOf:
+          - $ref: '#/components/schemas/MaintenanceWindowObject'
+          - type:
+            - object
+            - 'null'
+        maintenance_status:
+          type: string
+          description: The status of the maintenance window associated with the provider
+          enum:
+          - active
+          - inactive
+        icon:
+          type: string
+          description: A URL for the icon of the corresponding provider
+        regions:
+          type: array
+          description: A list of the different regions (i.e. country codes in ISO 3166 format) associated with the open banking provider
+          items:
+            type: string
+        mobile_only:
+          type: boolean
+          description: If true, the provider is only available on mobile devices and requires a dedicated provider app to be installed on the device
+    AuthorisationCodesResponse:
+      title: Authorisation Codes Response Payload
+      type: object
+      required:
+      - operation_id
+      - data
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          type: object
+          description: Details regarding the response object for the authorisation codes response.
+          properties:
+            task_id:
+              $ref: '#/components/schemas/TaskId'
+            provider:
+              type: string
+              description: Name of the provider (banking institution)
+            status:
+              $ref: '#/components/schemas/IngestResponseStatus'
+            result:
+              type: string
+              enum:
+              - success
+              - auth_denied
+              - auth_expired
+              - auth_used
+              - awaiting_authorisation
+              - connection_expired
+              - connection_not_found
+              - connection_permission
+              - connection_reauthenticate
+              - connection_revoked
+              - connection_status
+              - consent_not_found
+              - extension_not_permitted
+              - failed_body_decode
+              - failed_validation
+              - internal_auth_error
+              - internal_error
+              - internal_timeout
+              - internal_transient_error
+              - provider_unauthorised
+              - provider_unavailable
+              - provider_endpoint_deprecated
+              - provider_endpoint_unimplemented
+              - provider_endpoint_unsupported
+              - provider_failure
+              - provider_maintenance
+              - provider_marked_account_invalid
+              - provider_not_found
+              - provider_request_limit
+              - provider_timeout
+              - resource_not_found
+              - task_not_found
+    TaskCreatedResponseOB:
+      title: Task Created Response
+      type: object
+      description: Expected response structure
+      required:
+      - operation_id
+      - data
+      - metadata
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          $ref: '#/components/schemas/TaskCreatedView'
+        metadata:
+          $ref: '#/components/schemas/AsyncTaskMetadata'
+    TaskCreatedView:
+      title: Task Created View
+      description: Standard successful task created response.
+      type: object
+      required:
+      - task_id
+      - provider
+      properties:
+        task_id:
+          $ref: '#/components/schemas/TaskId'
+        provider:
+          type: string
+          description: The provider (ASPSP) associated with this task
   parameters:
-    OBProvidersQueryRegionFilter:
-      in: query
-      required: false
-      name: region
-      description: A comma separated list of Bud regions to be shown. If no filter is applied, all the providers are returned.
+    CustomerIdempotentIdentifier:
+      in: header
+      name: X-Customer-Idempotent-Identifier
       schema:
         type: string
-        enum:
-        - GBR
-    ConnectionTaskId:
+      description: 'Use the internal client identifier, provided in the `client_metadata` object when creating the customer in __Create Customer V3__, in place of an `X-Customer-Id` header.
+
+        '
+    TaskId:
       in: path
-      name: connection_task_id
+      name: task_id
       schema:
         type: string
         format: uuid
       required: true
-      description: Unique identifier related to a specific connection task
+      description: Bud Task identifier returned from an async task for the requested action
+    SigningIdHeaderParameter:
+      in: header
+      name: X-Signing-ID
+      description: The public key ID which should be used to verify the X-Signature header. Bud's list of public keys can be found at https://assets.thisisbud.com/bud-callback.jwks
+      required: true
+      schema:
+        type: string
+    CustomerSecret:
+      in: header
+      name: X-Customer-Secret
+      schema:
+        type: string
+      required: false
+      description: The Bud Customer secret used to encrypt customer data. This is required only if the customer secret is not already stored with Bud.
     OBProvidersQueryScopesFilter:
       in: query
       required: false
@@ -1559,6 +1572,14 @@ components:
         - transactions
         - parties
         - direct-debits
+    ConnectionTaskId:
+      in: path
+      name: connection_task_id
+      schema:
+        type: string
+        format: uuid
+      required: true
+      description: Unique identifier related to a specific connection task
     SignatureHeaderParameter:
       in: header
       name: X-Signature
@@ -1566,14 +1587,6 @@ components:
       required: true
       schema:
         type: string
-    CustomerIdempotentIdentifier:
-      in: header
-      name: X-Customer-Idempotent-Identifier
-      schema:
-        type: string
-      description: 'Use the internal client identifier, provided in the `client_metadata` object when creating the customer in __Create Customer V3__, in place of an `X-Customer-Id` header.
-
-        '
     OBProvidersQueryTypeFilter:
       in: query
       required: false
@@ -1585,6 +1598,14 @@ components:
         - sandbox
         - business
         - retail
+    ClientId:
+      in: header
+      name: X-Client-Id
+      schema:
+        type: string
+      required: true
+      description: The API Client Identifier (Service Application Identifier).
+      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
     CustomerId:
       in: header
       name: X-Customer-Id
@@ -1594,36 +1615,15 @@ components:
       required: true
       description: A unique identifier for a Customer, as registered on Bud's platform.
       example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
-    SigningIdHeaderParameter:
-      in: header
-      name: X-Signing-ID
-      description: The public key ID which should be used to verify the X-Signature header. Bud's list of public keys can be found at https://assets.thisisbud.com/bud-callback.jwks
-      required: true
-      schema:
-        type: string
-    ClientId:
-      in: header
-      name: X-Client-Id
-      schema:
-        type: string
-      required: true
-      description: The API Client Identifier (Service Application Identifier).
-      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
-    CustomerSecret:
-      in: header
-      name: X-Customer-Secret
-      schema:
-        type: string
+    OBProvidersQueryRegionFilter:
+      in: query
       required: false
-      description: The Bud Customer secret used to encrypt customer data. This is required only if the customer secret is not already stored with Bud.
-    TaskId:
-      in: path
-      name: task_id
+      name: region
+      description: A comma separated list of Bud regions to be shown. If no filter is applied, all the providers are returned.
       schema:
         type: string
-        format: uuid
-      required: true
-      description: Bud Task identifier returned from an async task for the requested action
+        enum:
+        - GBR
   securitySchemes:
     Basic:
       type: http

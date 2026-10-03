@@ -382,519 +382,79 @@ paths:
               schema:
                 $ref: '#/components/schemas/ServerErrorResponse'
 components:
-  schemas:
-    BudNextPageTokenMetadata:
-      title: Next Page Token
-      type: object
-      properties:
-        next_page_token:
-          type: string
-          description: 'The token to use to fetch the next page of results. This is only set if there are more results to fetch.
-
-            '
-      example:
-        next_page_token: b21055a9a9f46fc794a2e6855c65abd7e317181039fc6930daabac5822911d14a84895ecd947e2b5abdcb22e4fcc2c594e1f661dc63e34b9ba88760724047990896f7581a0786c2605dce19c6a9d80d1044f963b74fea0a929c0a4465a6e67378a74dce38ec5e26ae4cc804b62fd666d5df4cf2e7f524bd99e5523bc5d471768065c036dc0c73122705b280817fbbd7d9aa31f271d72cd3877d999dcb9a5b1c0be0c05
-    Error:
-      title: Error Object
-      type:
-      - object
-      - 'null'
-      description: Contains a field specific error message
-      additionalProperties:
+  parameters:
+    CustomerIdempotentIdentifier:
+      in: header
+      name: X-Customer-Idempotent-Identifier
+      schema:
         type: string
-    UpdateSpendingBudgetResponse:
-      title: Update Spending Budget Response
-      type: object
-      required:
-      - operation_id
-      - data
-      properties:
-        operation_id:
-          title: Operation ID
-          type: string
-          enum:
-          - goals_v1_spending_budgets_patch
-        data:
-          $ref: '#/components/schemas/SpendingBudget'
-    RetrieveSpendingBudgetTransactionsResponse:
-      title: Retrieve Spending Budget Transactions Response
-      type: object
-      required:
-      - operation_id
-      - data
-      - metadata
-      properties:
-        operation_id:
-          title: Operation ID
-          type: string
-          enum:
-          - goals_v1_spending_budget_transactions_get
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/schemas-Transaction'
-        metadata:
-          allOf:
-          - $ref: '#/components/schemas/BudResultsMetadata'
-          - type: object
-            properties:
-              budget_id:
-                title: Budget ID
-                type: string
-                description: 'The ID of the spending budget the transactions were retrieved for.
-
-
-                  Example: "81a68821-dca6-4771-80d4-002c7fce412e"
-
-                  '
-                example: 81a68821-dca6-4771-80d4-002c7fce412e
-              page_size:
-                $ref: '#/components/schemas/BudPageSizeMetadata'
-          - $ref: '#/components/schemas/BudNextPageTokenMetadata'
-    goals-components_schemas-Merchant:
-      title: Merchant
-      type: object
-      description: 'Merchant enrichment associated with a Transaction, as generated using a combination of Bud''s artificial
-
-        intelligence models and database of known merchants.
+      description: 'Use the internal client identifier, provided in the `client_metadata` object when creating the customer in __Create Customer V3__, in place of an `X-Customer-Id` header.
 
         '
-      required:
-      - id
-      - slug
-      - display_name
-      properties:
-        id:
-          type: string
-          description: UUID corresponding to the merchant, if available. Subject to version control.
-        slug:
-          type: string
-          description: Unique human readable identifier of the merchant. Not subject to version control.
-        display_name:
-          type: string
-          description: UI friendly display name for the merchant.
-        logo:
-          type: string
-          description: URL supplying merchant logo, if available.
-    BudCurrency:
-      title: Currency
-      description: 'The three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) of the monetary amount.
+    parameters-QueryBudPageSize:
+      in: query
+      name: page_size
+      schema:
+        type: integer
+      example: 200
+      description: Use this parameter to set the maximum number of results to be returned. This defaults to 100, and has a maximum of 200.
+    parameters-QueryBudPageToken:
+      in: query
+      name: page_token
+      schema:
+        type: string
+      example: b21055a9a9f46fc794a2e6855c65abd7e317181039fc6930daabac5822911d14a84895ecd947e2b5abdcb22e4fcc2c594e1f661dc63e34b9ba88760724047990896f7581a0786c2605dce19c6a9d80d1044f963b74fea0a929c0a4465a6e67378a74dce38ec5e26ae4cc804b62fd666d5df4cf2e7f524bd99e5523bc5d471768065c036dc0c73122705b280817fbbd7d9aa31f271d72cd3877d999dcb9a5b1c0be0c05
+      description: Use this paramater to fetch a specific page of results. Provided by the next_page_token field in the previous request.
+    QueryDay:
+      in: query
+      name: day
+      schema:
+        type: string
+      example: '2019-02-29T12:23:00Z'
+      description: "The day for which results are to be retrieved in the format [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339).\n\nExamples:\n  - `2023-01-17T17:29:51Z`\n  - `2023-01-17T17:29:51-08:00`\n"
+    ClientId:
+      in: header
+      name: X-Client-Id
+      schema:
+        type: string
+      required: true
+      description: The API Client Identifier (Service Application Identifier).
+      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
+    PathSpendingBudgetID:
+      name: budget_id
+      in: path
+      schema:
+        type: string
+      required: true
+      description: 'The ID of the spending budget.
 
 
-        Example: `GBP`
-
-        '
-      type: string
-    BudMonetaryValue:
-      title: Monetary Value
-      description: "The value of the monetary amount. The value is formatted with the number of decimal places for the respective currency. \n\nExample: `10.98`\n"
-      type: string
-    BudResultsMetadata:
-      title: Metadata
-      type: object
-      required:
-      - results
-      properties:
-        results:
-          type: integer
-          description: 'The number of results returned in the response.
-
-
-            Example: 1
-
-            '
-          example: 1
-    SpendingBudget:
-      allOf:
-      - $ref: '#/components/schemas/BaseSpendingBudget'
-      - type: object
-        required:
-        - id
-        - name
-        - amount
-        - recurrency
-        - spent
-        - created_at
-        properties:
-          id:
-            title: ID
-            type: string
-            description: 'The ID of the spending budget.
-
-
-              Example: "81a68821-dca6-4771-80d4-002c7fce412e"
-
-              '
-          spent:
-            title: Spent
-            type: object
-            description: 'The amount of money spent from the budget for the given time period.
-
-              '
-            required:
-            - from
-            - to
-            - amount
-            - ratio
-            properties:
-              from:
-                title: From
-                type: string
-                description: 'The date from which the budgeting period began in the format [RFC-3339](https://www.ietf.org/rfc/rfc3339.txt).
-
-
-                  Example: `2023-10-01T00:00:00Z`
-
-                  '
-              to:
-                title: From
-                type: string
-                description: 'The date to which the budgeting period ends in the format [RFC-3339](https://www.ietf.org/rfc/rfc3339.txt).
-
-
-                  Example: `2023-10-31T00:00:00Z`
-
-                  '
-              amount:
-                title: Amount
-                type: object
-                description: 'The amount of money spent from the budget.
-
-                  '
-                required:
-                - value
-                - currency
-                properties:
-                  value:
-                    $ref: '#/components/schemas/BudMonetaryValue'
-                  currency:
-                    $ref: '#/components/schemas/BudCurrency'
-              ratio:
-                title: Ratio
-                type: string
-                description: 'The ratio of spent money to the total budget amount.
-
-                  '
-          created_at:
-            title: Created At
-            type: string
-            description: 'The date and time the budget was created in the format [RFC-3339](https://www.ietf.org/rfc/rfc3339.txt).
-
-
-              Example: `2023-10-17T00:00:00Z`
-
-              '
-          _links:
-            title: _links
-            type: object
-            description: 'Useful follow up links
-
-              '
-            properties:
-              transactions:
-                title: Transactions Link
-                type: string
-                description: 'Link to follow to get transactions included in the budget.
-
-                  '
-    BadRequestResponse:
-      title: Bad Request Response
-      type: object
-      description: Expected response structure
-      required:
-      - operation_id
-      - code_id
-      - message
-      - errors
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        code_id:
-          type: string
-          description: A descriptive enough string that is linked to the reason for the error.
-        message:
-          type: string
-        errors:
-          anyOf:
-          - $ref: '#/components/schemas/Error'
-          - $ref: '#/components/schemas/Errors'
-    RetrieveSpendingBudgetsResponse:
-      title: Retrieve Spending Budgets Response
-      type: object
-      required:
-      - operation_id
-      - data
-      - metadata
-      properties:
-        operation_id:
-          title: Operation ID
-          type: string
-          enum:
-          - goals_v1_spending_budgets_get
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/SpendingBudget'
-        metadata:
-          allOf:
-          - $ref: '#/components/schemas/BudResultsMetadata'
-          - type: object
-            properties:
-              account_ids:
-                title: Account IDs
-                type: array
-                description: 'An array of account IDs used for filtering in the request.
-
-                  '
-                items:
-                  type: string
-                  description: 'An account ID used for filtering in the request.
-
-
-                    Example: `RxsYshVGded4JeilkXgWKdXA`
-
-                    '
-    PatchSpendingBudget:
-      title: Patch Spending Budget
-      type: object
-      properties:
-        name:
-          title: Name
-          type: string
-          description: 'The name of the spending budget.
-
-
-            Example: `Travel`
-
-            '
-          example: Travel
-        amount:
-          title: Amount
-          type: object
-          description: "The amount of money to be budgeted for. Must be greater than 0. \n\nNote: The Currency of a spending budget cannot be updated.\n"
-          required:
-          - value
-          properties:
-            value:
-              $ref: '#/components/schemas/BudMonetaryValue'
-        recurrency:
-          title: Recurrency
-          type: object
-          description: 'Whether and/or how often the budget recurs.
-
-
-            The `starting_day` is only required for budgets with a recurring period e.g. `monthly`
-
-
-            New periods may be added without a breaking change notice.
-
-            '
-          required:
-          - period
-          properties:
-            period:
-              title: Period
-              type: string
-              description: 'The period at which a budget recurs (if at all).
-
-
-                Currently supported options are:
-
-                - `one-off`
-
-                - `monthly`
-
-
-                New periods may be added without a breaking change notice.
-
-                '
-            starting_day:
-              title: Starting Day
-              type: integer
-              description: 'The day of which the budget period starts. Not required if a budget is `one-off`.
-
-
-                Must be between 1 and 28 for `monthly` budgets.
-
-                '
-        include:
-          title: Include
-          type: object
-          description: 'The inclusion criteria for transactions to be included in the budget.
-
-            '
-          properties:
-            categories:
-              title: Categories
-              description: "The categories of transactions to be included in the budget. \n\nIf L2 categories are specified, they must be grouped underneath their corresponding L1 category.\n\nAll categories specified must be compatible with the category taxonomy used for that customer.\n"
-              type: array
-              items:
-                required:
-                - l1
-                properties:
-                  l1:
-                    title: L1
-                    type: string
-                    description: 'L1 category to include in the filter. Must be specified if using category filtering.
-
-                      '
-                  l2:
-                    title: L2
-                    type: array
-                    description: 'L2 categories to include in the filter. Must all correspond to the parent L1 category specified.
-
-                      '
-                    items:
-                      type: string
-            merchants:
-              title: Merchants
-              type: object
-              description: 'The merchants of transactions to be included in the budget.
-
-                '
-              properties:
-                slugs:
-                  title: Slugs
-                  type: array
-                  description: 'The slugs of merchants to be included. E.g. `netflix` or `uber`
-
-                    '
-                  items:
-                    type: string
-    ServerErrorResponse:
-      title: Server Error Response
-      type: object
-      required:
-      - operation_id
-      - code_id
-      - message
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        code_id:
-          type: string
-          description: A descriptive enough string that is linked to the reason for the error.
-        message:
-          type: string
-          description: An actual user friendly error message.
-        errors:
-          anyOf:
-          - $ref: '#/components/schemas/Error'
-          - $ref: '#/components/schemas/Errors'
-    CreateSpendingBudgetResponse:
-      title: Create Spending Budget Response
-      type: object
-      required:
-      - operation_id
-      - data
-      properties:
-        operation_id:
-          title: Operation ID
-          type: string
-          enum:
-          - goals_v1_spending_budgets_post
-        data:
-          $ref: '#/components/schemas/SpendingBudget'
-    Errors:
-      title: Array of Error Object
-      description: Contains a list of error messages
-      type: object
-      additionalProperties:
-        type: array
-        items:
-          type: string
-    schemas-Categories:
-      title: Categories
-      type: object
-      description: "Categories enrichment associated with a Transaction, as generated by Bud's artificial intelligence models. \nCurrently two levels of category are supported, with `l1` being a coarse-grained category level and `l2` being\nmore refined.\n"
-      required:
-      - l1
-      - l2
-      properties:
-        l1:
-          $ref: '#/components/schemas/Category'
-          description: Level 1 Category
-        l2:
-          $ref: '#/components/schemas/Category'
-          description: Level 2 Category
-    schemas-Transaction:
-      title: Transaction
-      type: object
-      description: A financial transaction
-      required:
-      - transaction_id
-      - account_id
-      - description
-      - amount
-      - credit_debit_indicator
-      - suggested_description
-      - status
-      - date_time
-      properties:
-        transaction_id:
-          type: string
-          description: Unique identifier for the transaction. May be mutable depending on original ingestion source.
-        account_id:
-          type: string
-          description: Identifier for the account associated with the transaction.
-        provider:
-          type: string
-          description: Name of the transaction source provider. Optional as it may not have been supplied when using first party data.
-        description:
-          type: string
-          description: Description of the transaction.
-        credit_debit_indicator:
-          type: string
-          description: Credit/Debit Indicator
-          enum:
-          - credit
-          - debit
-        status:
-          type: string
-          description: Status of the transaction. Defaults to booked.
-          enum:
-          - booked
-          - pending
-        amount:
-          $ref: '#/components/schemas/BudAmount'
-        date_time:
-          type: string
-          description: Date of the transaction compliant with RFC3339.
-        enrichments:
-          $ref: '#/components/schemas/schemas-Enrichments'
-        suggested_description:
-          description: The description Bud suggests client apps show for a given transaction.
-          type: string
-        suggested_logo:
-          description: The logo Bud suggests client apps show for a given transaction.
-          type: string
-          format: uri
-    BudPageSizeMetadata:
-      title: Page Size
-      type: integer
-      description: 'The size of the page requested.
-
-
-        Example: `100`
+        Example: `81a68821-dca6-4771-80d4-002c7fce412e`
 
         '
-      example: 100
-    BudAmount:
-      title: Standard Bud Amount
-      type: object
-      description: The monetary amount.
-      required:
-      - value
-      - currency
-      properties:
-        value:
-          $ref: '#/components/schemas/BudMonetaryValue'
-        currency:
-          $ref: '#/components/schemas/BudCurrency'
-    CreateSpendingBudgetRequest:
-      title: Create Spending Budget Request
-      allOf:
-      - $ref: '#/components/schemas/BaseSpendingBudget'
+      example: 81a68821-dca6-4771-80d4-002c7fce412e
+    QueryBudAccountID:
+      in: query
+      name: account_id
+      schema:
+        type: string
+      example: RxsYshVGded4JeilkXgWKdXA
+      description: 'Use this parameter to filter the results on data associated with the given account id.
+
+
+        Example: `RxsYshVGded4JeilkXgWKdXA`
+
+        '
+    CustomerId:
+      in: header
+      name: X-Customer-Id
+      schema:
+        type: string
+        format: uuid
+      required: true
+      description: A unique identifier for a Customer, as registered on Bud's platform.
+      example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
+  schemas:
     BaseSpendingBudget:
       title: Spending Budget
       type: object
@@ -1011,6 +571,441 @@ components:
                     '
                   items:
                     type: string
+    Errors:
+      title: Array of Error Object
+      description: Contains a list of error messages
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          type: string
+    BadRequestResponse:
+      title: Bad Request Response
+      type: object
+      description: Expected response structure
+      required:
+      - operation_id
+      - code_id
+      - message
+      - errors
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        code_id:
+          type: string
+          description: A descriptive enough string that is linked to the reason for the error.
+        message:
+          type: string
+        errors:
+          anyOf:
+          - $ref: '#/components/schemas/Error'
+          - $ref: '#/components/schemas/Errors'
+    schemas-Categories:
+      title: Categories
+      type: object
+      description: "Categories enrichment associated with a Transaction, as generated by Bud's artificial intelligence models. \nCurrently two levels of category are supported, with `l1` being a coarse-grained category level and `l2` being\nmore refined.\n"
+      required:
+      - l1
+      - l2
+      properties:
+        l1:
+          $ref: '#/components/schemas/Category'
+          description: Level 1 Category
+        l2:
+          $ref: '#/components/schemas/Category'
+          description: Level 2 Category
+    OperationId:
+      title: Operation Id Field
+      type: string
+      description: A unique identifier/reference associated with a given endpoint/operation
+    BudCurrency:
+      title: Currency
+      description: 'The three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) of the monetary amount.
+
+
+        Example: `GBP`
+
+        '
+      type: string
+    BudResultsMetadata:
+      title: Metadata
+      type: object
+      required:
+      - results
+      properties:
+        results:
+          type: integer
+          description: 'The number of results returned in the response.
+
+
+            Example: 1
+
+            '
+          example: 1
+    schemas-Transaction:
+      title: Transaction
+      type: object
+      description: A financial transaction
+      required:
+      - transaction_id
+      - account_id
+      - description
+      - amount
+      - credit_debit_indicator
+      - suggested_description
+      - status
+      - date_time
+      properties:
+        transaction_id:
+          type: string
+          description: Unique identifier for the transaction. May be mutable depending on original ingestion source.
+        account_id:
+          type: string
+          description: Identifier for the account associated with the transaction.
+        provider:
+          type: string
+          description: Name of the transaction source provider. Optional as it may not have been supplied when using first party data.
+        description:
+          type: string
+          description: Description of the transaction.
+        credit_debit_indicator:
+          type: string
+          description: Credit/Debit Indicator
+          enum:
+          - credit
+          - debit
+        status:
+          type: string
+          description: Status of the transaction. Defaults to booked.
+          enum:
+          - booked
+          - pending
+        amount:
+          $ref: '#/components/schemas/BudAmount'
+        date_time:
+          type: string
+          description: Date of the transaction compliant with RFC3339.
+        enrichments:
+          $ref: '#/components/schemas/schemas-Enrichments'
+        suggested_description:
+          description: The description Bud suggests client apps show for a given transaction.
+          type: string
+        suggested_logo:
+          description: The logo Bud suggests client apps show for a given transaction.
+          type: string
+          format: uri
+    UpdateSpendingBudgetResponse:
+      title: Update Spending Budget Response
+      type: object
+      required:
+      - operation_id
+      - data
+      properties:
+        operation_id:
+          title: Operation ID
+          type: string
+          enum:
+          - goals_v1_spending_budgets_patch
+        data:
+          $ref: '#/components/schemas/SpendingBudget'
+    BudAmount:
+      title: Standard Bud Amount
+      type: object
+      description: The monetary amount.
+      required:
+      - value
+      - currency
+      properties:
+        value:
+          $ref: '#/components/schemas/BudMonetaryValue'
+        currency:
+          $ref: '#/components/schemas/BudCurrency'
+    BudMonetaryValue:
+      title: Monetary Value
+      description: "The value of the monetary amount. The value is formatted with the number of decimal places for the respective currency. \n\nExample: `10.98`\n"
+      type: string
+    goals-components_schemas-Merchant:
+      title: Merchant
+      type: object
+      description: 'Merchant enrichment associated with a Transaction, as generated using a combination of Bud''s artificial
+
+        intelligence models and database of known merchants.
+
+        '
+      required:
+      - id
+      - slug
+      - display_name
+      properties:
+        id:
+          type: string
+          description: UUID corresponding to the merchant, if available. Subject to version control.
+        slug:
+          type: string
+          description: Unique human readable identifier of the merchant. Not subject to version control.
+        display_name:
+          type: string
+          description: UI friendly display name for the merchant.
+        logo:
+          type: string
+          description: URL supplying merchant logo, if available.
+    PatchSpendingBudget:
+      title: Patch Spending Budget
+      type: object
+      properties:
+        name:
+          title: Name
+          type: string
+          description: 'The name of the spending budget.
+
+
+            Example: `Travel`
+
+            '
+          example: Travel
+        amount:
+          title: Amount
+          type: object
+          description: "The amount of money to be budgeted for. Must be greater than 0. \n\nNote: The Currency of a spending budget cannot be updated.\n"
+          required:
+          - value
+          properties:
+            value:
+              $ref: '#/components/schemas/BudMonetaryValue'
+        recurrency:
+          title: Recurrency
+          type: object
+          description: 'Whether and/or how often the budget recurs.
+
+
+            The `starting_day` is only required for budgets with a recurring period e.g. `monthly`
+
+
+            New periods may be added without a breaking change notice.
+
+            '
+          required:
+          - period
+          properties:
+            period:
+              title: Period
+              type: string
+              description: 'The period at which a budget recurs (if at all).
+
+
+                Currently supported options are:
+
+                - `one-off`
+
+                - `monthly`
+
+
+                New periods may be added without a breaking change notice.
+
+                '
+            starting_day:
+              title: Starting Day
+              type: integer
+              description: 'The day of which the budget period starts. Not required if a budget is `one-off`.
+
+
+                Must be between 1 and 28 for `monthly` budgets.
+
+                '
+        include:
+          title: Include
+          type: object
+          description: 'The inclusion criteria for transactions to be included in the budget.
+
+            '
+          properties:
+            categories:
+              title: Categories
+              description: "The categories of transactions to be included in the budget. \n\nIf L2 categories are specified, they must be grouped underneath their corresponding L1 category.\n\nAll categories specified must be compatible with the category taxonomy used for that customer.\n"
+              type: array
+              items:
+                required:
+                - l1
+                properties:
+                  l1:
+                    title: L1
+                    type: string
+                    description: 'L1 category to include in the filter. Must be specified if using category filtering.
+
+                      '
+                  l2:
+                    title: L2
+                    type: array
+                    description: 'L2 categories to include in the filter. Must all correspond to the parent L1 category specified.
+
+                      '
+                    items:
+                      type: string
+            merchants:
+              title: Merchants
+              type: object
+              description: 'The merchants of transactions to be included in the budget.
+
+                '
+              properties:
+                slugs:
+                  title: Slugs
+                  type: array
+                  description: 'The slugs of merchants to be included. E.g. `netflix` or `uber`
+
+                    '
+                  items:
+                    type: string
+    CreateSpendingBudgetResponse:
+      title: Create Spending Budget Response
+      type: object
+      required:
+      - operation_id
+      - data
+      properties:
+        operation_id:
+          title: Operation ID
+          type: string
+          enum:
+          - goals_v1_spending_budgets_post
+        data:
+          $ref: '#/components/schemas/SpendingBudget'
+    Error:
+      title: Error Object
+      type:
+      - object
+      - 'null'
+      description: Contains a field specific error message
+      additionalProperties:
+        type: string
+    BudNextPageTokenMetadata:
+      title: Next Page Token
+      type: object
+      properties:
+        next_page_token:
+          type: string
+          description: 'The token to use to fetch the next page of results. This is only set if there are more results to fetch.
+
+            '
+      example:
+        next_page_token: b21055a9a9f46fc794a2e6855c65abd7e317181039fc6930daabac5822911d14a84895ecd947e2b5abdcb22e4fcc2c594e1f661dc63e34b9ba88760724047990896f7581a0786c2605dce19c6a9d80d1044f963b74fea0a929c0a4465a6e67378a74dce38ec5e26ae4cc804b62fd666d5df4cf2e7f524bd99e5523bc5d471768065c036dc0c73122705b280817fbbd7d9aa31f271d72cd3877d999dcb9a5b1c0be0c05
+    SpendingBudget:
+      allOf:
+      - $ref: '#/components/schemas/BaseSpendingBudget'
+      - type: object
+        required:
+        - id
+        - name
+        - amount
+        - recurrency
+        - spent
+        - created_at
+        properties:
+          id:
+            title: ID
+            type: string
+            description: 'The ID of the spending budget.
+
+
+              Example: "81a68821-dca6-4771-80d4-002c7fce412e"
+
+              '
+          spent:
+            title: Spent
+            type: object
+            description: 'The amount of money spent from the budget for the given time period.
+
+              '
+            required:
+            - from
+            - to
+            - amount
+            - ratio
+            properties:
+              from:
+                title: From
+                type: string
+                description: 'The date from which the budgeting period began in the format [RFC-3339](https://www.ietf.org/rfc/rfc3339.txt).
+
+
+                  Example: `2023-10-01T00:00:00Z`
+
+                  '
+              to:
+                title: From
+                type: string
+                description: 'The date to which the budgeting period ends in the format [RFC-3339](https://www.ietf.org/rfc/rfc3339.txt).
+
+
+                  Example: `2023-10-31T00:00:00Z`
+
+                  '
+              amount:
+                title: Amount
+                type: object
+                description: 'The amount of money spent from the budget.
+
+                  '
+                required:
+                - value
+                - currency
+                properties:
+                  value:
+                    $ref: '#/components/schemas/BudMonetaryValue'
+                  currency:
+                    $ref: '#/components/schemas/BudCurrency'
+              ratio:
+                title: Ratio
+                type: string
+                description: 'The ratio of spent money to the total budget amount.
+
+                  '
+          created_at:
+            title: Created At
+            type: string
+            description: 'The date and time the budget was created in the format [RFC-3339](https://www.ietf.org/rfc/rfc3339.txt).
+
+
+              Example: `2023-10-17T00:00:00Z`
+
+              '
+          _links:
+            title: _links
+            type: object
+            description: 'Useful follow up links
+
+              '
+            properties:
+              transactions:
+                title: Transactions Link
+                type: string
+                description: 'Link to follow to get transactions included in the budget.
+
+                  '
+    ServerErrorResponse:
+      title: Server Error Response
+      type: object
+      required:
+      - operation_id
+      - code_id
+      - message
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        code_id:
+          type: string
+          description: A descriptive enough string that is linked to the reason for the error.
+        message:
+          type: string
+          description: An actual user friendly error message.
+        errors:
+          anyOf:
+          - $ref: '#/components/schemas/Error'
+          - $ref: '#/components/schemas/Errors'
+    CreateSpendingBudgetRequest:
+      title: Create Spending Budget Request
+      allOf:
+      - $ref: '#/components/schemas/BaseSpendingBudget'
     schemas-Enrichments:
       title: Enrichments
       type: object
@@ -1020,6 +1015,87 @@ components:
           $ref: '#/components/schemas/schemas-Categories'
         merchant:
           $ref: '#/components/schemas/goals-components_schemas-Merchant'
+    BudPageSizeMetadata:
+      title: Page Size
+      type: integer
+      description: 'The size of the page requested.
+
+
+        Example: `100`
+
+        '
+      example: 100
+    RetrieveSpendingBudgetTransactionsResponse:
+      title: Retrieve Spending Budget Transactions Response
+      type: object
+      required:
+      - operation_id
+      - data
+      - metadata
+      properties:
+        operation_id:
+          title: Operation ID
+          type: string
+          enum:
+          - goals_v1_spending_budget_transactions_get
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/schemas-Transaction'
+        metadata:
+          allOf:
+          - $ref: '#/components/schemas/BudResultsMetadata'
+          - type: object
+            properties:
+              budget_id:
+                title: Budget ID
+                type: string
+                description: 'The ID of the spending budget the transactions were retrieved for.
+
+
+                  Example: "81a68821-dca6-4771-80d4-002c7fce412e"
+
+                  '
+                example: 81a68821-dca6-4771-80d4-002c7fce412e
+              page_size:
+                $ref: '#/components/schemas/BudPageSizeMetadata'
+          - $ref: '#/components/schemas/BudNextPageTokenMetadata'
+    RetrieveSpendingBudgetsResponse:
+      title: Retrieve Spending Budgets Response
+      type: object
+      required:
+      - operation_id
+      - data
+      - metadata
+      properties:
+        operation_id:
+          title: Operation ID
+          type: string
+          enum:
+          - goals_v1_spending_budgets_get
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SpendingBudget'
+        metadata:
+          allOf:
+          - $ref: '#/components/schemas/BudResultsMetadata'
+          - type: object
+            properties:
+              account_ids:
+                title: Account IDs
+                type: array
+                description: 'An array of account IDs used for filtering in the request.
+
+                  '
+                items:
+                  type: string
+                  description: 'An account ID used for filtering in the request.
+
+
+                    Example: `RxsYshVGded4JeilkXgWKdXA`
+
+                    '
     Category:
       title: Category
       type: object
@@ -1034,82 +1110,6 @@ components:
         confidence:
           type: string
           description: Degree of belief of correct assignment, expressed as a probability.
-    OperationId:
-      title: Operation Id Field
-      type: string
-      description: A unique identifier/reference associated with a given endpoint/operation
-  parameters:
-    parameters-QueryBudPageSize:
-      in: query
-      name: page_size
-      schema:
-        type: integer
-      example: 200
-      description: Use this parameter to set the maximum number of results to be returned. This defaults to 100, and has a maximum of 200.
-    PathSpendingBudgetID:
-      name: budget_id
-      in: path
-      schema:
-        type: string
-      required: true
-      description: 'The ID of the spending budget.
-
-
-        Example: `81a68821-dca6-4771-80d4-002c7fce412e`
-
-        '
-      example: 81a68821-dca6-4771-80d4-002c7fce412e
-    parameters-QueryBudPageToken:
-      in: query
-      name: page_token
-      schema:
-        type: string
-      example: b21055a9a9f46fc794a2e6855c65abd7e317181039fc6930daabac5822911d14a84895ecd947e2b5abdcb22e4fcc2c594e1f661dc63e34b9ba88760724047990896f7581a0786c2605dce19c6a9d80d1044f963b74fea0a929c0a4465a6e67378a74dce38ec5e26ae4cc804b62fd666d5df4cf2e7f524bd99e5523bc5d471768065c036dc0c73122705b280817fbbd7d9aa31f271d72cd3877d999dcb9a5b1c0be0c05
-      description: Use this paramater to fetch a specific page of results. Provided by the next_page_token field in the previous request.
-    QueryBudAccountID:
-      in: query
-      name: account_id
-      schema:
-        type: string
-      example: RxsYshVGded4JeilkXgWKdXA
-      description: 'Use this parameter to filter the results on data associated with the given account id.
-
-
-        Example: `RxsYshVGded4JeilkXgWKdXA`
-
-        '
-    CustomerIdempotentIdentifier:
-      in: header
-      name: X-Customer-Idempotent-Identifier
-      schema:
-        type: string
-      description: 'Use the internal client identifier, provided in the `client_metadata` object when creating the customer in __Create Customer V3__, in place of an `X-Customer-Id` header.
-
-        '
-    CustomerId:
-      in: header
-      name: X-Customer-Id
-      schema:
-        type: string
-        format: uuid
-      required: true
-      description: A unique identifier for a Customer, as registered on Bud's platform.
-      example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
-    QueryDay:
-      in: query
-      name: day
-      schema:
-        type: string
-      example: '2019-02-29T12:23:00Z'
-      description: "The day for which results are to be retrieved in the format [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339).\n\nExamples:\n  - `2023-01-17T17:29:51Z`\n  - `2023-01-17T17:29:51-08:00`\n"
-    ClientId:
-      in: header
-      name: X-Client-Id
-      schema:
-        type: string
-      required: true
-      description: The API Client Identifier (Service Application Identifier).
-      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
   securitySchemes:
     Basic:
       type: http

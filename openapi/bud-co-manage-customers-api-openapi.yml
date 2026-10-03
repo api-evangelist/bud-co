@@ -728,33 +728,36 @@ paths:
           description: An unexpected error occurred on the server side.
 components:
   schemas:
-    CustomerDeleteV3:
-      title: Customer Delete V3
+    CustomersCreateResponse:
+      title: Create Customers Response
       type: object
+      description: Expected response structure.
       required:
-      - task_id
+      - operation_id
+      - data
+      - metadata
       properties:
-        task_id:
-          $ref: '#/components/schemas/TaskId'
-    CustomerContextType:
-      title: Customer Context Type
-      type: string
-      enum:
-      - personal
-      - business
-      description: 'The type of customer signed up:
-
-
-        | Value      | Description                             |
-
-        |------------|-----------------------------------------|
-
-        | `personal` | Individuals with personal bank accounts |
-
-        | `business` | Businesses with business accounts       |
-
-        '
-    CustomerContext:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          description: An array of Customer Created objects
+          items:
+            $ref: '#/components/schemas/CustomerCreated'
+        metadata:
+          $ref: '#/components/schemas/ResultsMetadata'
+    CustomersGetAllV3ResponseMetadata:
+      type: object
+      description: Metadata that defines token-based pagination of results.
+      required:
+      - results
+      properties:
+        next_page_token:
+          type: string
+          description: Page token for next part of the result set, omitted if there are no other pages.
+        results:
+          type: integer
+          description: The number of results returned.
+    CustomerContextRequest:
       title: Customer Context
       description: The context in which a customer is processed throughout the Bud platform.
       type: object
@@ -765,34 +768,61 @@ components:
           $ref: '#/components/schemas/CustomerContextRegion'
         locale:
           $ref: '#/components/schemas/CustomerContextLocale'
-        host_secret:
-          $ref: '#/components/schemas/CustomerContextHostSecret'
         models:
           $ref: '#/components/schemas/CustomerContextModels'
-    CustomersGetAllV3DataItem:
+    Errors:
+      title: Array of Error Object
+      description: Contains a list of error messages
       type: object
-      description: Representation of a Customer.
-      required:
-      - customer_id
-      - created_at
-      properties:
-        customer_id:
-          type: string
-          format: uuid
-        created_at:
-          type: string
-          description: Date and time at which the Customer has been registered (ISO 8601).
-        idempotent_identifier:
-          type: string
-          description: Client-assigned idempotent customer identifier (omitted if not present).
-    Error:
-      title: Error Object
-      type:
-      - object
-      - 'null'
-      description: Contains a field specific error message
       additionalProperties:
-        type: string
+        type: array
+        items:
+          type: string
+    CustomerContextResponse:
+      title: Customer Context Response
+      description: Customer context response.
+      type: object
+      required:
+      - operation_id
+      - data
+      properties:
+        operation_id:
+          type: string
+        data:
+          $ref: '#/components/schemas/CustomerContext'
+    BadRequestResponse:
+      title: Bad Request Response
+      type: object
+      description: Expected response structure
+      required:
+      - operation_id
+      - code_id
+      - message
+      - errors
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        code_id:
+          type: string
+          description: A descriptive enough string that is linked to the reason for the error.
+        message:
+          type: string
+        errors:
+          anyOf:
+          - $ref: '#/components/schemas/Error'
+          - $ref: '#/components/schemas/Errors'
+    CustomerContextHostSecret:
+      title: Customer Context Host Secret
+      type: boolean
+      description: Determines whether the customer secret key should be stored with Bud, meaning the API consumer does not need to store this and provide it on subsequent API calls related to that customer.
+    CustomerDeleteV3:
+      title: Customer Delete V3
+      type: object
+      required:
+      - task_id
+      properties:
+        task_id:
+          $ref: '#/components/schemas/TaskId'
     CustomerCreateResponse:
       title: Create Customer Response
       type: object
@@ -819,214 +849,10 @@ components:
               type: string
             customer_context:
               $ref: '#/components/schemas/CustomerContext'
-    CustomerCreatedV3:
-      title: Customer Created V3
-      type: object
-      required:
-      - customer_id
-      - customer_context
-      properties:
-        customer_id:
-          description: A unique identifier for a Customer, as registered on Bud's platform
-          type: string
-          format: uuid
-        customer_secret:
-          description: A unique Customer encryption key used to encrypt their data on the Bud platform. Only returned if the secret is *not* hosted on the Bud Platform.
-          type: string
-        customer_context:
-          $ref: '#/components/schemas/CustomerContext'
-        client_metadata:
-          $ref: '#/components/schemas/ClientMetadata'
-    CustomerContextHostSecret:
-      title: Customer Context Host Secret
-      type: boolean
-      description: Determines whether the customer secret key should be stored with Bud, meaning the API consumer does not need to store this and provide it on subsequent API calls related to that customer.
-    IdempotentIdentifier:
-      title: Idempotent Identifier
-      description: An internal client identifier. If specified will ensure we only have one customer id per identifier.
-      type: string
-    CustomerContextRegion:
-      title: Customer Context Region
-      type: string
-      description: The region/country where the customer is located, format defined by ISO 3166 Alpha-2.
-    CreateCustomersV3BatchPayload:
-      title: Create Customers V3 Batch Payload
-      type: object
-      properties:
-        number_of_customers:
-          description: The number of customers to create (register) on Bud's platform in a single request.
-          type: integer
-          default: 1
-          maximum: 200
-        customer_context:
-          $ref: '#/components/schemas/CustomerContextRequest'
-    DeleteResultCodes:
-      type: string
-      description: The result of the operation. Either success or failed.
-      enum:
-      - success
-      - failed
-    ClientMetadata:
-      title: Client Metadata
-      description: A set of Client Metadata
-      type: object
-      properties:
-        idempotent_identifier:
-          $ref: '#/components/schemas/IdempotentIdentifier'
-    CustomerDeleteV3StatusResponse:
-      title: Customer Delete Status Response
-      type: object
-      description: Expected response structure
-      required:
-      - operation_id
-      - metadata
-      - data
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        data:
-          $ref: '#/components/schemas/TaskCustomerDeleteV3'
-        metadata:
-          $ref: '#/components/schemas/TaskCustomerDeleteV3MetaData'
-    CustomerContextRequest:
-      title: Customer Context
-      description: The context in which a customer is processed throughout the Bud platform.
-      type: object
-      properties:
-        type:
-          $ref: '#/components/schemas/CustomerContextType'
-        region:
-          $ref: '#/components/schemas/CustomerContextRegion'
-        locale:
-          $ref: '#/components/schemas/CustomerContextLocale'
-        models:
-          $ref: '#/components/schemas/CustomerContextModels'
-    AsyncTaskMetadata:
-      title: Async Task Metadata
-      type: object
-      description: Metadata associated with an asynchronous task
-      properties:
-        status:
-          type: string
-          description: The status of the job associated with the specified task id
-          enum:
-          - Completed
-          - Pending
-          - Failed
-        next_url:
-          type: string
-          description: The URL to call to obtain the results of the task
-        next_url_delay:
-          type: number
-          description: The time in milliseconds that the client should wait before polling the relevant GET endpoint with the above task id
     CustomerContextLocale:
       title: Customer Context Locale
       type: string
       description: The locale/language, based on the region, format defined by BCP 47.
-    TaskCustomerDeleteV3:
-      title: Customer Delete Task Response
-      type: object
-      description: Result of GET customer delete taskId
-      required:
-      - task_id
-      properties:
-        result:
-          $ref: '#/components/schemas/DeleteResultCodes'
-        task_id:
-          $ref: '#/components/schemas/TaskId'
-    UpdateCustomerContextRequest:
-      title: Update Customer Context Request
-      type: object
-      description: Expected request payload structure.
-      properties:
-        region:
-          $ref: '#/components/schemas/CustomerContextRegion'
-        locale:
-          $ref: '#/components/schemas/CustomerContextLocale'
-        models:
-          $ref: '#/components/schemas/CustomerContextModels'
-    BadRequestResponse:
-      title: Bad Request Response
-      type: object
-      description: Expected response structure
-      required:
-      - operation_id
-      - code_id
-      - message
-      - errors
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        code_id:
-          type: string
-          description: A descriptive enough string that is linked to the reason for the error.
-        message:
-          type: string
-        errors:
-          anyOf:
-          - $ref: '#/components/schemas/Error'
-          - $ref: '#/components/schemas/Errors'
-    ResultsMetadata:
-      title: Results Metadata Object
-      type: object
-      description: Metadata associated with the response schema
-      properties:
-        results:
-          type: number
-          description: The number of results returned
-    CustomerContextModels:
-      title: Customer Context Models
-      type: object
-      description: The configuration for Bud's enrichment models.
-      properties:
-        categorisation:
-          type: string
-          description: The name of the categorisation model to use for this customer at enrichment. See *List Categorisation Models V2* for available models.
-    CustomerCreated:
-      title: Customer Created
-      type: object
-      required:
-      - customer_id
-      - customer_secret
-      - customer_context
-      properties:
-        customer_id:
-          description: A unique identifier for a Customer, as registered on Bud's platform
-          type: string
-          format: uuid
-        customer_secret:
-          description: An unique Customer encryption key used to encrypt their data on the Bud platform. Please note that this key is not held by Bud, and is required in the header of any endpoint that involves reading Customer data stored on the Bud platform.
-          type: string
-        customer_context:
-          $ref: '#/components/schemas/CustomerContext'
-    CustomerContextResponse:
-      title: Customer Context Response
-      description: Customer context response.
-      type: object
-      required:
-      - operation_id
-      - data
-      properties:
-        operation_id:
-          type: string
-        data:
-          $ref: '#/components/schemas/CustomerContext'
-    CustomersGetAllV3Response:
-      title: List customers response
-      type: object
-      description: Expected response structure.
-      required:
-      - operation_id
-      - data
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomersGetAllV3DataItem'
-        metadata:
-          $ref: '#/components/schemas/CustomersGetAllV3ResponseMetadata'
     UpdateCustomerContextResponse:
       title: Customer Context Update Response
       description: Customer context update response.
@@ -1047,68 +873,40 @@ components:
               $ref: '#/components/schemas/CustomerContextLocale'
             models:
               $ref: '#/components/schemas/CustomerContextModels'
-    CustomerDeleteV3Response:
-      title: Delete Customer V3 Response
+    CustomerContextModels:
+      title: Customer Context Models
       type: object
-      description: Expected response structure.
-      required:
-      - operation_id
-      - data
-      - metadata
+      description: The configuration for Bud's enrichment models.
       properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        data:
-          $ref: '#/components/schemas/CustomerDeleteV3'
-        metadata:
-          $ref: '#/components/schemas/AsyncTaskMetadata'
-    Errors:
-      title: Array of Error Object
-      description: Contains a list of error messages
-      type: object
-      additionalProperties:
-        type: array
-        items:
+        categorisation:
           type: string
-    CustomersCreateResponse:
-      title: Create Customers Response
+          description: The name of the categorisation model to use for this customer at enrichment. See *List Categorisation Models V2* for available models.
+    OperationId:
+      title: Operation Id Field
+      type: string
+      description: A unique identifier/reference associated with a given endpoint/operation
+    CustomersGetAllV3DataItem:
       type: object
-      description: Expected response structure.
+      description: Representation of a Customer.
       required:
-      - operation_id
-      - data
-      - metadata
+      - customer_id
+      - created_at
       properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        data:
-          description: An array of Customer Created objects
-          items:
-            $ref: '#/components/schemas/CustomerCreated'
-        metadata:
-          $ref: '#/components/schemas/ResultsMetadata'
-    CustomerCreatedV3Metadata:
-      title: Customer Created V3 Metadata
-      type: object
-      properties:
+        customer_id:
+          type: string
+          format: uuid
         created_at:
           type: string
-          format: date-time
-          description: The date and time the customer was created. Format ISO 8601.
-    CustomersGetAllV3ResponseMetadata:
-      type: object
-      description: Metadata that defines token-based pagination of results.
-      required:
-      - results
-      properties:
-        next_page_token:
+          description: Date and time at which the Customer has been registered (ISO 8601).
+        idempotent_identifier:
           type: string
-          description: Page token for next part of the result set, omitted if there are no other pages.
-        results:
-          type: integer
-          description: The number of results returned.
-    CreateCustomersPayload:
-      title: Create Customers Payload
+          description: Client-assigned idempotent customer identifier (omitted if not present).
+    CustomerContextRegion:
+      title: Customer Context Region
+      type: string
+      description: The region/country where the customer is located, format defined by ISO 3166 Alpha-2.
+    CreateCustomersV3BatchPayload:
+      title: Create Customers V3 Batch Payload
       type: object
       properties:
         number_of_customers:
@@ -1117,25 +915,37 @@ components:
           default: 1
           maximum: 200
         customer_context:
-          $ref: '#/components/schemas/CustomerContext'
-    TaskId:
-      title: Task Id
-      type: string
-      description: Bud Task identifier returned from an async task for the requested action
-    CustomerCreateV3Response:
-      title: Create Customer V3 Response
+          $ref: '#/components/schemas/CustomerContextRequest'
+    AsyncTaskMetadata:
+      title: Async Task Metadata
       type: object
-      description: Expected response structure.
-      required:
-      - operation_id
-      - data
+      description: Metadata associated with an asynchronous task
       properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        data:
-          $ref: '#/components/schemas/CustomerCreatedV3'
-        metadata:
-          $ref: '#/components/schemas/CustomerCreatedV3Metadata'
+        status:
+          type: string
+          description: The status of the job associated with the specified task id
+          enum:
+          - Completed
+          - Pending
+          - Failed
+        next_url:
+          type: string
+          description: The URL to call to obtain the results of the task
+        next_url_delay:
+          type: number
+          description: The time in milliseconds that the client should wait before polling the relevant GET endpoint with the above task id
+    IdempotentIdentifier:
+      title: Idempotent Identifier
+      description: An internal client identifier. If specified will ensure we only have one customer id per identifier.
+      type: string
+    CustomerCreatedV3Metadata:
+      title: Customer Created V3 Metadata
+      type: object
+      properties:
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time the customer was created. Format ISO 8601.
     TaskCustomerDeleteV3MetaData:
       title: Task Status Metadata
       type: object
@@ -1156,6 +966,130 @@ components:
         next_url_delay:
           type: number
           description: The time in milliseconds that the client should wait before polling the relevant GET endpoint with the above task id if the `status` property returned is `Pending`
+    ResultsMetadata:
+      title: Results Metadata Object
+      type: object
+      description: Metadata associated with the response schema
+      properties:
+        results:
+          type: number
+          description: The number of results returned
+    CustomersGetAllV3Response:
+      title: List customers response
+      type: object
+      description: Expected response structure.
+      required:
+      - operation_id
+      - data
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomersGetAllV3DataItem'
+        metadata:
+          $ref: '#/components/schemas/CustomersGetAllV3ResponseMetadata'
+    CustomerDeleteV3StatusResponse:
+      title: Customer Delete Status Response
+      type: object
+      description: Expected response structure
+      required:
+      - operation_id
+      - metadata
+      - data
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          $ref: '#/components/schemas/TaskCustomerDeleteV3'
+        metadata:
+          $ref: '#/components/schemas/TaskCustomerDeleteV3MetaData'
+    TaskCustomerDeleteV3:
+      title: Customer Delete Task Response
+      type: object
+      description: Result of GET customer delete taskId
+      required:
+      - task_id
+      properties:
+        result:
+          $ref: '#/components/schemas/DeleteResultCodes'
+        task_id:
+          $ref: '#/components/schemas/TaskId'
+    CustomerContextType:
+      title: Customer Context Type
+      type: string
+      enum:
+      - personal
+      - business
+      description: 'The type of customer signed up:
+
+
+        | Value      | Description                             |
+
+        |------------|-----------------------------------------|
+
+        | `personal` | Individuals with personal bank accounts |
+
+        | `business` | Businesses with business accounts       |
+
+        '
+    TaskId:
+      title: Task Id
+      type: string
+      description: Bud Task identifier returned from an async task for the requested action
+    CustomerDeleteV3Response:
+      title: Delete Customer V3 Response
+      type: object
+      description: Expected response structure.
+      required:
+      - operation_id
+      - data
+      - metadata
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          $ref: '#/components/schemas/CustomerDeleteV3'
+        metadata:
+          $ref: '#/components/schemas/AsyncTaskMetadata'
+    CreateCustomersPayload:
+      title: Create Customers Payload
+      type: object
+      properties:
+        number_of_customers:
+          description: The number of customers to create (register) on Bud's platform in a single request.
+          type: integer
+          default: 1
+          maximum: 200
+        customer_context:
+          $ref: '#/components/schemas/CustomerContext'
+    UpdateCustomerContextRequest:
+      title: Update Customer Context Request
+      type: object
+      description: Expected request payload structure.
+      properties:
+        region:
+          $ref: '#/components/schemas/CustomerContextRegion'
+        locale:
+          $ref: '#/components/schemas/CustomerContextLocale'
+        models:
+          $ref: '#/components/schemas/CustomerContextModels'
+    CustomerContext:
+      title: Customer Context
+      description: The context in which a customer is processed throughout the Bud platform.
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/CustomerContextType'
+        region:
+          $ref: '#/components/schemas/CustomerContextRegion'
+        locale:
+          $ref: '#/components/schemas/CustomerContextLocale'
+        host_secret:
+          $ref: '#/components/schemas/CustomerContextHostSecret'
+        models:
+          $ref: '#/components/schemas/CustomerContextModels'
     CreateCustomersV3BatchResponse:
       title: Create Customers V3 Batch Response
       type: object
@@ -1172,10 +1106,76 @@ components:
             $ref: '#/components/schemas/CustomerCreatedV3'
         metadata:
           $ref: '#/components/schemas/CustomerCreatedV3Metadata'
-    OperationId:
-      title: Operation Id Field
+    ClientMetadata:
+      title: Client Metadata
+      description: A set of Client Metadata
+      type: object
+      properties:
+        idempotent_identifier:
+          $ref: '#/components/schemas/IdempotentIdentifier'
+    Error:
+      title: Error Object
+      type:
+      - object
+      - 'null'
+      description: Contains a field specific error message
+      additionalProperties:
+        type: string
+    CustomerCreateV3Response:
+      title: Create Customer V3 Response
+      type: object
+      description: Expected response structure.
+      required:
+      - operation_id
+      - data
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          $ref: '#/components/schemas/CustomerCreatedV3'
+        metadata:
+          $ref: '#/components/schemas/CustomerCreatedV3Metadata'
+    CustomerCreated:
+      title: Customer Created
+      type: object
+      required:
+      - customer_id
+      - customer_secret
+      - customer_context
+      properties:
+        customer_id:
+          description: A unique identifier for a Customer, as registered on Bud's platform
+          type: string
+          format: uuid
+        customer_secret:
+          description: An unique Customer encryption key used to encrypt their data on the Bud platform. Please note that this key is not held by Bud, and is required in the header of any endpoint that involves reading Customer data stored on the Bud platform.
+          type: string
+        customer_context:
+          $ref: '#/components/schemas/CustomerContext'
+    DeleteResultCodes:
       type: string
-      description: A unique identifier/reference associated with a given endpoint/operation
+      description: The result of the operation. Either success or failed.
+      enum:
+      - success
+      - failed
+    CustomerCreatedV3:
+      title: Customer Created V3
+      type: object
+      required:
+      - customer_id
+      - customer_context
+      properties:
+        customer_id:
+          description: A unique identifier for a Customer, as registered on Bud's platform
+          type: string
+          format: uuid
+        customer_secret:
+          description: A unique Customer encryption key used to encrypt their data on the Bud platform. Only returned if the secret is *not* hosted on the Bud Platform.
+          type: string
+        customer_context:
+          $ref: '#/components/schemas/CustomerContext'
+        client_metadata:
+          $ref: '#/components/schemas/ClientMetadata'
   parameters:
     PathCustomerID:
       in: path
@@ -1186,14 +1186,6 @@ components:
       required: true
       description: A unique identifier for a Customer, as registered on Bud's platform.
       example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
-    ClientId:
-      in: header
-      name: X-Client-Id
-      schema:
-        type: string
-      required: true
-      description: The API Client Identifier (Service Application Identifier).
-      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
     TaskId:
       in: path
       name: task_id
@@ -1202,6 +1194,14 @@ components:
         format: uuid
       required: true
       description: Bud Task identifier returned from an async task for the requested action
+    ClientId:
+      in: header
+      name: X-Client-Id
+      schema:
+        type: string
+      required: true
+      description: The API Client Identifier (Service Application Identifier).
+      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
   securitySchemes:
     Basic:
       type: http

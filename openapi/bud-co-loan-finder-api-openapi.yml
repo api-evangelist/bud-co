@@ -91,98 +91,19 @@ paths:
         5XX:
           description: An unexpected error occurred on the server side
 components:
-  parameters:
-    SmartFinderFrom:
-      in: header
-      name: X-From
-      required: false
-      schema:
-        type: string
-      examples:
-        date_only:
-          value: '2022-02-28'
-        RFC3339:
-          value: '2019-02-28T07:20:50.52Z'
-      description: Transaction from date, this works in pair with the 'X-To' parameter
-    SmartFinderTo:
-      in: header
-      name: X-To
-      required: false
-      schema:
-        type: string
-      examples:
-        date_only:
-          value: '2022-03-30'
-        RFC3339:
-          value: '2019-03-30T07:20:50.52Z'
-      description: Transaction to date, this works in pair with the 'X-From' parameter
-    ClientId:
-      in: header
-      name: X-Client-Id
-      schema:
-        type: string
-      required: true
-      description: The API Client Identifier (Service Application Identifier).
-      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
-    CustomerSecret:
-      in: header
-      name: X-Customer-Secret
-      schema:
-        type: string
-      required: false
-      description: The Bud Customer secret used to encrypt customer data. This is required only if the customer secret is not already stored with Bud.
-    CustomerId:
-      in: header
-      name: X-Customer-Id
-      schema:
-        type: string
-        format: uuid
-      required: true
-      description: A unique identifier for a Customer, as registered on Bud's platform.
-      example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
-    CustomerIdempotentIdentifier:
-      in: header
-      name: X-Customer-Idempotent-Identifier
-      schema:
-        type: string
-      description: 'Use the internal client identifier, provided in the `client_metadata` object when creating the customer in __Create Customer V3__, in place of an `X-Customer-Id` header.
-
-        '
   schemas:
-    LoanStatistics:
-      type: object
-      title: Loan Statistics
-      required:
-      - total_debit
-      properties:
-        total_debit:
-          allOf:
-          - description: Total debit amount of all loan transactions
-          - $ref: '#/components/schemas/BudAmount'
-    TransactionsResultsMetadata:
-      title: Metadata
-      description: Metadata associated with the response schema
+    LoanTransactionV1:
+      title: Loan Transaction
       allOf:
-      - $ref: '#/components/schemas/LegacyBudDateRangeMetadata'
+      - $ref: '#/components/schemas/BasicTransactionV2'
       - type: object
-        required:
-        - results
         properties:
-          results:
-            type: number
-            description: Number of results returned
-    BudAmount:
-      title: Standard Bud Amount
-      type: object
-      description: The monetary amount.
-      required:
-      - value
-      - currency
-      properties:
-        value:
-          $ref: '#/components/schemas/BudMonetaryValue'
-        currency:
-          $ref: '#/components/schemas/BudCurrency'
+          merchant:
+            allOf:
+            - type:
+              - object
+              - 'null'
+            - $ref: '#/components/schemas/MerchantIdV2'
     LoansResponseV1:
       title: Loans Finder Response
       type: object
@@ -209,6 +130,36 @@ components:
               $ref: '#/components/schemas/LoanStatistics'
         metadata:
           $ref: '#/components/schemas/TransactionsResultsMetadata'
+    LoanStatistics:
+      type: object
+      title: Loan Statistics
+      required:
+      - total_debit
+      properties:
+        total_debit:
+          allOf:
+          - description: Total debit amount of all loan transactions
+          - $ref: '#/components/schemas/BudAmount'
+    OperationId:
+      title: Operation Id Field
+      type: string
+      description: A unique identifier/reference associated with a given endpoint/operation
+    BudAmount:
+      title: Standard Bud Amount
+      type: object
+      description: The monetary amount.
+      required:
+      - value
+      - currency
+      properties:
+        value:
+          $ref: '#/components/schemas/BudMonetaryValue'
+        currency:
+          $ref: '#/components/schemas/BudCurrency'
+    BudMonetaryValue:
+      title: Monetary Value
+      description: "The value of the monetary amount. The value is formatted with the number of decimal places for the respective currency. \n\nExample: `10.98`\n"
+      type: string
     BudCurrency:
       title: Currency
       description: 'The three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) of the monetary amount.
@@ -218,6 +169,40 @@ components:
 
         '
       type: string
+    MerchantIdV2:
+      title: Merchant ID Object
+      type: object
+      description: Details surrounding the identified merchant of the transaction
+      required:
+      - id
+      - name
+      - logo
+      - confidence
+      properties:
+        id:
+          type: string
+          description: A unique ID for the identified merchant
+        name:
+          type: string
+          description: The clean name of the identified merchant
+        logo:
+          type: string
+          description: The merchant's logo image URL location
+        confidence:
+          type: string
+          description: The level of certainty that the model has predicted the merchant
+    TransactionsResultsMetadata:
+      title: Metadata
+      description: Metadata associated with the response schema
+      allOf:
+      - $ref: '#/components/schemas/LegacyBudDateRangeMetadata'
+      - type: object
+        required:
+        - results
+        properties:
+          results:
+            type: number
+            description: Number of results returned
     BasicTransactionV2:
       title: Basic Transaction Schema
       type: object
@@ -254,10 +239,6 @@ components:
           enum:
           - Credit
           - Debit
-    BudMonetaryValue:
-      title: Monetary Value
-      description: "The value of the monetary amount. The value is formatted with the number of decimal places for the respective currency. \n\nExample: `10.98`\n"
-      type: string
     LegacyBudDateRangeMetadata:
       title: Metadata
       type: object
@@ -285,44 +266,63 @@ components:
             Example: `2023-03-17`
 
             '
-    OperationId:
-      title: Operation Id Field
-      type: string
-      description: A unique identifier/reference associated with a given endpoint/operation
-    MerchantIdV2:
-      title: Merchant ID Object
-      type: object
-      description: Details surrounding the identified merchant of the transaction
-      required:
-      - id
-      - name
-      - logo
-      - confidence
-      properties:
-        id:
-          type: string
-          description: A unique ID for the identified merchant
-        name:
-          type: string
-          description: The clean name of the identified merchant
-        logo:
-          type: string
-          description: The merchant's logo image URL location
-        confidence:
-          type: string
-          description: The level of certainty that the model has predicted the merchant
-    LoanTransactionV1:
-      title: Loan Transaction
-      allOf:
-      - $ref: '#/components/schemas/BasicTransactionV2'
-      - type: object
-        properties:
-          merchant:
-            allOf:
-            - type:
-              - object
-              - 'null'
-            - $ref: '#/components/schemas/MerchantIdV2'
+  parameters:
+    CustomerIdempotentIdentifier:
+      in: header
+      name: X-Customer-Idempotent-Identifier
+      schema:
+        type: string
+      description: 'Use the internal client identifier, provided in the `client_metadata` object when creating the customer in __Create Customer V3__, in place of an `X-Customer-Id` header.
+
+        '
+    CustomerId:
+      in: header
+      name: X-Customer-Id
+      schema:
+        type: string
+        format: uuid
+      required: true
+      description: A unique identifier for a Customer, as registered on Bud's platform.
+      example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
+    SmartFinderFrom:
+      in: header
+      name: X-From
+      required: false
+      schema:
+        type: string
+      examples:
+        date_only:
+          value: '2022-02-28'
+        RFC3339:
+          value: '2019-02-28T07:20:50.52Z'
+      description: Transaction from date, this works in pair with the 'X-To' parameter
+    CustomerSecret:
+      in: header
+      name: X-Customer-Secret
+      schema:
+        type: string
+      required: false
+      description: The Bud Customer secret used to encrypt customer data. This is required only if the customer secret is not already stored with Bud.
+    SmartFinderTo:
+      in: header
+      name: X-To
+      required: false
+      schema:
+        type: string
+      examples:
+        date_only:
+          value: '2022-03-30'
+        RFC3339:
+          value: '2019-03-30T07:20:50.52Z'
+      description: Transaction to date, this works in pair with the 'X-From' parameter
+    ClientId:
+      in: header
+      name: X-Client-Id
+      schema:
+        type: string
+      required: true
+      description: The API Client Identifier (Service Application Identifier).
+      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
   securitySchemes:
     Basic:
       type: http

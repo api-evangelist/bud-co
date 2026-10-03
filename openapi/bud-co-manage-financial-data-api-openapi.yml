@@ -121,21 +121,6 @@ paths:
           description: An unexpected error occurred on the server side.
 components:
   parameters:
-    ClientId:
-      in: header
-      name: X-Client-Id
-      schema:
-        type: string
-      required: true
-      description: The API Client Identifier (Service Application Identifier).
-      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
-    CustomerSecret:
-      in: header
-      name: X-Customer-Secret
-      schema:
-        type: string
-      required: false
-      description: The Bud Customer secret used to encrypt customer data. This is required only if the customer secret is not already stored with Bud.
     CustomerIdempotentIdentifier:
       in: header
       name: X-Customer-Idempotent-Identifier
@@ -160,15 +145,22 @@ components:
         type: string
       required: true
       description: Name of the provider (banking institution)
-  schemas:
-    Error:
-      title: Error Object
-      type:
-      - object
-      - 'null'
-      description: Contains a field specific error message
-      additionalProperties:
+    CustomerSecret:
+      in: header
+      name: X-Customer-Secret
+      schema:
         type: string
+      required: false
+      description: The Bud Customer secret used to encrypt customer data. This is required only if the customer secret is not already stored with Bud.
+    ClientId:
+      in: header
+      name: X-Client-Id
+      schema:
+        type: string
+      required: true
+      description: The API Client Identifier (Service Application Identifier).
+      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
+  schemas:
     ServerErrorResponse:
       title: Server Error Response
       type: object
@@ -222,6 +214,14 @@ components:
           anyOf:
           - $ref: '#/components/schemas/Error'
           - $ref: '#/components/schemas/Errors'
+    Error:
+      title: Error Object
+      type:
+      - object
+      - 'null'
+      description: Contains a field specific error message
+      additionalProperties:
+        type: string
   securitySchemes:
     Basic:
       type: http

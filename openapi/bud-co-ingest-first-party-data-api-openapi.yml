@@ -1272,399 +1272,40 @@ paths:
         5XX:
           description: An unexpected error occurred on the server side
 components:
-  parameters:
-    BudCategorisationModel:
-      in: header
-      name: X-Bud-Categorisation-Model
-      description: 'Overrides the default categorisation model for both the returned enrichment and the persisted enrichment.
-
-
-        Possible values can be retrieved from the __Retrieve Available Categorisation Models V2__ endpoint.
-
-
-        It should be noted that only models for the customers region will be used. For example, if a customer is created with the region "GB", then only "uk-v*" models will be utilised.
-
-        If a model is specified that cannot be used, then the default model will be used instead.
-
-        '
-      schema:
-        type: string
-    NoCustomerHeader:
-      in: header
-      name: X-No-Customer
-      schema:
-        type: boolean
-      description: 'If provided as true, the customer_id is not required in the request. This is only available with X-Disable-Synchronous not set or set to false.
-
-        **Note:** This functionality is not available by default. In order to use it, please raise a Support request.'
-      example: true
-    GenerateTransactionIDs:
-      in: header
-      name: X-Generate-Transaction-IDs
-      schema:
-        type: string
-        enum:
-        - 'true'
-      example: 'true'
-      description: 'Enable transaction ID generation based on the contents of the transaction data. The transaction ID field still needs to be provided, but it will not be validated or checked for uniqueness and instead overwritten with a generated value.
-
-        When generating IDs from transaction data, the following fields are taken into account: account ID, description, amount, currency and date.
-
-        '
-    DisableSynchronous:
-      in: header
-      name: X-Disable-Synchronous
-      description: 'If provided as true, the task will **not** be processed synchronously.
-
-
-        If false or the header is not included, the task **will** be processed synchronously.
-
-        '
-      schema:
-        type: boolean
-    IngestTransactionsV2ContentType:
-      in: header
-      name: Content-Type
-      required: true
-      schema:
-        type: string
-        enum:
-        - application/bud-transaction-v3+json
-        - application/bud-transaction-v2+json
-      description: Define the transactions' format for this request.
-    SignatureHeaderParameter:
-      in: header
-      name: X-Signature
-      description: The signed request body JWT
-      required: true
-      schema:
-        type: string
-    SigningIdHeaderParameter:
-      in: header
-      name: X-Signing-ID
-      description: The public key ID which should be used to verify the X-Signature header. Bud's list of public keys can be found at https://assets.thisisbud.com/bud-callback.jwks
-      required: true
-      schema:
-        type: string
-    ClientId:
-      in: header
-      name: X-Client-Id
-      schema:
-        type: string
-      required: true
-      description: The API Client Identifier (Service Application Identifier).
-      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
-    IngestAccountsContentType:
-      in: header
-      name: Content-Type
-      required: true
-      schema:
-        type: string
-        enum:
-        - application/bud-accounts+json
-      description: Define the transactions' format for this request.
-    TaskId:
-      in: path
-      name: task_id
-      schema:
-        type: string
-        format: uuid
-      required: true
-      description: Bud Task identifier returned from an async task for the requested action
   schemas:
-    CustomerID:
-      type: string
-      format: uuid
-      description: A unique identifier for a Customer, as registered on Bud's platform.
-      example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
-    IngestResponseV3SubTask:
-      title: Customer Ingest Task
-      description: A single customer ingest task status
-      type: object
-      oneOf:
-      - $ref: '#/components/schemas/IngestResponseV3SubTaskWithCustomerID'
-      - $ref: '#/components/schemas/IngestResponseV3SubTaskWithCustomerIdempotentIdentifier'
-      required:
-      - status
-      properties:
-        status:
-          title: Ingest Response Status
-          description: Ingest response status.
-          type: string
-          enum:
-          - Completed
-          - Failed
-          - Pending
-        result:
-          $ref: '#/components/schemas/IngestTaskResult'
-        error:
-          description: Any error messages describing why a sub task has failed.
-          type: object
-          additionalProperties: true
-    SynchronousEnrichmentsList:
+    TransactionWindowArray:
       type: array
-      description: 'The list of enrichments product to execute during the synchronous execution of the request. Based on this list, the transactions sent will be processed through a number of enrichment flows, and this drives the amount of additional information attached to each transactions in the synchronous process.
+      description: 'If not provided, the transaction window is inferred from the date of the first and last transactions.
 
-
-        The list of available enrichement products during the synchronous ingestion is the following:
-
-        - categories
-
-        - merchants
-
-
-        The default behaviour is to execute `categories` and `merchants`.
-
-
-        Note: This attribute doesn''t limit the execution of all Bud''s enrichments, we''ll still return a number of additional information (eg: tokens), but it switches on and off the two enrichments listed above.
+        Only a single window per customer account is supported.
 
         '
-      example:
-      - categories
-      - merchants
       items:
-        type: string
-        enum:
-        - categories
-        - merchants
-    BudTransactionType:
-      title: transaction_type
-      type: object
-      description: 'The code and a description of the transaction type. Providing these fields may help improve enrichment accuracy.
-
-        '
-      properties:
-        bud_code:
-          type: string
-          description: 'The code representing the type of the given transaction. This typically comes in the form of a proprietary code respective to the __provider__.
-
-
-            Current list of valid accepted codes:
-
-
-            | Code  | Meaning
-
-            |:------|:-------------------------------------------------------------------|
-
-            | DEB   | [Debit / Credit] Card                                              |
-
-            | CSQ   | Cash / Cheque(s)                                                   |
-
-            | CHG   | Charge                                                             |
-
-            | COR   | Correction                                                         |
-
-            | CPT   | Cashpoint / ATM                                                    |
-
-            | INT   | Interest                                                           |
-
-            | OTH   | Other                                                              |
-
-            | BAT   | Bank Transfer (e.g. FP/MP/IB/BACS/CHAPS/SWIFT)                     |
-
-            | DD    | Direct Debit                                                       |
-
-            | SO    | Standing Order                                                     |
-
-            '
-        description:
-          type: string
-          description: 'A human-readable description of the given __bud_code__.
-
-            example: `Contactless POS`
-
-            '
-    schemas-TransactionForSyncIngest:
-      title: Transaction
-      type: object
-      description: A financial transaction
-      required:
-      - transaction_id
-      - account_id
-      - description
-      - amount
-      - credit_debit_indicator
-      - status
-      - date_time
-      - suggested_description
-      properties:
-        transaction_id:
-          type: string
-          description: Unique identifier for the transaction. May be mutable depending on original ingestion source.
-        account_id:
-          type: string
-          description: Identifier for the account associated with the transaction.
-        description:
-          type: string
-          description: Description of the transaction.
-        credit_debit_indicator:
-          type: string
-          description: Credit/Debit Indicator
-          enum:
-          - credit
-          - debit
-        status:
-          type: string
-          description: Status of the transaction. Defaults to booked.
-          enum:
-          - booked
-          - pending
-          - declined
-        suggested_description:
-          type: string
-          description: The description Bud suggests client apps show for a given transaction.
-        suggested_logo:
-          type: string
-          description: The logo Bud suggests client apps show for a given transaction.
-        transaction_type:
-          $ref: '#/components/schemas/BudTransactionType'
-        amount:
-          $ref: '#/components/schemas/BudAmount'
-        date_time:
-          type: string
-          description: Date of the transaction compliant with RFC3339.
-        value_date_time:
-          type: string
-          description: Date the assets involved in the transaction transferred compliant with RFC3339. For credits this is the date that the asset becomes available, for debits this is the date that the asset ceased to be available
-        enrichments:
-          $ref: '#/components/schemas/SyncEnrichments'
-        merchant_category_code:
-          type: string
-          description: 'A Merchant Category Code (MCC) is a four-digit number listed in ISO 18245.  An MCC is used to classify a business by the types of goods or services it provides.
-
-            '
-        tags:
-          type: array
-          description: 'A list of potential tags associated with the transaction after contextual enrichment, which can be used for filtering.
-
-
-            Region and client specific.
-
-
-            | Value                   | Description                                               |
-
-            |:------------------------|:----------------------------------------------------------|
-
-            | `benefit`               | A government/non-profit benefit transaction               |
-
-            | `debt-collection`       | A transaction associated with a known debt-collector      |
-
-            | `loan`                  | A transaction associated with a loan                      |
-
-            | `hcst`                  | A transaction associated with a high cost short term loan |
-
-            | `income`                | A transaction associated with income                      |
-
-            | `pending`               | A transaction which has not been booked                   |
-
-            | `regular-transaction`   | A transaction predicted to occur with a regular frequency |
-
-            | `subscription`          | A transaction associated with a subscription service      |
-
-            | `online`                | A transaction associated with an online merchant          |
-
-            '
-          items:
-            type: string
-    IngestAccountIdentifiers:
-      title: Ingest Account Identifiers
-      type: object
-      description: Schema to define identifiers for a given account
-      required:
-      - type
-      - value
-      properties:
-        type:
-          type: string
-          description: The type of identifier detailed within the value field associated with the account
-          enum:
-          - uk_sort_code
-          - uk_account_number
-          - iban
-          - us_account_number
-          - pan
-        value:
-          type: string
-          description: The identifier associated with the account
-    CustomerSecret:
-      type: string
-      description: The Bud Customer secret used to encrypt customer data. This is required only if the customer secret is not already stored with Bud.
-    ReopenAccountsRequest:
-      title: Reopen Accounts Request
-      type: array
-      items:
-        type: object
-        oneOf:
-        - $ref: '#/components/schemas/IngestFirstPartyDataWithCustomerID'
-        - $ref: '#/components/schemas/IngestFirstPartyDataWithCustomerIdempotentIdentifier'
-        properties:
-          account_ids:
-            type: array
-            items:
-              type: string
-    ValidationInvalid:
-      type: array
-      title: Invalid Fields
-      description: list of invalid fields for a transaction
-      items:
-        type: string
+        $ref: '#/components/schemas/TransactionWindow'
     IngestAccountsRequest:
       title: Bud Accounts Request
       description: Ingest accounts expected request body.
       type: array
       items:
         $ref: '#/components/schemas/IngestCustomerWithAccounts'
-    Categories:
-      title: Categories
+    IngestStatusV3Response:
+      title: Ingestion Task Status Response
       type: object
-      description: 'Categories enrichment associated with a Transaction, as generated by Bud''s artificial intelligence models.  Currently two levels of category are supported, with `l1` being a coarse-grained category level and `l2` being more refined.
-
-        '
-      properties:
-        l1:
-          $ref: '#/components/schemas/Category'
-          description: Level 1 Category
-        l2:
-          $ref: '#/components/schemas/Category'
-          description: Level 2 Category
-    IngestCustomerWithAccounts:
-      title: Ingest Customer With Accounts
-      description: A customer with a accounts data.
-      type: object
-      required:
-      - accounts
-      oneOf:
-      - $ref: '#/components/schemas/IngestFirstPartyDataWithCustomerID'
-      - $ref: '#/components/schemas/IngestFirstPartyDataWithCustomerIdempotentIdentifier'
-      properties:
-        accounts:
-          type: array
-          description: List of accounts that belongs to the customer.
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/IngestCustomerAccount'
-    TaskNotFoundError:
-      type: object
-      title: Task Not Found
+      description: Report on the status of an ingestion task
       required:
       - operation_id
-      - code_id
-      - message
+      - data
+      - metadata
       properties:
         operation_id:
           $ref: '#/components/schemas/OperationId'
-        code_id:
-          type: string
-        message:
-          type: string
-          description: High level description on what has failed
-      example:
-        operation_id: ingest_transactions_get
-        code_id: not_found
-        message: Task not found
-    IngestTransactionsV3Request:
-      title: Bud V3 Transactions Request
-      description: Ingest transaction expected request body.
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/IngestResponseV3SubTask'
+        metadata:
+          $ref: '#/components/schemas/IngestStatusTaskMetadata'
+    TransactionSettlementV3Request:
       type: array
       items:
         type: object
@@ -1672,349 +1313,20 @@ components:
         - $ref: '#/components/schemas/IngestFirstPartyDataWithCustomerID'
         - $ref: '#/components/schemas/IngestFirstPartyDataWithCustomerIdempotentIdentifier'
         properties:
-          sync_enrichments:
-            $ref: '#/components/schemas/SynchronousEnrichmentsList'
           transactions:
             type: array
-            description: List of transactions belonging to the customer.
-            minItems: 1
             items:
-              $ref: '#/components/schemas/CustomerTransactionV3'
-          transaction_windows:
-            $ref: '#/components/schemas/TransactionWindowArray'
-    IngestV2SyncResponse:
-      title: Ingest Transactions V2 Sync Response
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/IngestV2Response'
-      - type: object
-        required:
-        - operation_id
-        - metadata
-        properties:
-          data:
-            type: array
-            items:
-              $ref: '#/components/schemas/IngestV2SyncResponseData'
-          metadata:
-            $ref: '#/components/schemas/IngestV2SyncMetadata'
-    BodyDecodeError:
-      type: object
-      title: JSON Decoding Error
-      required:
-      - operation_id
-      - code_id
-      - message
-      - errors
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        code_id:
-          type: string
-          enum:
-          - failed_body_decode
-        message:
-          type: string
-          description: 'High level description on what has failed '
-        errors:
-          type: object
-          description: Contains more details on the decoding error
-          required:
-          - decode_error
-          properties:
-            decode_error:
-              type: string
-    Token:
-      title: Token
-      type: object
-      description: The token item.
-      required:
-      - value
-      - confidence
-      properties:
-        value:
-          type: string
-        confidence:
-          type: string
-          description: Degree of belief of correct assignment, expressed as a probability.
-    FirstPartyIngestionGenericError:
-      type: object
-      title: Content Type Error
-      required:
-      - operation_id
-      - code_id
-      - message
-      - errors
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        code_id:
-          type: string
-          enum:
-          - failed_validation
-        message:
-          type: string
-          description: 'High level description on what has failed '
-        errors:
-          type: object
-          description: Error details
-          properties:
-            content_type:
-              type: string
-              description: The content type header provided in the request is unknown
-            <index>.customer_id:
-              type: string
-              description: Missing customer ID. Index prefix is the index of the customer in the request
-            <index>.customer_secret:
-              type: string
-              description: Missing customer secret. Index is the index of the customer in the request
-            <index>.accounts:
-              type: string
-              description: Missing customer accounts. Index is the index of the customer in the request
-      example:
-        operation_id: ingest_accounts_post
-        code_id: failed_validation
-        message: validation failure(s) in request payload
-        errors:
-          0.customer_secret: The customer secret is mandatory
-    Location:
-      title: Location
-      type: object
-      description: Location enrichment associated with a Transaction
-      properties:
-        address:
-          type: object
-          description: The address where the transaction occurred. The level of detail depends on the resolution with which we are able to detect the transaction location.
-          properties:
-            address_lines:
-              type: array
-              description: A list of all the address lines detected for the transaction. This could be anything from a full street address down to just the region.
-              items:
-                type: string
-            street_address:
-              type: string
-              description: The street address where the transaction occurred. Typically this will consist of the street number and street name with an optional suite.
-            city:
-              type: string
-              description: The city or town where the transaction occurred.
-            region:
-              type: string
-              description: The county or region where the transaction occurred.
-            postal_code:
-              type: string
-              description: The postcode where the transaction occurred.
-            country:
-              type: string
-              description: 'The ISO 3166-1 alpha-2 country code representing the country where the transaction occurred.
-
-
-                If a location could not be determined, but a `country_code` was supplied in the ingestion request; that value will be reflected here.
-
-                '
-        geolocation:
-          type: object
-          description: The geolocation where the transaction occurred. This is only available if we are able to narrow down the transaction location to an exact match.
-          properties:
-            latitude:
-              type: number
-              format: double
-              description: The latitudinal position where the transaction occurred.
-            longitude:
-              type: number
-              format: double
-              description: The longitudinal position where the transaction occurred.
-        tokens:
-          type: array
-          description: A list of substrings from the description identified as being relevant to the transaction location.
-          items:
-            type: string
-    FPIIngestSucceededWebhookBody:
-      title: FPI Ingestion Succeeded Webhook Payload
-      type: object
-      description: 'The payload sent to the client defined webhook (via the console) when an First Party Ingestion task succeeds.
-
-        '
-      required:
-      - data
-      properties:
-        data:
-          type: object
-          required:
-          - event
-          - task_id
-          - operation_id
-          properties:
-            event:
-              description: The event type
-              type: string
-              example: first_party_ingester.ingest.succeeded
-            task_id:
-              description: The associated task ID
-              type: string
-              example: 3928aca4-b73c-4f13-a540-1b3759e06d27
-            operation_id:
-              description: The endpoint ID the operation was related to
-              type: string
-              example: v2_ingest_transactions_post
-            subtask_details:
-              description: Details of the individual subtasks (customers) of the ingestion
-              type: array
-              items:
-                type: object
-                required:
-                - customer_id
-                properties:
-                  customer_id:
-                    type: string
-                    description: A unique identifier for a Customer, as registered on Bud's platform.
-                  customer_idempotent_identifier:
-                    type: string
-                    description: The `idempotent_identifier` provided when the customer given was created.
-    IngestResponseV3SubTaskWithCustomerIdempotentIdentifier:
-      title: With Customer Idempotent Identifier
-      properties:
-        customer_idempotent_identifier:
-          type: string
-          description: 'An internal client identifier. This identifier can then be used in place of `X-Customer-Id` across Bud''s endpoints.
-
-            '
-      required:
-      - customer_idempotent_identifier
-    BudCurrency:
-      title: Currency
-      description: 'The three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) of the monetary amount.
-
-
-        Example: `GBP`
-
-        '
-      type: string
-    IngestAccountDetails:
-      title: Ingest Account Details
-      type: object
-      description: Schema to define any further details about a given account
-      required:
-      - scheme_name
-      - identification
-      properties:
-        scheme_name:
-          type: string
-          description: Name of the scheme associated with the account
-        identification:
-          type: string
-          description: A unique identifier for the account
-        secondary_identification:
-          type: string
-          description: Any secondary identifier associated with the account
-        name:
-          type: string
-          description: The name of the account holder
-    BudMonetaryValue:
-      title: Monetary Value
-      description: "The value of the monetary amount. The value is formatted with the number of decimal places for the respective currency. \n\nExample: `10.98`\n"
-      type: string
-    BudClientAttributes:
-      title: Client Attributes
-      type: object
-      description: 'An optional map of key-value string pairs that allows clients to attach arbitrary metadata to the transaction.
-
-        This field can be used to store any relevant information specific to the client''s needs.
-
-        It accepts a maximum of 16 key-value pairs. With a maximum key length of 64 characters and a maximum value length of 256 characters.
-
-        '
-      properties:
-        key:
-          type: string
-          description: An arbitrary key-value pair for the client attribute.
-      example:
-        fraud_score: '0.8'
-        overdraft_used: 'true'
-    IngestAccountBalance:
-      title: Ingest Account Balance
-      type: object
-      description: Information surrounding a Customer's Account Balance
-      required:
-      - amount
-      - date_time
-      - type
-      - credit_debit_indicator
-      properties:
-        amount:
-          $ref: '#/components/schemas/InpAmount'
-        credit_debit_indicator:
-          type: string
-          description: To describe whether the account balance is in debit or credit
-          enum:
-          - incoming_credit
-          - outgoing_debit
-        credit_line:
-          items:
-            $ref: '#/components/schemas/IngestCreditLine'
-        date:
-          type: string
-          format: YYYY-MM-DD
-          deprecated: true
-          description: The date associated with the balance of the given account
-        time:
-          type: string
-          format: hh:mm:ss
-          deprecated: true
-          description: The time associated with the balance of the given account
-        date_time:
-          type: string
-          format: date-time
-          description: RFC 3339 format string of the date time of the balance
-        type:
-          type: string
-          description: 'Describes the state of the balance
-
-
-            | Value                     | Description                                               |
-
-            |:--------------------------|:----------------------------------------------------------|
-
-            | `ClosingAvailable`        | Closing balance of amount of money that is at the disposal of the account owner on the date specified.               |
-
-            | `ClosingBooked`           | Balance of the account at the end of the pre-agreed account reporting period. It is the sum of the opening booked balance at the beginning of the period and all entries booked to the account during the pre-agreed account reporting period.      |
-
-            | `ClosingCleared`          | Closing balance of amount of money that is cleared on the date specified.                     |
-
-            | `Expected`                | Balance, composed of booked entries and pending items known at the time of calculation, which projects the end of day balance if everything is booked on the account and no other entry is posted.  |
-
-            | `ForwardAvailable`        | Forward available balance of money that is at the disposal of the account owner on the date specified.               |
-
-            | `Information`             | Balance for informational purposes.      |
-
-            | `InterimAvailable`        | Available balance calculated in the course of the account servicer''s business day, at the time specified, and subject to further changes during the business day. The interim balance is calculated on the basis of booked credit and debit items during the calculation time/period specified.       |
-
-            | `InterimBooked`           | Balance calculated in the course of the account servicer''s business day, at the time specified, and subject to further changes during the business day. The interim balance is calculated on the basis of booked credit and debit items during the calculation time/period specified.       |
-
-            | `InterimCleared`          | Cleared balance calculated in the course of the account servicer''s business day, at the time specified, and subject to further changes during the business day.        |
-
-            | `OpeningAvailable`        | Opening balance of amount of money that is at the disposal of the account owner on the date specified.        |
-
-            | `OpeningBooked`           | Book balance of the account at the beginning of the account reporting period. It always equals the closing book balance from the previous report.        |
-
-            | `OpeningCleared`          | Opening balance of amount of money that is cleared on the date specified.       |
-
-            | `PreviouslyClosedBooked`  | Balance of the account at the previously closed account reporting period. The opening booked balance for the new period has to be equal to this balance.  |
-
-            '
-          enum:
-          - ClosingAvailable
-          - ClosingBooked
-          - ClosingCleared
-          - Expected
-          - ForwardAvailable
-          - Information
-          - InterimAvailable
-          - InterimBooked
-          - InterimCleared
-          - OpeningAvailable
-          - OpeningBooked
-          - OpeningCleared
-          - PreviouslyClosedBooked
+              type: object
+              required:
+              - transaction_id
+              - date_time
+              properties:
+                transaction_id:
+                  type: string
+                  description: The unique identifier of a transaction to be booked.
+                date_time:
+                  type: string
+                  description: "The datetime when the transaction transitioned to booked in the format [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339).\n\nExamples:\n  - `2023-01-17T17:29:51Z`\n  - `2023-01-17T17:29:51-08:00`\n"
     IngestCustomerAccount:
       title: Ingest Customer Account
       description: An account item.
@@ -2118,29 +1430,291 @@ components:
               relationship:
                 type: string
                 description: "The relationship that the individual holder has with the account.\nCurrently supported values include (but are not necessarily limited to):\n  - `sole`\n  - `joint`\n  - `delegate`\n  - `unknown`\n"
-    TransactionWindow:
+    BudTransactionType:
+      title: transaction_type
       type: object
-      title: Transaction Window
-      description: "The transaction window is used to describe the entire period for which you have provided full coverage for the transactions within the request. \n\nIt is used by Bud to ascertain periods of inactivity on the account(s) in question to ensure accurate data can be provided across downstream endpoints (e.g. Retrieve Balances Over Time).\n"
-      required:
-      - account_id
-      - start
-      - end
+      description: 'The code and a description of the transaction type. Providing these fields may help improve enrichment accuracy.
+
+        '
       properties:
+        bud_code:
+          type: string
+          description: 'The code representing the type of the given transaction. This typically comes in the form of a proprietary code respective to the __provider__.
+
+
+            Current list of valid accepted codes:
+
+
+            | Code  | Meaning
+
+            |:------|:-------------------------------------------------------------------|
+
+            | DEB   | [Debit / Credit] Card                                              |
+
+            | CSQ   | Cash / Cheque(s)                                                   |
+
+            | CHG   | Charge                                                             |
+
+            | COR   | Correction                                                         |
+
+            | CPT   | Cashpoint / ATM                                                    |
+
+            | INT   | Interest                                                           |
+
+            | OTH   | Other                                                              |
+
+            | BAT   | Bank Transfer (e.g. FP/MP/IB/BACS/CHAPS/SWIFT)                     |
+
+            | DD    | Direct Debit                                                       |
+
+            | SO    | Standing Order                                                     |
+
+            '
+        description:
+          type: string
+          description: 'A human-readable description of the given __bud_code__.
+
+            example: `Contactless POS`
+
+            '
+    IngestCreditLine:
+      title: Ingest Credit Line
+      type: object
+      description: A set of elements used to provide details on the credit line
+      required:
+      - amount
+      - type
+      properties:
+        included:
+          type: boolean
+          description: Indicates whether or not the credit line is included in the balance of the account, if not present, credit line is not included in the balance amount of the account
+        amount:
+          $ref: '#/components/schemas/InpAmount'
+        type:
+          type: string
+          description: Limit type, in a coded form
+          enum:
+          - Available
+          - Credit
+          - Emergency
+          - Pre-Agreed
+          - Temporary
+    IngestAccountDetails:
+      title: Ingest Account Details
+      type: object
+      description: Schema to define any further details about a given account
+      required:
+      - scheme_name
+      - identification
+      properties:
+        scheme_name:
+          type: string
+          description: Name of the scheme associated with the account
+        identification:
+          type: string
+          description: A unique identifier for the account
+        secondary_identification:
+          type: string
+          description: Any secondary identifier associated with the account
+        name:
+          type: string
+          description: The name of the account holder
+    TransactionSettlementV3Response:
+      title: Settle Transactions V3 Response
+      type: object
+      required:
+      - operation_id
+      - metadata
+      properties:
+        operation_id:
+          type: string
+        metadata:
+          type: object
+          required:
+          - task_id
+          properties:
+            task_id:
+              type: string
+              format: uuid
+              description: "The task_id of the async settlement task.\n\nThis can be used to check the status and errors of the task using the __Retrieve Ingestion Task Status V3__ endpoint. \n"
+            next_url:
+              type: string
+              description: The path to call to obtain the current status of the task.
+              example: /v2/ingest/status/4cef424c-1d7f-4cab-8be2-aee7e1774a00
+            next_url_delay:
+              type: number
+              description: The time in milliseconds that the client should wait before trying to retrieve the current status of the task.
+              example: 500
+    ValidationError:
+      type: object
+      title: Validation Errors
+      required:
+      - operation_id
+      - code_id
+      - message
+      - errors
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        code_id:
+          type: string
+          enum:
+          - failed_validation
+        message:
+          type: string
+          description: 'High level description on what has failed '
+        errors:
+          type: object
+          title: Map_of_customer_IDs
+          description: a map of customer IDs to transaction validation errors
+          properties:
+            missing_fields:
+              type: object
+              title: Map of transaction IDs
+              description: 'A map of transaction IDs to missing fields array.
+
+
+                If the transaction ID was missing use the request transaction array index to identify it.
+
+                See example
+
+                '
+              additionalProperties:
+                $ref: '#/components/schemas/ValidationMissing'
+            invalid_fields:
+              type: object
+              title: Map of transaction IDs
+              description: 'A map of transaction IDs to invalid fields array.
+
+
+                If the transaction ID was missing use the request transaction array index to identify it.
+
+                See example
+
+                '
+              additionalProperties:
+                $ref: '#/components/schemas/ValidationInvalid'
+      example:
+        operation_id: enrich_transactions_post
+        code_id: failed_validation
+        message: validation failure(s) in request payload
+        errors:
+          1db8c4b5-e5ae-429e-947b-6a4616ffc717:
+            missing_fields:
+              8b13ac45-9fe6-4c17-8c6d-b60ab2b4edad:
+              - description
+              - customer_id
+              ba466961-d623-4173-9001-2f6487a9a41e:
+              - customer_id
+              tx-1:
+              - transaction_id
+              578f24f2-5046-463a-bca6-239e0dfac7fa:
+              - amount
+            invalid_fields:
+              8b13ac45-9fe6-4c17-8c6d-b60ab2b4edad:
+              - date
+              ba466961-d623-4173-9001-2f6487a9a41e:
+              - date
+    schemas-TransactionForSyncIngest:
+      title: Transaction
+      type: object
+      description: A financial transaction
+      required:
+      - transaction_id
+      - account_id
+      - description
+      - amount
+      - credit_debit_indicator
+      - status
+      - date_time
+      - suggested_description
+      properties:
+        transaction_id:
+          type: string
+          description: Unique identifier for the transaction. May be mutable depending on original ingestion source.
         account_id:
           type: string
-          description: The account identifier that the transaction belongs to
-          example: 2f5b2055-6253-4cd0-b646-06788342a609
-        start:
+          description: Identifier for the account associated with the transaction.
+        description:
           type: string
-          format: date-time
-          description: The date detailing the start of the transaction window, compliant with RFC3339
-          example: '2022-05-10T23:00:00Z'
-        end:
+          description: Description of the transaction.
+        credit_debit_indicator:
           type: string
-          format: date-time
-          description: The date detailing the end of the transaction window, compliant with RFC3339
-          example: '2022-10-10T23:00:00Z'
+          description: Credit/Debit Indicator
+          enum:
+          - credit
+          - debit
+        status:
+          type: string
+          description: Status of the transaction. Defaults to booked.
+          enum:
+          - booked
+          - pending
+          - declined
+        suggested_description:
+          type: string
+          description: The description Bud suggests client apps show for a given transaction.
+        suggested_logo:
+          type: string
+          description: The logo Bud suggests client apps show for a given transaction.
+        transaction_type:
+          $ref: '#/components/schemas/BudTransactionType'
+        amount:
+          $ref: '#/components/schemas/BudAmount'
+        date_time:
+          type: string
+          description: Date of the transaction compliant with RFC3339.
+        value_date_time:
+          type: string
+          description: Date the assets involved in the transaction transferred compliant with RFC3339. For credits this is the date that the asset becomes available, for debits this is the date that the asset ceased to be available
+        enrichments:
+          $ref: '#/components/schemas/SyncEnrichments'
+        merchant_category_code:
+          type: string
+          description: 'A Merchant Category Code (MCC) is a four-digit number listed in ISO 18245.  An MCC is used to classify a business by the types of goods or services it provides.
+
+            '
+        tags:
+          type: array
+          description: 'A list of potential tags associated with the transaction after contextual enrichment, which can be used for filtering.
+
+
+            Region and client specific.
+
+
+            | Value                   | Description                                               |
+
+            |:------------------------|:----------------------------------------------------------|
+
+            | `benefit`               | A government/non-profit benefit transaction               |
+
+            | `debt-collection`       | A transaction associated with a known debt-collector      |
+
+            | `loan`                  | A transaction associated with a loan                      |
+
+            | `hcst`                  | A transaction associated with a high cost short term loan |
+
+            | `income`                | A transaction associated with income                      |
+
+            | `pending`               | A transaction which has not been booked                   |
+
+            | `regular-transaction`   | A transaction predicted to occur with a regular frequency |
+
+            | `subscription`          | A transaction associated with a subscription service      |
+
+            | `online`                | A transaction associated with an online merchant          |
+
+            '
+          items:
+            type: string
+    IngestV2Response:
+      type: object
+      required:
+      - operation_id
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+          example: v2_ingest_transactions_post
     CustomerTransactionV3:
       title: Customer Transaction V3
       description: A schema for Bud V3 transaction format
@@ -2247,14 +1821,44 @@ components:
             identifier:
               type: string
               description: An identifier for the account of the other party
-    IngestV2Response:
+    InpAmount:
+      title: Amount
+      description: Amount structure
+      allOf:
+      - type: object
+        properties:
+          local_currency:
+            allOf:
+            - description: 'The original three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) the payment was transacted in.
+
+
+                Example: `USD`
+
+                '
+            - $ref: '#/components/schemas/BudCurrency'
+          local_value:
+            allOf:
+            - description: 'The original value of the payment in the local currency. The value is formatted with the number of decimal places for the respective currency.
+
+
+                Example: `10.98`
+
+                '
+            - $ref: '#/components/schemas/BudMonetaryValue'
+      - $ref: '#/components/schemas/BudAmount'
+    Categories:
+      title: Categories
       type: object
-      required:
-      - operation_id
+      description: 'Categories enrichment associated with a Transaction, as generated by Bud''s artificial intelligence models.  Currently two levels of category are supported, with `l1` being a coarse-grained category level and `l2` being more refined.
+
+        '
       properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-          example: v2_ingest_transactions_post
+        l1:
+          $ref: '#/components/schemas/Category'
+          description: Level 1 Category
+        l2:
+          $ref: '#/components/schemas/Category'
+          description: Level 2 Category
     OverallIngestResponseStatus:
       title: Ingest Task Overall Status
       description: Ingest response status.
@@ -2264,6 +1868,631 @@ components:
       - Pending
       - Failed
       - PartialCompleted
+    IngestResponseV3SubTaskWithCustomerIdempotentIdentifier:
+      title: With Customer Idempotent Identifier
+      properties:
+        customer_idempotent_identifier:
+          type: string
+          description: 'An internal client identifier. This identifier can then be used in place of `X-Customer-Id` across Bud''s endpoints.
+
+            '
+      required:
+      - customer_idempotent_identifier
+    IngestFirstPartyDataWithCustomerIdempotentIdentifier:
+      title: With Customer Idempotent Identifier
+      properties:
+        customer_idempotent_identifier:
+          type: string
+          description: 'An internal client identifier. If specified, a Bud customer will either be automatically created, or utilised to ingest the given data.
+
+            This identifier can then be used in place of `X-Customer-Id` across Bud''s endpoints.
+
+            '
+      required:
+      - customer_idempotent_identifier
+    OperationId:
+      title: Operation Id Field
+      type: string
+      description: A unique identifier/reference associated with a given endpoint/operation
+    FirstPartyIngestionGenericError:
+      type: object
+      title: Content Type Error
+      required:
+      - operation_id
+      - code_id
+      - message
+      - errors
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        code_id:
+          type: string
+          enum:
+          - failed_validation
+        message:
+          type: string
+          description: 'High level description on what has failed '
+        errors:
+          type: object
+          description: Error details
+          properties:
+            content_type:
+              type: string
+              description: The content type header provided in the request is unknown
+            <index>.customer_id:
+              type: string
+              description: Missing customer ID. Index prefix is the index of the customer in the request
+            <index>.customer_secret:
+              type: string
+              description: Missing customer secret. Index is the index of the customer in the request
+            <index>.accounts:
+              type: string
+              description: Missing customer accounts. Index is the index of the customer in the request
+      example:
+        operation_id: ingest_accounts_post
+        code_id: failed_validation
+        message: validation failure(s) in request payload
+        errors:
+          0.customer_secret: The customer secret is mandatory
+    Token:
+      title: Token
+      type: object
+      description: The token item.
+      required:
+      - value
+      - confidence
+      properties:
+        value:
+          type: string
+        confidence:
+          type: string
+          description: Degree of belief of correct assignment, expressed as a probability.
+    BodyDecodeError:
+      type: object
+      title: JSON Decoding Error
+      required:
+      - operation_id
+      - code_id
+      - message
+      - errors
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        code_id:
+          type: string
+          enum:
+          - failed_body_decode
+        message:
+          type: string
+          description: 'High level description on what has failed '
+        errors:
+          type: object
+          description: Contains more details on the decoding error
+          required:
+          - decode_error
+          properties:
+            decode_error:
+              type: string
+    BudClientAttributes:
+      title: Client Attributes
+      type: object
+      description: 'An optional map of key-value string pairs that allows clients to attach arbitrary metadata to the transaction.
+
+        This field can be used to store any relevant information specific to the client''s needs.
+
+        It accepts a maximum of 16 key-value pairs. With a maximum key length of 64 characters and a maximum value length of 256 characters.
+
+        '
+      properties:
+        key:
+          type: string
+          description: An arbitrary key-value pair for the client attribute.
+      example:
+        fraud_score: '0.8'
+        overdraft_used: 'true'
+    BudCurrency:
+      title: Currency
+      description: 'The three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) of the monetary amount.
+
+
+        Example: `GBP`
+
+        '
+      type: string
+    IngestV2SyncResponse:
+      title: Ingest Transactions V2 Sync Response
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/IngestV2Response'
+      - type: object
+        required:
+        - operation_id
+        - metadata
+        properties:
+          data:
+            type: array
+            items:
+              $ref: '#/components/schemas/IngestV2SyncResponseData'
+          metadata:
+            $ref: '#/components/schemas/IngestV2SyncMetadata'
+    IngestResponseV3SubTask:
+      title: Customer Ingest Task
+      description: A single customer ingest task status
+      type: object
+      oneOf:
+      - $ref: '#/components/schemas/IngestResponseV3SubTaskWithCustomerID'
+      - $ref: '#/components/schemas/IngestResponseV3SubTaskWithCustomerIdempotentIdentifier'
+      required:
+      - status
+      properties:
+        status:
+          title: Ingest Response Status
+          description: Ingest response status.
+          type: string
+          enum:
+          - Completed
+          - Failed
+          - Pending
+        result:
+          $ref: '#/components/schemas/IngestTaskResult'
+        error:
+          description: Any error messages describing why a sub task has failed.
+          type: object
+          additionalProperties: true
+    IngestCustomerWithAccounts:
+      title: Ingest Customer With Accounts
+      description: A customer with a accounts data.
+      type: object
+      required:
+      - accounts
+      oneOf:
+      - $ref: '#/components/schemas/IngestFirstPartyDataWithCustomerID'
+      - $ref: '#/components/schemas/IngestFirstPartyDataWithCustomerIdempotentIdentifier'
+      properties:
+        accounts:
+          type: array
+          description: List of accounts that belongs to the customer.
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/IngestCustomerAccount'
+    CustomerID:
+      type: string
+      format: uuid
+      description: A unique identifier for a Customer, as registered on Bud's platform.
+      example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
+    TransactionSettlementV3WebookBody:
+      title: Transaction Settlement Webhook Payload
+      type: object
+      description: 'The payload send to the client defined webhook (via the console) when a Book or Decline settlement task is Completed.
+
+        '
+      required:
+      - data
+      properties:
+        data:
+          type: object
+          required:
+          - event
+          - operation_id
+          - status
+          - task_id
+          properties:
+            event:
+              description: The type of settlement task that completed.
+              type: string
+              enum:
+              - first_party_ingester.transactions.booked
+              - first_party_ingester.transactions.declined
+            operation_id:
+              description: The operation ID of settlement task that completed.
+              type: string
+              enum:
+              - v3_ingest_transactions_book_post
+              - v3_ingest_transactions_decline_post
+            status:
+              description: The status of the settlement task that completed.
+              type: string
+              enum:
+              - Completed
+              - PartialCompleted
+              - Failed
+            task_id:
+              description: "The task_id of the settlement task that completed.\n\nThis can be used to check full status and errors of the task using the __Retrieve Ingestion Task Status V3__ endpoint. \n"
+              type: string
+    IngestTransactionsV3Request:
+      title: Bud V3 Transactions Request
+      description: Ingest transaction expected request body.
+      type: array
+      items:
+        type: object
+        oneOf:
+        - $ref: '#/components/schemas/IngestFirstPartyDataWithCustomerID'
+        - $ref: '#/components/schemas/IngestFirstPartyDataWithCustomerIdempotentIdentifier'
+        properties:
+          sync_enrichments:
+            $ref: '#/components/schemas/SynchronousEnrichmentsList'
+          transactions:
+            type: array
+            description: List of transactions belonging to the customer.
+            minItems: 1
+            items:
+              $ref: '#/components/schemas/CustomerTransactionV3'
+          transaction_windows:
+            $ref: '#/components/schemas/TransactionWindowArray'
+    IngestTaskResult:
+      title: Ingestion Task Result
+      type: string
+      description: 'Indicates the outcome of the ingest task. Either success or various error codes:
+
+
+        | code | description |
+
+        | ---- | ----------- |
+
+        | success | Ingestion completed successfully. Data is now available. |
+
+        | validation_error | The request format is invalid. Please review the endpoint documentation for correct parameters and headers. |
+
+        | data_mapping_error | The data payload does not match the expected schema. Ensure your data aligns with the defined structure. |
+
+        | internal_error | Something went wrong on our side. Please retry your request later. |
+
+        | timed_out | The task did not complete in due time. |
+
+        '
+    TransactionWindow:
+      type: object
+      title: Transaction Window
+      description: "The transaction window is used to describe the entire period for which you have provided full coverage for the transactions within the request. \n\nIt is used by Bud to ascertain periods of inactivity on the account(s) in question to ensure accurate data can be provided across downstream endpoints (e.g. Retrieve Balances Over Time).\n"
+      required:
+      - account_id
+      - start
+      - end
+      properties:
+        account_id:
+          type: string
+          description: The account identifier that the transaction belongs to
+          example: 2f5b2055-6253-4cd0-b646-06788342a609
+        start:
+          type: string
+          format: date-time
+          description: The date detailing the start of the transaction window, compliant with RFC3339
+          example: '2022-05-10T23:00:00Z'
+        end:
+          type: string
+          format: date-time
+          description: The date detailing the end of the transaction window, compliant with RFC3339
+          example: '2022-10-10T23:00:00Z'
+    ReopenAccountsRequest:
+      title: Reopen Accounts Request
+      type: array
+      items:
+        type: object
+        oneOf:
+        - $ref: '#/components/schemas/IngestFirstPartyDataWithCustomerID'
+        - $ref: '#/components/schemas/IngestFirstPartyDataWithCustomerIdempotentIdentifier'
+        properties:
+          account_ids:
+            type: array
+            items:
+              type: string
+    BadRequestErrorWihoutErrRequired:
+      type: object
+      title: JSON Decoding Error
+      required:
+      - operation_id
+      - code_id
+      - message
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        code_id:
+          type: string
+        message:
+          type: string
+          description: High level description of what has failed
+        errors:
+          type: object
+          description: Contains more details on the decoding error
+    CloseAccountsRequest:
+      title: Close Accounts Request
+      type: array
+      items:
+        type: object
+        oneOf:
+        - $ref: '#/components/schemas/IngestFirstPartyDataWithCustomerID'
+        - $ref: '#/components/schemas/IngestFirstPartyDataWithCustomerIdempotentIdentifier'
+        properties:
+          account_ids:
+            type: array
+            items:
+              type: string
+          metadata:
+            type: object
+            properties:
+              as_of:
+                type: string
+                example: '2025-09-24T14:55:09Z'
+                description: The datetime that the accounts closed in the format [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339). If not provided, the current datetime will be used.
+    IngestV2Metadata:
+      title: Created Task Details
+      description: Metadata on the created task, including the task_id
+      type: object
+      required:
+      - task_id
+      properties:
+        task_id:
+          type: string
+          format: uuid
+          description: Can be used with the transaction status endpoint to retrieve the status of the full enriched process
+        next_url:
+          type: string
+          description: The path to call to obtain the current status of the task.
+          example: /v2/ingest/status/4cef424c-1d7f-4cab-8be2-aee7e1774a00
+        next_url_delay:
+          type: number
+          description: The time in milliseconds that the client should wait before trying to retrieve the current status of the task.
+          example: 500
+    IngestV2AsyncResponse:
+      title: Ingest Transactions V2 Async Response
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/IngestV2Response'
+      - type: object
+        required:
+        - operation_id
+        - metadata
+        properties:
+          metadata:
+            $ref: '#/components/schemas/IngestV2Metadata'
+    IngestFirstPartyDataWithCustomerID:
+      title: With Customer ID
+      properties:
+        customer_id:
+          $ref: '#/components/schemas/CustomerID'
+        customer_secret:
+          $ref: '#/components/schemas/CustomerSecret'
+      required:
+      - customer_id
+    ValidationMissing:
+      type: array
+      title: Missing Fields
+      description: list of required missing fields for a transaction
+      items:
+        type: string
+    IngestV2SyncResponseData:
+      title: Enriched Customer Transactions
+      type: object
+      oneOf:
+      - $ref: '#/components/schemas/IngestResponseV3SubTaskWithCustomerID'
+      - $ref: '#/components/schemas/IngestResponseV3SubTaskWithCustomerIdempotentIdentifier'
+      required:
+      - enriched_transactions
+      properties:
+        enriched_transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/schemas-TransactionForSyncIngest'
+    IngestResponseV3SubTaskWithCustomerID:
+      title: With Customer ID
+      properties:
+        customer_id:
+          $ref: '#/components/schemas/CustomerID'
+      required:
+      - customer_id
+    CustomerSecret:
+      type: string
+      description: The Bud Customer secret used to encrypt customer data. This is required only if the customer secret is not already stored with Bud.
+    BudAmount:
+      title: Standard Bud Amount
+      type: object
+      description: The monetary amount.
+      required:
+      - value
+      - currency
+      properties:
+        value:
+          $ref: '#/components/schemas/BudMonetaryValue'
+        currency:
+          $ref: '#/components/schemas/BudCurrency'
+    BudMonetaryValue:
+      title: Monetary Value
+      description: "The value of the monetary amount. The value is formatted with the number of decimal places for the respective currency. \n\nExample: `10.98`\n"
+      type: string
+    TaskNotFoundError:
+      type: object
+      title: Task Not Found
+      required:
+      - operation_id
+      - code_id
+      - message
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        code_id:
+          type: string
+        message:
+          type: string
+          description: High level description on what has failed
+      example:
+        operation_id: ingest_transactions_get
+        code_id: not_found
+        message: Task not found
+    SyncEnrichments:
+      title: Enrichments
+      type: object
+      description: Contextual enrichments associated with a Transaction
+      properties:
+        categories:
+          $ref: '#/components/schemas/Categories'
+        merchant:
+          $ref: '#/components/schemas/Merchant'
+        processor:
+          $ref: '#/components/schemas/Processor'
+        location:
+          $ref: '#/components/schemas/Location'
+        transaction_types:
+          type: array
+          description: Transaction types associated with the transaction
+          items:
+            type: string
+        names:
+          type: array
+          description: Names that were detected in the transaction description
+          items:
+            type: string
+    Location:
+      title: Location
+      type: object
+      description: Location enrichment associated with a Transaction
+      properties:
+        address:
+          type: object
+          description: The address where the transaction occurred. The level of detail depends on the resolution with which we are able to detect the transaction location.
+          properties:
+            address_lines:
+              type: array
+              description: A list of all the address lines detected for the transaction. This could be anything from a full street address down to just the region.
+              items:
+                type: string
+            street_address:
+              type: string
+              description: The street address where the transaction occurred. Typically this will consist of the street number and street name with an optional suite.
+            city:
+              type: string
+              description: The city or town where the transaction occurred.
+            region:
+              type: string
+              description: The county or region where the transaction occurred.
+            postal_code:
+              type: string
+              description: The postcode where the transaction occurred.
+            country:
+              type: string
+              description: 'The ISO 3166-1 alpha-2 country code representing the country where the transaction occurred.
+
+
+                If a location could not be determined, but a `country_code` was supplied in the ingestion request; that value will be reflected here.
+
+                '
+        geolocation:
+          type: object
+          description: The geolocation where the transaction occurred. This is only available if we are able to narrow down the transaction location to an exact match.
+          properties:
+            latitude:
+              type: number
+              format: double
+              description: The latitudinal position where the transaction occurred.
+            longitude:
+              type: number
+              format: double
+              description: The longitudinal position where the transaction occurred.
+        tokens:
+          type: array
+          description: A list of substrings from the description identified as being relevant to the transaction location.
+          items:
+            type: string
+    IngestV2SyncMetadata:
+      title: Created Task Details
+      description: Metadata on the created task, including the task_id
+      type: object
+      required:
+      - task_id
+      properties:
+        task_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Can be used with the transaction status endpoint to retrieve the status of the full enriched process
+        next_url:
+          type: string
+          description: The path to call to obtain the current status of the task.
+          example: /v2/ingest/status/4cef424c-1d7f-4cab-8be2-aee7e1774a00
+        next_url_delay:
+          type: number
+          description: The time in milliseconds that the client should wait before trying to retrieve the current status of the task.
+          example: 500
+    Merchant:
+      title: Merchant
+      type: object
+      description: 'Merchant enrichment associated with a Transaction, as generated using a combination of Bud''s artificial  intelligence models and database of known merchants.
+
+        '
+      properties:
+        id:
+          type: string
+          description: UUID corresponding to the merchant, if available. Subject to version control.
+        slug:
+          type: string
+          description: Unique human readable identifier of the merchant. Not subject to version control.
+        display_name:
+          type: string
+          description: UI friendly display name for the merchant.
+        logo:
+          type: string
+          description: URL supplying merchant logo, if available.
+        tokens:
+          type: array
+          description: 'A list of tokens calculated from the transaction model, used to identify the Merchant.  This list is often present even if the merchant details (id, slug, disply_name, logo) are not returned.
+
+            '
+          items:
+            $ref: '#/components/schemas/Token'
+        website:
+          type: string
+          description: URL supplying merchant website, if available.
+        tags:
+          type: array
+          items:
+            type: string
+          description: A list of tags describing the merchant
+    IngestAccountIdentifiers:
+      title: Ingest Account Identifiers
+      type: object
+      description: Schema to define identifiers for a given account
+      required:
+      - type
+      - value
+      properties:
+        type:
+          type: string
+          description: The type of identifier detailed within the value field associated with the account
+          enum:
+          - uk_sort_code
+          - uk_account_number
+          - iban
+          - us_account_number
+          - pan
+        value:
+          type: string
+          description: The identifier associated with the account
+    SynchronousEnrichmentsList:
+      type: array
+      description: 'The list of enrichments product to execute during the synchronous execution of the request. Based on this list, the transactions sent will be processed through a number of enrichment flows, and this drives the amount of additional information attached to each transactions in the synchronous process.
+
+
+        The list of available enrichement products during the synchronous ingestion is the following:
+
+        - categories
+
+        - merchants
+
+
+        The default behaviour is to execute `categories` and `merchants`.
+
+
+        Note: This attribute doesn''t limit the execution of all Bud''s enrichments, we''ll still return a number of additional information (eg: tokens), but it switches on and off the two enrichments listed above.
+
+        '
+      example:
+      - categories
+      - merchants
+      items:
+        type: string
+        enum:
+        - categories
+        - merchants
     AccountsDataValidationError:
       type: object
       title: Accounts validation error
@@ -2328,65 +2557,48 @@ components:
             invalid_fields:
               accounts[0]:
               - currency
-    InpAmount:
-      title: Amount
-      description: Amount structure
-      allOf:
-      - type: object
-        properties:
-          local_currency:
-            allOf:
-            - description: 'The original three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) the payment was transacted in.
-
-
-                Example: `USD`
-
-                '
-            - $ref: '#/components/schemas/BudCurrency'
-          local_value:
-            allOf:
-            - description: 'The original value of the payment in the local currency. The value is formatted with the number of decimal places for the respective currency.
-
-
-                Example: `10.98`
-
-                '
-            - $ref: '#/components/schemas/BudMonetaryValue'
-      - $ref: '#/components/schemas/BudAmount'
-    Merchant:
-      title: Merchant
+    FPIIngestSucceededWebhookBody:
+      title: FPI Ingestion Succeeded Webhook Payload
       type: object
-      description: 'Merchant enrichment associated with a Transaction, as generated using a combination of Bud''s artificial  intelligence models and database of known merchants.
+      description: 'The payload sent to the client defined webhook (via the console) when an First Party Ingestion task succeeds.
 
         '
+      required:
+      - data
       properties:
-        id:
-          type: string
-          description: UUID corresponding to the merchant, if available. Subject to version control.
-        slug:
-          type: string
-          description: Unique human readable identifier of the merchant. Not subject to version control.
-        display_name:
-          type: string
-          description: UI friendly display name for the merchant.
-        logo:
-          type: string
-          description: URL supplying merchant logo, if available.
-        tokens:
-          type: array
-          description: 'A list of tokens calculated from the transaction model, used to identify the Merchant.  This list is often present even if the merchant details (id, slug, disply_name, logo) are not returned.
-
-            '
-          items:
-            $ref: '#/components/schemas/Token'
-        website:
-          type: string
-          description: URL supplying merchant website, if available.
-        tags:
-          type: array
-          items:
-            type: string
-          description: A list of tags describing the merchant
+        data:
+          type: object
+          required:
+          - event
+          - task_id
+          - operation_id
+          properties:
+            event:
+              description: The event type
+              type: string
+              example: first_party_ingester.ingest.succeeded
+            task_id:
+              description: The associated task ID
+              type: string
+              example: 3928aca4-b73c-4f13-a540-1b3759e06d27
+            operation_id:
+              description: The endpoint ID the operation was related to
+              type: string
+              example: v2_ingest_transactions_post
+            subtask_details:
+              description: Details of the individual subtasks (customers) of the ingestion
+              type: array
+              items:
+                type: object
+                required:
+                - customer_id
+                properties:
+                  customer_id:
+                    type: string
+                    description: A unique identifier for a Customer, as registered on Bud's platform.
+                  customer_idempotent_identifier:
+                    type: string
+                    description: The `idempotent_identifier` provided when the customer given was created.
     Processor:
       title: Processor
       type: object
@@ -2416,329 +2628,111 @@ components:
         website:
           type: string
           description: URL supplying merchant website, if available.
-    IngestV2SyncResponseData:
-      title: Enriched Customer Transactions
+    IngestAccountBalance:
+      title: Ingest Account Balance
       type: object
-      oneOf:
-      - $ref: '#/components/schemas/IngestResponseV3SubTaskWithCustomerID'
-      - $ref: '#/components/schemas/IngestResponseV3SubTaskWithCustomerIdempotentIdentifier'
-      required:
-      - enriched_transactions
-      properties:
-        enriched_transactions:
-          type: array
-          items:
-            $ref: '#/components/schemas/schemas-TransactionForSyncIngest'
-    CloseAccountsRequest:
-      title: Close Accounts Request
-      type: array
-      items:
-        type: object
-        oneOf:
-        - $ref: '#/components/schemas/IngestFirstPartyDataWithCustomerID'
-        - $ref: '#/components/schemas/IngestFirstPartyDataWithCustomerIdempotentIdentifier'
-        properties:
-          account_ids:
-            type: array
-            items:
-              type: string
-          metadata:
-            type: object
-            properties:
-              as_of:
-                type: string
-                example: '2025-09-24T14:55:09Z'
-                description: The datetime that the accounts closed in the format [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339). If not provided, the current datetime will be used.
-    BadRequestErrorWihoutErrRequired:
-      type: object
-      title: JSON Decoding Error
-      required:
-      - operation_id
-      - code_id
-      - message
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        code_id:
-          type: string
-        message:
-          type: string
-          description: High level description of what has failed
-        errors:
-          type: object
-          description: Contains more details on the decoding error
-    IngestV2SyncMetadata:
-      title: Created Task Details
-      description: Metadata on the created task, including the task_id
-      type: object
-      required:
-      - task_id
-      properties:
-        task_id:
-          type:
-          - string
-          - 'null'
-          format: uuid
-          description: Can be used with the transaction status endpoint to retrieve the status of the full enriched process
-        next_url:
-          type: string
-          description: The path to call to obtain the current status of the task.
-          example: /v2/ingest/status/4cef424c-1d7f-4cab-8be2-aee7e1774a00
-        next_url_delay:
-          type: number
-          description: The time in milliseconds that the client should wait before trying to retrieve the current status of the task.
-          example: 500
-    IngestStatusV3Response:
-      title: Ingestion Task Status Response
-      type: object
-      description: Report on the status of an ingestion task
-      required:
-      - operation_id
-      - data
-      - metadata
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/IngestResponseV3SubTask'
-        metadata:
-          $ref: '#/components/schemas/IngestStatusTaskMetadata'
-    IngestCreditLine:
-      title: Ingest Credit Line
-      type: object
-      description: A set of elements used to provide details on the credit line
+      description: Information surrounding a Customer's Account Balance
       required:
       - amount
+      - date_time
       - type
+      - credit_debit_indicator
       properties:
-        included:
-          type: boolean
-          description: Indicates whether or not the credit line is included in the balance of the account, if not present, credit line is not included in the balance amount of the account
         amount:
           $ref: '#/components/schemas/InpAmount'
+        credit_debit_indicator:
+          type: string
+          description: To describe whether the account balance is in debit or credit
+          enum:
+          - incoming_credit
+          - outgoing_debit
+        credit_line:
+          items:
+            $ref: '#/components/schemas/IngestCreditLine'
+        date:
+          type: string
+          format: YYYY-MM-DD
+          deprecated: true
+          description: The date associated with the balance of the given account
+        time:
+          type: string
+          format: hh:mm:ss
+          deprecated: true
+          description: The time associated with the balance of the given account
+        date_time:
+          type: string
+          format: date-time
+          description: RFC 3339 format string of the date time of the balance
         type:
           type: string
-          description: Limit type, in a coded form
+          description: 'Describes the state of the balance
+
+
+            | Value                     | Description                                               |
+
+            |:--------------------------|:----------------------------------------------------------|
+
+            | `ClosingAvailable`        | Closing balance of amount of money that is at the disposal of the account owner on the date specified.               |
+
+            | `ClosingBooked`           | Balance of the account at the end of the pre-agreed account reporting period. It is the sum of the opening booked balance at the beginning of the period and all entries booked to the account during the pre-agreed account reporting period.      |
+
+            | `ClosingCleared`          | Closing balance of amount of money that is cleared on the date specified.                     |
+
+            | `Expected`                | Balance, composed of booked entries and pending items known at the time of calculation, which projects the end of day balance if everything is booked on the account and no other entry is posted.  |
+
+            | `ForwardAvailable`        | Forward available balance of money that is at the disposal of the account owner on the date specified.               |
+
+            | `Information`             | Balance for informational purposes.      |
+
+            | `InterimAvailable`        | Available balance calculated in the course of the account servicer''s business day, at the time specified, and subject to further changes during the business day. The interim balance is calculated on the basis of booked credit and debit items during the calculation time/period specified.       |
+
+            | `InterimBooked`           | Balance calculated in the course of the account servicer''s business day, at the time specified, and subject to further changes during the business day. The interim balance is calculated on the basis of booked credit and debit items during the calculation time/period specified.       |
+
+            | `InterimCleared`          | Cleared balance calculated in the course of the account servicer''s business day, at the time specified, and subject to further changes during the business day.        |
+
+            | `OpeningAvailable`        | Opening balance of amount of money that is at the disposal of the account owner on the date specified.        |
+
+            | `OpeningBooked`           | Book balance of the account at the beginning of the account reporting period. It always equals the closing book balance from the previous report.        |
+
+            | `OpeningCleared`          | Opening balance of amount of money that is cleared on the date specified.       |
+
+            | `PreviouslyClosedBooked`  | Balance of the account at the previously closed account reporting period. The opening booked balance for the new period has to be equal to this balance.  |
+
+            '
           enum:
-          - Available
-          - Credit
-          - Emergency
-          - Pre-Agreed
-          - Temporary
-    TransactionSettlementV3Response:
-      title: Settle Transactions V3 Response
-      type: object
-      required:
-      - operation_id
-      - metadata
-      properties:
-        operation_id:
-          type: string
-        metadata:
-          type: object
-          required:
-          - task_id
-          properties:
-            task_id:
-              type: string
-              format: uuid
-              description: "The task_id of the async settlement task.\n\nThis can be used to check the status and errors of the task using the __Retrieve Ingestion Task Status V3__ endpoint. \n"
-            next_url:
-              type: string
-              description: The path to call to obtain the current status of the task.
-              example: /v2/ingest/status/4cef424c-1d7f-4cab-8be2-aee7e1774a00
-            next_url_delay:
-              type: number
-              description: The time in milliseconds that the client should wait before trying to retrieve the current status of the task.
-              example: 500
-    TransactionWindowArray:
+          - ClosingAvailable
+          - ClosingBooked
+          - ClosingCleared
+          - Expected
+          - ForwardAvailable
+          - Information
+          - InterimAvailable
+          - InterimBooked
+          - InterimCleared
+          - OpeningAvailable
+          - OpeningBooked
+          - OpeningCleared
+          - PreviouslyClosedBooked
+    ValidationInvalid:
       type: array
-      description: 'If not provided, the transaction window is inferred from the date of the first and last transactions.
-
-        Only a single window per customer account is supported.
-
-        '
-      items:
-        $ref: '#/components/schemas/TransactionWindow'
-    IngestFirstPartyDataWithCustomerID:
-      title: With Customer ID
-      properties:
-        customer_id:
-          $ref: '#/components/schemas/CustomerID'
-        customer_secret:
-          $ref: '#/components/schemas/CustomerSecret'
-      required:
-      - customer_id
-    IngestV2AsyncResponse:
-      title: Ingest Transactions V2 Async Response
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/IngestV2Response'
-      - type: object
-        required:
-        - operation_id
-        - metadata
-        properties:
-          metadata:
-            $ref: '#/components/schemas/IngestV2Metadata'
-    IngestResponseV3SubTaskWithCustomerID:
-      title: With Customer ID
-      properties:
-        customer_id:
-          $ref: '#/components/schemas/CustomerID'
-      required:
-      - customer_id
-    ValidationMissing:
-      type: array
-      title: Missing Fields
-      description: list of required missing fields for a transaction
+      title: Invalid Fields
+      description: list of invalid fields for a transaction
       items:
         type: string
-    TransactionSettlementV3WebookBody:
-      title: Transaction Settlement Webhook Payload
+    Category:
+      title: Category
       type: object
-      description: 'The payload send to the client defined webhook (via the console) when a Book or Decline settlement task is Completed.
-
-        '
+      description: Category associated with a Transaction
       required:
-      - data
+      - slug
+      - confidence
       properties:
-        data:
-          type: object
-          required:
-          - event
-          - operation_id
-          - status
-          - task_id
-          properties:
-            event:
-              description: The type of settlement task that completed.
-              type: string
-              enum:
-              - first_party_ingester.transactions.booked
-              - first_party_ingester.transactions.declined
-            operation_id:
-              description: The operation ID of settlement task that completed.
-              type: string
-              enum:
-              - v3_ingest_transactions_book_post
-              - v3_ingest_transactions_decline_post
-            status:
-              description: The status of the settlement task that completed.
-              type: string
-              enum:
-              - Completed
-              - PartialCompleted
-              - Failed
-            task_id:
-              description: "The task_id of the settlement task that completed.\n\nThis can be used to check full status and errors of the task using the __Retrieve Ingestion Task Status V3__ endpoint. \n"
-              type: string
-    ValidationError:
-      type: object
-      title: Validation Errors
-      required:
-      - operation_id
-      - code_id
-      - message
-      - errors
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        code_id:
+        slug:
           type: string
-          enum:
-          - failed_validation
-        message:
+          description: Unique human readable identifier of the category. Not subject to version control.
+        confidence:
           type: string
-          description: 'High level description on what has failed '
-        errors:
-          type: object
-          title: Map_of_customer_IDs
-          description: a map of customer IDs to transaction validation errors
-          properties:
-            missing_fields:
-              type: object
-              title: Map of transaction IDs
-              description: 'A map of transaction IDs to missing fields array.
-
-
-                If the transaction ID was missing use the request transaction array index to identify it.
-
-                See example
-
-                '
-              additionalProperties:
-                $ref: '#/components/schemas/ValidationMissing'
-            invalid_fields:
-              type: object
-              title: Map of transaction IDs
-              description: 'A map of transaction IDs to invalid fields array.
-
-
-                If the transaction ID was missing use the request transaction array index to identify it.
-
-                See example
-
-                '
-              additionalProperties:
-                $ref: '#/components/schemas/ValidationInvalid'
-      example:
-        operation_id: enrich_transactions_post
-        code_id: failed_validation
-        message: validation failure(s) in request payload
-        errors:
-          1db8c4b5-e5ae-429e-947b-6a4616ffc717:
-            missing_fields:
-              8b13ac45-9fe6-4c17-8c6d-b60ab2b4edad:
-              - description
-              - customer_id
-              ba466961-d623-4173-9001-2f6487a9a41e:
-              - customer_id
-              tx-1:
-              - transaction_id
-              578f24f2-5046-463a-bca6-239e0dfac7fa:
-              - amount
-            invalid_fields:
-              8b13ac45-9fe6-4c17-8c6d-b60ab2b4edad:
-              - date
-              ba466961-d623-4173-9001-2f6487a9a41e:
-              - date
-    BudAmount:
-      title: Standard Bud Amount
-      type: object
-      description: The monetary amount.
-      required:
-      - value
-      - currency
-      properties:
-        value:
-          $ref: '#/components/schemas/BudMonetaryValue'
-        currency:
-          $ref: '#/components/schemas/BudCurrency'
-    TransactionSettlementV3Request:
-      type: array
-      items:
-        type: object
-        oneOf:
-        - $ref: '#/components/schemas/IngestFirstPartyDataWithCustomerID'
-        - $ref: '#/components/schemas/IngestFirstPartyDataWithCustomerIdempotentIdentifier'
-        properties:
-          transactions:
-            type: array
-            items:
-              type: object
-              required:
-              - transaction_id
-              - date_time
-              properties:
-                transaction_id:
-                  type: string
-                  description: The unique identifier of a transaction to be booked.
-                date_time:
-                  type: string
-                  description: "The datetime when the transaction transitioned to booked in the format [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339).\n\nExamples:\n  - `2023-01-17T17:29:51Z`\n  - `2023-01-17T17:29:51-08:00`\n"
+          description: Degree of belief of correct assignment, expressed as a probability.
     FPIIngestFailedWebhookBody:
       title: FPI Ingestion Failed Webhook Payload
       type: object
@@ -2786,64 +2780,6 @@ components:
                   customer_idempotent_identifier:
                     type: string
                     description: The `idempotent_identifier` provided when the customer given was created.
-    SyncEnrichments:
-      title: Enrichments
-      type: object
-      description: Contextual enrichments associated with a Transaction
-      properties:
-        categories:
-          $ref: '#/components/schemas/Categories'
-        merchant:
-          $ref: '#/components/schemas/Merchant'
-        processor:
-          $ref: '#/components/schemas/Processor'
-        location:
-          $ref: '#/components/schemas/Location'
-        transaction_types:
-          type: array
-          description: Transaction types associated with the transaction
-          items:
-            type: string
-        names:
-          type: array
-          description: Names that were detected in the transaction description
-          items:
-            type: string
-    IngestTaskResult:
-      title: Ingestion Task Result
-      type: string
-      description: 'Indicates the outcome of the ingest task. Either success or various error codes:
-
-
-        | code | description |
-
-        | ---- | ----------- |
-
-        | success | Ingestion completed successfully. Data is now available. |
-
-        | validation_error | The request format is invalid. Please review the endpoint documentation for correct parameters and headers. |
-
-        | data_mapping_error | The data payload does not match the expected schema. Ensure your data aligns with the defined structure. |
-
-        | internal_error | Something went wrong on our side. Please retry your request later. |
-
-        | timed_out | The task did not complete in due time. |
-
-        '
-    Category:
-      title: Category
-      type: object
-      description: Category associated with a Transaction
-      required:
-      - slug
-      - confidence
-      properties:
-        slug:
-          type: string
-          description: Unique human readable identifier of the category. Not subject to version control.
-        confidence:
-          type: string
-          description: Degree of belief of correct assignment, expressed as a probability.
     IngestStatusTaskMetadata:
       title: Ingest Task Metadata
       description: Expected response structure.
@@ -2887,41 +2823,105 @@ components:
         next_url_delay:
           description: Recommended delay in milliseconds before next call
           type: number
-    OperationId:
-      title: Operation Id Field
-      type: string
-      description: A unique identifier/reference associated with a given endpoint/operation
-    IngestFirstPartyDataWithCustomerIdempotentIdentifier:
-      title: With Customer Idempotent Identifier
-      properties:
-        customer_idempotent_identifier:
-          type: string
-          description: 'An internal client identifier. If specified, a Bud customer will either be automatically created, or utilised to ingest the given data.
+  parameters:
+    TaskId:
+      in: path
+      name: task_id
+      schema:
+        type: string
+        format: uuid
+      required: true
+      description: Bud Task identifier returned from an async task for the requested action
+    SigningIdHeaderParameter:
+      in: header
+      name: X-Signing-ID
+      description: The public key ID which should be used to verify the X-Signature header. Bud's list of public keys can be found at https://assets.thisisbud.com/bud-callback.jwks
+      required: true
+      schema:
+        type: string
+    BudCategorisationModel:
+      in: header
+      name: X-Bud-Categorisation-Model
+      description: 'Overrides the default categorisation model for both the returned enrichment and the persisted enrichment.
 
-            This identifier can then be used in place of `X-Customer-Id` across Bud''s endpoints.
 
-            '
-      required:
-      - customer_idempotent_identifier
-    IngestV2Metadata:
-      title: Created Task Details
-      description: Metadata on the created task, including the task_id
-      type: object
-      required:
-      - task_id
-      properties:
-        task_id:
-          type: string
-          format: uuid
-          description: Can be used with the transaction status endpoint to retrieve the status of the full enriched process
-        next_url:
-          type: string
-          description: The path to call to obtain the current status of the task.
-          example: /v2/ingest/status/4cef424c-1d7f-4cab-8be2-aee7e1774a00
-        next_url_delay:
-          type: number
-          description: The time in milliseconds that the client should wait before trying to retrieve the current status of the task.
-          example: 500
+        Possible values can be retrieved from the __Retrieve Available Categorisation Models V2__ endpoint.
+
+
+        It should be noted that only models for the customers region will be used. For example, if a customer is created with the region "GB", then only "uk-v*" models will be utilised.
+
+        If a model is specified that cannot be used, then the default model will be used instead.
+
+        '
+      schema:
+        type: string
+    IngestTransactionsV2ContentType:
+      in: header
+      name: Content-Type
+      required: true
+      schema:
+        type: string
+        enum:
+        - application/bud-transaction-v3+json
+        - application/bud-transaction-v2+json
+      description: Define the transactions' format for this request.
+    SignatureHeaderParameter:
+      in: header
+      name: X-Signature
+      description: The signed request body JWT
+      required: true
+      schema:
+        type: string
+    ClientId:
+      in: header
+      name: X-Client-Id
+      schema:
+        type: string
+      required: true
+      description: The API Client Identifier (Service Application Identifier).
+      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
+    DisableSynchronous:
+      in: header
+      name: X-Disable-Synchronous
+      description: 'If provided as true, the task will **not** be processed synchronously.
+
+
+        If false or the header is not included, the task **will** be processed synchronously.
+
+        '
+      schema:
+        type: boolean
+    NoCustomerHeader:
+      in: header
+      name: X-No-Customer
+      schema:
+        type: boolean
+      description: 'If provided as true, the customer_id is not required in the request. This is only available with X-Disable-Synchronous not set or set to false.
+
+        **Note:** This functionality is not available by default. In order to use it, please raise a Support request.'
+      example: true
+    GenerateTransactionIDs:
+      in: header
+      name: X-Generate-Transaction-IDs
+      schema:
+        type: string
+        enum:
+        - 'true'
+      example: 'true'
+      description: 'Enable transaction ID generation based on the contents of the transaction data. The transaction ID field still needs to be provided, but it will not be validated or checked for uniqueness and instead overwritten with a generated value.
+
+        When generating IDs from transaction data, the following fields are taken into account: account ID, description, amount, currency and date.
+
+        '
+    IngestAccountsContentType:
+      in: header
+      name: Content-Type
+      required: true
+      schema:
+        type: string
+        enum:
+        - application/bud-accounts+json
+      description: Define the transactions' format for this request.
   securitySchemes:
     Basic:
       type: http

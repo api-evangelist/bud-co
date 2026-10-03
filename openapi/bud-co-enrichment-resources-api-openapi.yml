@@ -163,16 +163,77 @@ paths:
         5XX:
           description: An unexpected error occurred on the server side
 components:
-  parameters:
-    ClientId:
-      in: header
-      name: X-Client-Id
-      schema:
-        type: string
-      required: true
-      description: The API Client Identifier (Service Application Identifier).
-      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
   schemas:
+    GetCategoriesV2Response:
+      title: Categories Response
+      type: object
+      description: Expected response structure for the get categories endpoint.
+      required:
+      - operation_id
+      - data
+      - metadata
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          oneOf:
+          - $ref: '#/components/schemas/CategoriesFlat'
+          - $ref: '#/components/schemas/CategoriesMap'
+        metadata:
+          type: object
+          required:
+          - model
+          properties:
+            model:
+              $ref: '#/components/schemas/schemas-CategorisationModel'
+    CategoriesFlat:
+      title: Category List
+      type: object
+      description: A list of all the available categories and subcategories.
+      properties:
+        categories:
+          type: array
+          description: List of all the available categories.
+          items:
+            type: string
+        subcategories:
+          type: array
+          description: List of all the available subcategories.
+          items:
+            type: string
+    OperationId:
+      title: Operation Id Field
+      type: string
+      description: A unique identifier/reference associated with a given endpoint/operation
+    GetModelsResponse:
+      title: Models Response
+      required:
+      - operation_id
+      - data
+      properties:
+        operation_id:
+          type: string
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/schemas-CategorisationModel'
+    schemas-CategorisationModel:
+      title: Categorisation Model
+      type: object
+      description: Bud categorisation model.
+      required:
+      - name
+      - description
+      properties:
+        name:
+          type: string
+          description: Name of the model.
+        description:
+          type: string
+          description: Description of the model & use-cases it provides.
+        deprecated:
+          type: boolean
+          description: A flag to mark a particular model version as deprecated (this field is omitted if the model is not deprecated).
     CategoriesMap:
       title: Category Map
       description: A map of all the available categories and respective subcategories
@@ -225,76 +286,15 @@ components:
                   - essential
                   items:
                     type: string
-    GetCategoriesV2Response:
-      title: Categories Response
-      type: object
-      description: Expected response structure for the get categories endpoint.
-      required:
-      - operation_id
-      - data
-      - metadata
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        data:
-          oneOf:
-          - $ref: '#/components/schemas/CategoriesFlat'
-          - $ref: '#/components/schemas/CategoriesMap'
-        metadata:
-          type: object
-          required:
-          - model
-          properties:
-            model:
-              $ref: '#/components/schemas/schemas-CategorisationModel'
-    CategoriesFlat:
-      title: Category List
-      type: object
-      description: A list of all the available categories and subcategories.
-      properties:
-        categories:
-          type: array
-          description: List of all the available categories.
-          items:
-            type: string
-        subcategories:
-          type: array
-          description: List of all the available subcategories.
-          items:
-            type: string
-    GetModelsResponse:
-      title: Models Response
-      required:
-      - operation_id
-      - data
-      properties:
-        operation_id:
-          type: string
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/schemas-CategorisationModel'
-    OperationId:
-      title: Operation Id Field
-      type: string
-      description: A unique identifier/reference associated with a given endpoint/operation
-    schemas-CategorisationModel:
-      title: Categorisation Model
-      type: object
-      description: Bud categorisation model.
-      required:
-      - name
-      - description
-      properties:
-        name:
-          type: string
-          description: Name of the model.
-        description:
-          type: string
-          description: Description of the model & use-cases it provides.
-        deprecated:
-          type: boolean
-          description: A flag to mark a particular model version as deprecated (this field is omitted if the model is not deprecated).
+  parameters:
+    ClientId:
+      in: header
+      name: X-Client-Id
+      schema:
+        type: string
+      required: true
+      description: The API Client Identifier (Service Application Identifier).
+      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
   securitySchemes:
     Basic:
       type: http

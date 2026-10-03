@@ -193,14 +193,14 @@ components:
             refresh_token:
               type: string
               description: A long-lived token that can be used to obtain a new `access_token` when the current `access_token` expires.
-    Error:
-      title: Error Object
-      type:
-      - object
-      - 'null'
-      description: Contains a field specific error message
+    Errors:
+      title: Array of Error Object
+      description: Contains a list of error messages
+      type: object
       additionalProperties:
-        type: string
+        type: array
+        items:
+          type: string
     ServerErrorResponse:
       title: Server Error Response
       type: object
@@ -221,18 +221,18 @@ components:
           anyOf:
           - $ref: '#/components/schemas/Error'
           - $ref: '#/components/schemas/Errors'
-    Errors:
-      title: Array of Error Object
-      description: Contains a list of error messages
-      type: object
-      additionalProperties:
-        type: array
-        items:
-          type: string
     OperationId:
       title: Operation Id Field
       type: string
       description: A unique identifier/reference associated with a given endpoint/operation
+    Error:
+      title: Error Object
+      type:
+      - object
+      - 'null'
+      description: Contains a field specific error message
+      additionalProperties:
+        type: string
   parameters:
     ClientId:
       in: header
