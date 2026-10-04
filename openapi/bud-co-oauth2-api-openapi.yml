@@ -163,6 +163,26 @@ paths:
                 message: 'An error occurred while processing your request. Get in touch with us and provide us your request id: 7ef63242-ba6d-4661-8014-f9eaa9cb2ad8'
 components:
   schemas:
+    ServerErrorResponse:
+      title: Server Error Response
+      type: object
+      required:
+      - operation_id
+      - code_id
+      - message
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        code_id:
+          type: string
+          description: A descriptive enough string that is linked to the reason for the error.
+        message:
+          type: string
+          description: An actual user friendly error message.
+        errors:
+          anyOf:
+          - $ref: '#/components/schemas/Error'
+          - $ref: '#/components/schemas/Errors'
     RetrieveAuthTokenResponse:
       title: Retrieve Auth Token Response
       required:
@@ -201,26 +221,6 @@ components:
         type: array
         items:
           type: string
-    ServerErrorResponse:
-      title: Server Error Response
-      type: object
-      required:
-      - operation_id
-      - code_id
-      - message
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        code_id:
-          type: string
-          description: A descriptive enough string that is linked to the reason for the error.
-        message:
-          type: string
-          description: An actual user friendly error message.
-        errors:
-          anyOf:
-          - $ref: '#/components/schemas/Error'
-          - $ref: '#/components/schemas/Errors'
     OperationId:
       title: Operation Id Field
       type: string

@@ -294,21 +294,6 @@ paths:
           description: An unexpected error occurred on the server side
 components:
   schemas:
-    TransactionTotal:
-      type: object
-      description: Totals of all included transactions for the specified currency.
-      required:
-      - amount
-      - credit_debit_indicator
-      properties:
-        amount:
-          $ref: '#/components/schemas/BudAmount'
-        credit_debit_indicator:
-          type: string
-          description: Credit/Debit Indicator
-          enum:
-          - credit
-          - debit
     GetCustomerCharacteristicsResponse:
       title: Retrieve Customer Characteristics Response
       type: object
@@ -324,6 +309,147 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CustomerCharacteristicSimple'
+    TransactionTotal:
+      type: object
+      description: Totals of all included transactions for the specified currency.
+      required:
+      - amount
+      - credit_debit_indicator
+      properties:
+        amount:
+          $ref: '#/components/schemas/BudAmount'
+        credit_debit_indicator:
+          type: string
+          description: Credit/Debit Indicator
+          enum:
+          - credit
+          - debit
+    GetSaverCharacteristicsResponse:
+      title: Get Saver Customer Characteristics Response
+      type: object
+      required:
+      - operation_id
+      - data
+      properties:
+        operation_id:
+          type: string
+          enum:
+          - characteristics_v1_customer_saver_get
+        data:
+          type: object
+          properties:
+            saver_transactions:
+              type: array
+              items:
+                $ref: '#/components/schemas/CustomerCharacteristicTransaction'
+            saver_transaction_totals:
+              type: array
+              items:
+                $ref: '#/components/schemas/TransactionTotal'
+    GetOverdraftCharacteristicsResponse:
+      title: Get Overdraft Customer Characteristics Response
+      type: object
+      required:
+      - operation_id
+      - data
+      properties:
+        operation_id:
+          type: string
+          enum:
+          - characteristics_v1_customer_overdraft_get
+        data:
+          type: object
+          properties:
+            overdraft_transactions:
+              type: array
+              items:
+                $ref: '#/components/schemas/CustomerCharacteristicTransaction'
+            overdraft_transaction_totals:
+              type: array
+              items:
+                $ref: '#/components/schemas/TransactionTotal'
+    BudCurrency:
+      title: Currency
+      description: 'The three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) of the monetary amount.
+
+
+        Example: `GBP`
+
+        '
+      type: string
+    GetCreditCardCharacteristicsResponse:
+      title: Get Credit Card Customer Characteristics Response
+      type: object
+      required:
+      - operation_id
+      - data
+      properties:
+        operation_id:
+          type: string
+          enum:
+          - characteristics_v1_customer_credit_card_get
+        data:
+          type: object
+          properties:
+            credit_card_transactions:
+              type: array
+              items:
+                $ref: '#/components/schemas/CustomerCharacteristicTransaction'
+            credit_card_transaction_totals:
+              type: array
+              items:
+                $ref: '#/components/schemas/TransactionTotal'
+    CustomerCharacteristicSimple:
+      title: Customer Characteristic
+      type: object
+      properties:
+        type:
+          title: Characteristic Type
+          type: string
+          description: 'The type of customer characteristic. Currently supported values include:
+
+            - `credit_card`
+
+            - `loan`
+
+            - `overdraft`
+
+            - `saver`
+
+
+            However clients integrating with this endpoint should expect more to be added without notice.
+
+            '
+        link:
+          title: Characteristic Details Link
+          type: string
+          description: The URL to follow to get detailed Characteristic information about the customer.
+    Category:
+      title: Category
+      type: object
+      description: Category associated with a Transaction
+      required:
+      - slug
+      - confidence
+      properties:
+        slug:
+          type: string
+          description: Unique human readable identifier of the category. Not subject to version control.
+        confidence:
+          type: string
+          description: Degree of belief of correct assignment, expressed as a probability.
+    BudAmount:
+      title: Standard Bud Amount
+      type: object
+      description: The monetary amount.
+      required:
+      - value
+      - currency
+      properties:
+        value:
+          $ref: '#/components/schemas/BudMonetaryValue'
+        currency:
+          $ref: '#/components/schemas/BudCurrency'
     CustomerCharacteristicTransaction:
       title: Customer Characteristic Transaction
       type: object
@@ -409,154 +535,11 @@ components:
         l2:
           $ref: '#/components/schemas/Category'
           description: Level 2 Category
-    BudAmount:
-      title: Standard Bud Amount
-      type: object
-      description: The monetary amount.
-      required:
-      - value
-      - currency
-      properties:
-        value:
-          $ref: '#/components/schemas/BudMonetaryValue'
-        currency:
-          $ref: '#/components/schemas/BudCurrency'
     BudMonetaryValue:
       title: Monetary Value
       description: "The value of the monetary amount. The value is formatted with the number of decimal places for the respective currency. \n\nExample: `10.98`\n"
       type: string
-    BudCurrency:
-      title: Currency
-      description: 'The three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) of the monetary amount.
-
-
-        Example: `GBP`
-
-        '
-      type: string
-    Category:
-      title: Category
-      type: object
-      description: Category associated with a Transaction
-      required:
-      - slug
-      - confidence
-      properties:
-        slug:
-          type: string
-          description: Unique human readable identifier of the category. Not subject to version control.
-        confidence:
-          type: string
-          description: Degree of belief of correct assignment, expressed as a probability.
-    GetCreditCardCharacteristicsResponse:
-      title: Get Credit Card Customer Characteristics Response
-      type: object
-      required:
-      - operation_id
-      - data
-      properties:
-        operation_id:
-          type: string
-          enum:
-          - characteristics_v1_customer_credit_card_get
-        data:
-          type: object
-          properties:
-            credit_card_transactions:
-              type: array
-              items:
-                $ref: '#/components/schemas/CustomerCharacteristicTransaction'
-            credit_card_transaction_totals:
-              type: array
-              items:
-                $ref: '#/components/schemas/TransactionTotal'
-    GetOverdraftCharacteristicsResponse:
-      title: Get Overdraft Customer Characteristics Response
-      type: object
-      required:
-      - operation_id
-      - data
-      properties:
-        operation_id:
-          type: string
-          enum:
-          - characteristics_v1_customer_overdraft_get
-        data:
-          type: object
-          properties:
-            overdraft_transactions:
-              type: array
-              items:
-                $ref: '#/components/schemas/CustomerCharacteristicTransaction'
-            overdraft_transaction_totals:
-              type: array
-              items:
-                $ref: '#/components/schemas/TransactionTotal'
-    CustomerCharacteristicSimple:
-      title: Customer Characteristic
-      type: object
-      properties:
-        type:
-          title: Characteristic Type
-          type: string
-          description: 'The type of customer characteristic. Currently supported values include:
-
-            - `credit_card`
-
-            - `loan`
-
-            - `overdraft`
-
-            - `saver`
-
-
-            However clients integrating with this endpoint should expect more to be added without notice.
-
-            '
-        link:
-          title: Characteristic Details Link
-          type: string
-          description: The URL to follow to get detailed Characteristic information about the customer.
-    GetSaverCharacteristicsResponse:
-      title: Get Saver Customer Characteristics Response
-      type: object
-      required:
-      - operation_id
-      - data
-      properties:
-        operation_id:
-          type: string
-          enum:
-          - characteristics_v1_customer_saver_get
-        data:
-          type: object
-          properties:
-            saver_transactions:
-              type: array
-              items:
-                $ref: '#/components/schemas/CustomerCharacteristicTransaction'
-            saver_transaction_totals:
-              type: array
-              items:
-                $ref: '#/components/schemas/TransactionTotal'
   parameters:
-    CustomerIdempotentIdentifier:
-      in: header
-      name: X-Customer-Idempotent-Identifier
-      schema:
-        type: string
-      description: 'Use the internal client identifier, provided in the `client_metadata` object when creating the customer in __Create Customer V3__, in place of an `X-Customer-Id` header.
-
-        '
-    CustomerId:
-      in: header
-      name: X-Customer-Id
-      schema:
-        type: string
-        format: uuid
-      required: true
-      description: A unique identifier for a Customer, as registered on Bud's platform.
-      example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
     CustomerSecret:
       in: header
       name: X-Customer-Secret
@@ -572,6 +555,23 @@ components:
       required: true
       description: The API Client Identifier (Service Application Identifier).
       example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
+    CustomerId:
+      in: header
+      name: X-Customer-Id
+      schema:
+        type: string
+        format: uuid
+      required: true
+      description: A unique identifier for a Customer, as registered on Bud's platform.
+      example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
+    CustomerIdempotentIdentifier:
+      in: header
+      name: X-Customer-Idempotent-Identifier
+      schema:
+        type: string
+      description: 'Use the internal client identifier, provided in the `client_metadata` object when creating the customer in __Create Customer V3__, in place of an `X-Customer-Id` header.
+
+        '
   securitySchemes:
     Basic:
       type: http

@@ -240,106 +240,34 @@ paths:
         5XX:
           description: An unexpected error occurred on the server side
 components:
-  parameters:
-    CustomerIdempotentIdentifier:
-      in: header
-      name: X-Customer-Idempotent-Identifier
-      schema:
-        type: string
-      description: 'Use the internal client identifier, provided in the `client_metadata` object when creating the customer in __Create Customer V3__, in place of an `X-Customer-Id` header.
-
-        '
-    CustomerSecret:
-      in: header
-      name: X-Customer-Secret
-      schema:
-        type: string
-      required: false
-      description: The Bud Customer secret used to encrypt customer data. This is required only if the customer secret is not already stored with Bud.
-    SmartFinderTo:
-      in: header
-      name: X-To
-      required: false
-      schema:
-        type: string
-      examples:
-        date_only:
-          value: '2022-03-30'
-        RFC3339:
-          value: '2019-03-30T07:20:50.52Z'
-      description: Transaction to date, this works in pair with the 'X-From' parameter
-    SmartFinderFrom:
-      in: header
-      name: X-From
-      required: false
-      schema:
-        type: string
-      examples:
-        date_only:
-          value: '2022-02-28'
-        RFC3339:
-          value: '2019-02-28T07:20:50.52Z'
-      description: Transaction from date, this works in pair with the 'X-To' parameter
-    ClientId:
-      in: header
-      name: X-Client-Id
-      schema:
-        type: string
-      required: true
-      description: The API Client Identifier (Service Application Identifier).
-      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
-    CustomerId:
-      in: header
-      name: X-Customer-Id
-      schema:
-        type: string
-        format: uuid
-      required: true
-      description: A unique identifier for a Customer, as registered on Bud's platform.
-      example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
   schemas:
-    BenefitsTotalsResponseV1:
-      title: Benefit Totals
+    IncomeAverageOverPeriod:
+      title: Average income statistics over time period
       type: object
-      description: Benefits Total income structure
       required:
-      - operation_id
-      - data
-      - metadata
+      - income
+      - regular_income
       properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        data:
-          type: array
-          items:
-            type: object
-            required:
-            - benefit
-            - total_credit
-            properties:
-              benefit:
-                $ref: '#/components/schemas/Benefit'
-              total_credit:
-                $ref: '#/components/schemas/BudAmount'
-        metadata:
-          $ref: '#/components/schemas/TransactionsResultsMetadata'
-    IncomeTransactionV2:
-      allOf:
-      - $ref: '#/components/schemas/BasicTransactionV2'
-      - title: Income Transaction
-        required:
-        - enrichment
-        properties:
-          enrichment:
-            $ref: '#/components/schemas/IncomeEnrichmentsV2'
-    Errors:
-      title: Array of Error Object
-      description: Contains a list of error messages
+        income:
+          allOf:
+          - description: average of all income transactions
+          - $ref: '#/components/schemas/BudAmount'
+        regular_income:
+          allOf:
+          - description: average income transactions that we have also detected as regular
+          - $ref: '#/components/schemas/BudAmount'
+    LegacyBudAmount:
+      title: Legacy Bud Amount
       type: object
-      additionalProperties:
-        type: array
-        items:
-          type: string
+      description: The monetary amount.
+      required:
+      - amount
+      - currency
+      properties:
+        amount:
+          $ref: '#/components/schemas/BudMonetaryValue'
+        currency:
+          $ref: '#/components/schemas/BudCurrency'
     BadRequestResponse:
       title: Bad Request Response
       type: object
@@ -361,192 +289,6 @@ components:
           anyOf:
           - $ref: '#/components/schemas/Error'
           - $ref: '#/components/schemas/Errors'
-    BasicTransaction:
-      title: Basic Transaction Schema
-      type: object
-      description: Basic transaction schema
-      required:
-      - transaction_id
-      - account_id
-      - transaction_description
-      - provider
-      - date
-      - amount
-      - credit_debit_indicator
-      properties:
-        transaction_id:
-          type: string
-          description: A unique identifier for the transaction
-        account_id:
-          type: string
-          description: A unique identifier for the Customer bank account
-        transaction_description:
-          type: string
-          description: Any Customer defined input, e.g. a bank transfer reference
-        provider:
-          type: string
-          description: The name of the relevant provider relevant to the source of the original transaction data
-        date:
-          type: string
-          description: "The date of the transaction in the format [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339).\n\nExamples:\n  - `2023-03-17T17:29:51Z`\n  - `2023-03-17T17:29:51-08:00`\n"
-        amount:
-          $ref: '#/components/schemas/LegacyBudAmount'
-        credit_debit_indicator:
-          type: string
-          description: Indication as to whether the transaction was a credit or debit
-          enum:
-          - Credit
-          - Debit
-    TransactionsResultsMetadata:
-      title: Metadata
-      description: Metadata associated with the response schema
-      allOf:
-      - $ref: '#/components/schemas/LegacyBudDateRangeMetadata'
-      - type: object
-        required:
-        - results
-        properties:
-          results:
-            type: number
-            description: Number of results returned
-    BasicTransactionV2:
-      title: Basic Transaction Schema
-      type: object
-      description: Basic transaction schema
-      required:
-      - transaction_id
-      - account_id
-      - transaction_description
-      - provider
-      - date
-      - amount
-      - credit_debit_indicator
-      properties:
-        transaction_id:
-          type: string
-          description: A unique identifier for the transaction
-        account_id:
-          type: string
-          description: A unique identifier for the Customer bank account
-        transaction_description:
-          type: string
-          description: A description of the transaction, similar to the transaction information in Open Banking. e.g. a bank transfer reference"
-        provider:
-          type: string
-          description: The name of the relevant provider relevant to the source of the original transaction data
-        date:
-          type: string
-          description: "The date of the transaction in the format [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339).\n\nExamples:\n  - `2023-03-17T17:29:51Z`\n  - `2023-03-17T17:29:51-08:00`\n"
-        amount:
-          $ref: '#/components/schemas/BudAmount'
-        credit_debit_indicator:
-          type: string
-          description: Indication as to whether the transaction was a credit or debit
-          enum:
-          - Credit
-          - Debit
-    BenefitsTransactionV1:
-      title: Benefit Transactions
-      allOf:
-      - $ref: '#/components/schemas/BasicTransaction'
-      - type: object
-        required:
-        - benefit
-        properties:
-          benefit:
-            $ref: '#/components/schemas/Benefit'
-    OperationId:
-      title: Operation Id Field
-      type: string
-      description: A unique identifier/reference associated with a given endpoint/operation
-    LegacyBudAmount:
-      title: Legacy Bud Amount
-      type: object
-      description: The monetary amount.
-      required:
-      - amount
-      - currency
-      properties:
-        amount:
-          $ref: '#/components/schemas/BudMonetaryValue'
-        currency:
-          $ref: '#/components/schemas/BudCurrency'
-    BudCurrency:
-      title: Currency
-      description: 'The three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) of the monetary amount.
-
-
-        Example: `GBP`
-
-        '
-      type: string
-    LegacyBudDateRangeMetadata:
-      title: Metadata
-      type: object
-      required:
-      - from
-      - to
-      properties:
-        from:
-          type: string
-          description: 'The date from when results were retrieved in the format [ISO-8601](https://www.iso.org/iso-8601-date-and-time-format.html).
-
-            This is either populated with the default value used when retrieving the results, or the user specified parameter.
-
-
-            Example: `2023-01-17`
-
-            '
-        to:
-          type: string
-          description: 'The date up to when results were retrieved in the format [ISO-8601](https://www.iso.org/iso-8601-date-and-time-format.html).
-
-            This is either populated with the default value used when retrieving the results, or the user specified parameter.
-
-
-            Example: `2023-03-17`
-
-            '
-    IncomeAverage:
-      title: Average income statistics
-      type: object
-      description: 'Averages of income amounts. These averages are calculated using the filters supplied in the `X-From` & `X-To` headers.
-
-        For instance, with 6 months of £1000/month and a date range of 6 months, the monthly average will be £1000.
-
-        However, if the supplied date range is 12 months and there is no data for more than those 6 months, the average will be £500/month.
-
-
-        Note that the number of months are calculated inclusively e.g. `months(2022-01-01, 2022-02-28) = 2` and `months(2022-01-01, 2022-03-01) = 3`.'
-      required:
-      - monthly
-      properties:
-        monthly:
-          allOf:
-          - description: average income per month
-          - $ref: '#/components/schemas/IncomeAverageOverPeriod'
-    ProcessorIdV2:
-      title: Processor ID Object
-      type: object
-      description: Details surrounding the identified processor of the transaction
-      required:
-      - id
-      - name
-      - logo
-      - confidence
-      properties:
-        id:
-          type: string
-          description: A unique ID for the identified processor
-        name:
-          type: string
-          description: The clean name of the identified processor
-        logo:
-          type: string
-          description: The processor's logo image URL location
-        confidence:
-          type: string
-          description: The level of certainty that the model has predicted the processor
     BudAmount:
       title: Standard Bud Amount
       type: object
@@ -559,6 +301,20 @@ components:
           $ref: '#/components/schemas/BudMonetaryValue'
         currency:
           $ref: '#/components/schemas/BudCurrency'
+    IncomeEnrichmentV2:
+      title: Income Enrichment
+      type: object
+      description: Results from Bud's Income Finder Service
+      required:
+      - type
+      - confidence
+      properties:
+        type:
+          type: string
+          description: The type of identified income type, either `salary_or_wages` or `other_incoming`
+        confidence:
+          type: string
+          description: The level of certainty that the model has predicted an income related transaction.
     BenefitsResponseV1:
       title: Benefits Finder Response
       type: object
@@ -576,102 +332,6 @@ components:
             $ref: '#/components/schemas/BenefitsTransactionV1'
         metadata:
           $ref: '#/components/schemas/TransactionsResultsMetadata'
-    BudMonetaryValue:
-      title: Monetary Value
-      description: "The value of the monetary amount. The value is formatted with the number of decimal places for the respective currency. \n\nExample: `10.98`\n"
-      type: string
-    IncomeAverageOverPeriod:
-      title: Average income statistics over time period
-      type: object
-      required:
-      - income
-      - regular_income
-      properties:
-        income:
-          allOf:
-          - description: average of all income transactions
-          - $ref: '#/components/schemas/BudAmount'
-        regular_income:
-          allOf:
-          - description: average income transactions that we have also detected as regular
-          - $ref: '#/components/schemas/BudAmount'
-    MerchantIdV2:
-      title: Merchant ID Object
-      type: object
-      description: Details surrounding the identified merchant of the transaction
-      required:
-      - id
-      - name
-      - logo
-      - confidence
-      properties:
-        id:
-          type: string
-          description: A unique ID for the identified merchant
-        name:
-          type: string
-          description: The clean name of the identified merchant
-        logo:
-          type: string
-          description: The merchant's logo image URL location
-        confidence:
-          type: string
-          description: The level of certainty that the model has predicted the merchant
-    IncomeEnrichmentV2:
-      title: Income Enrichment
-      type: object
-      description: Results from Bud's Income Finder Service
-      required:
-      - type
-      - confidence
-      properties:
-        type:
-          type: string
-          description: The type of identified income type, either `salary_or_wages` or `other_incoming`
-        confidence:
-          type: string
-          description: The level of certainty that the model has predicted an income related transaction.
-    Benefit:
-      title: Benefit
-      type: object
-      required:
-      - type
-      - display_name
-      properties:
-        type:
-          type: string
-          description: The type of benefit
-          example: attendance_allowance
-        display_name:
-          type: string
-          example: Attendance Allowance
-          description: The display name of the benefit type
-    IncomeResponseV2:
-      type: object
-      title: Income Finder Response V2
-      required:
-      - operation_id
-      - data
-      - metadata
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        data:
-          type: object
-          title: Income_Finder_Response_Data
-          required:
-          - transactions
-          - statistics
-          properties:
-            transactions:
-              type: array
-              title: Income Transactions
-              items:
-                $ref: '#/components/schemas/IncomeTransactionV2'
-            statistics:
-              $ref: '#/components/schemas/IncomeStatistics'
-        metadata:
-          $ref: '#/components/schemas/TransactionsResultsMetadata'
     Error:
       title: Error Object
       type:
@@ -680,32 +340,27 @@ components:
       description: Contains a field specific error message
       additionalProperties:
         type: string
-    CategoriserCategory:
-      title: Categoriser Category
-      type: object
-      description: The details in relation to a specific category level, as taken from the output of Bud's categorsiation service.
-      required:
-      - name
-      - confidence
-      - label
-      properties:
-        name:
-          type: string
-          description: Internal name (identifier) of the category
-        confidence:
-          type: string
-          description: The level of certainty that the model has predicted the category
-        label:
-          type: string
-          description: Humanised category name
-    IncomeStatistics:
-      type: object
-      title: Income statistics
-      required:
-      - average
-      properties:
-        average:
-          $ref: '#/components/schemas/IncomeAverage'
+    TransactionsResultsMetadata:
+      title: Metadata
+      description: Metadata associated with the response schema
+      allOf:
+      - $ref: '#/components/schemas/LegacyBudDateRangeMetadata'
+      - type: object
+        required:
+        - results
+        properties:
+          results:
+            type: number
+            description: Number of results returned
+    BudCurrency:
+      title: Currency
+      description: 'The three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) of the monetary amount.
+
+
+        Example: `GBP`
+
+        '
+      type: string
     IncomeEnrichmentsV2:
       type: object
       title: Income Transaction Enrichments
@@ -755,6 +410,351 @@ components:
             - object
             - 'null'
           - $ref: '#/components/schemas/IncomeEnrichmentV2'
+    LegacyBudDateRangeMetadata:
+      title: Metadata
+      type: object
+      required:
+      - from
+      - to
+      properties:
+        from:
+          type: string
+          description: 'The date from when results were retrieved in the format [ISO-8601](https://www.iso.org/iso-8601-date-and-time-format.html).
+
+            This is either populated with the default value used when retrieving the results, or the user specified parameter.
+
+
+            Example: `2023-01-17`
+
+            '
+        to:
+          type: string
+          description: 'The date up to when results were retrieved in the format [ISO-8601](https://www.iso.org/iso-8601-date-and-time-format.html).
+
+            This is either populated with the default value used when retrieving the results, or the user specified parameter.
+
+
+            Example: `2023-03-17`
+
+            '
+    Errors:
+      title: Array of Error Object
+      description: Contains a list of error messages
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          type: string
+    Benefit:
+      title: Benefit
+      type: object
+      required:
+      - type
+      - display_name
+      properties:
+        type:
+          type: string
+          description: The type of benefit
+          example: attendance_allowance
+        display_name:
+          type: string
+          example: Attendance Allowance
+          description: The display name of the benefit type
+    ProcessorIdV2:
+      title: Processor ID Object
+      type: object
+      description: Details surrounding the identified processor of the transaction
+      required:
+      - id
+      - name
+      - logo
+      - confidence
+      properties:
+        id:
+          type: string
+          description: A unique ID for the identified processor
+        name:
+          type: string
+          description: The clean name of the identified processor
+        logo:
+          type: string
+          description: The processor's logo image URL location
+        confidence:
+          type: string
+          description: The level of certainty that the model has predicted the processor
+    BasicTransactionV2:
+      title: Basic Transaction Schema
+      type: object
+      description: Basic transaction schema
+      required:
+      - transaction_id
+      - account_id
+      - transaction_description
+      - provider
+      - date
+      - amount
+      - credit_debit_indicator
+      properties:
+        transaction_id:
+          type: string
+          description: A unique identifier for the transaction
+        account_id:
+          type: string
+          description: A unique identifier for the Customer bank account
+        transaction_description:
+          type: string
+          description: A description of the transaction, similar to the transaction information in Open Banking. e.g. a bank transfer reference"
+        provider:
+          type: string
+          description: The name of the relevant provider relevant to the source of the original transaction data
+        date:
+          type: string
+          description: "The date of the transaction in the format [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339).\n\nExamples:\n  - `2023-03-17T17:29:51Z`\n  - `2023-03-17T17:29:51-08:00`\n"
+        amount:
+          $ref: '#/components/schemas/BudAmount'
+        credit_debit_indicator:
+          type: string
+          description: Indication as to whether the transaction was a credit or debit
+          enum:
+          - Credit
+          - Debit
+    BenefitsTotalsResponseV1:
+      title: Benefit Totals
+      type: object
+      description: Benefits Total income structure
+      required:
+      - operation_id
+      - data
+      - metadata
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          type: array
+          items:
+            type: object
+            required:
+            - benefit
+            - total_credit
+            properties:
+              benefit:
+                $ref: '#/components/schemas/Benefit'
+              total_credit:
+                $ref: '#/components/schemas/BudAmount'
+        metadata:
+          $ref: '#/components/schemas/TransactionsResultsMetadata'
+    BudMonetaryValue:
+      title: Monetary Value
+      description: "The value of the monetary amount. The value is formatted with the number of decimal places for the respective currency. \n\nExample: `10.98`\n"
+      type: string
+    IncomeStatistics:
+      type: object
+      title: Income statistics
+      required:
+      - average
+      properties:
+        average:
+          $ref: '#/components/schemas/IncomeAverage'
+    BenefitsTransactionV1:
+      title: Benefit Transactions
+      allOf:
+      - $ref: '#/components/schemas/BasicTransaction'
+      - type: object
+        required:
+        - benefit
+        properties:
+          benefit:
+            $ref: '#/components/schemas/Benefit'
+    IncomeResponseV2:
+      type: object
+      title: Income Finder Response V2
+      required:
+      - operation_id
+      - data
+      - metadata
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          type: object
+          title: Income_Finder_Response_Data
+          required:
+          - transactions
+          - statistics
+          properties:
+            transactions:
+              type: array
+              title: Income Transactions
+              items:
+                $ref: '#/components/schemas/IncomeTransactionV2'
+            statistics:
+              $ref: '#/components/schemas/IncomeStatistics'
+        metadata:
+          $ref: '#/components/schemas/TransactionsResultsMetadata'
+    IncomeAverage:
+      title: Average income statistics
+      type: object
+      description: 'Averages of income amounts. These averages are calculated using the filters supplied in the `X-From` & `X-To` headers.
+
+        For instance, with 6 months of £1000/month and a date range of 6 months, the monthly average will be £1000.
+
+        However, if the supplied date range is 12 months and there is no data for more than those 6 months, the average will be £500/month.
+
+
+        Note that the number of months are calculated inclusively e.g. `months(2022-01-01, 2022-02-28) = 2` and `months(2022-01-01, 2022-03-01) = 3`.'
+      required:
+      - monthly
+      properties:
+        monthly:
+          allOf:
+          - description: average income per month
+          - $ref: '#/components/schemas/IncomeAverageOverPeriod'
+    MerchantIdV2:
+      title: Merchant ID Object
+      type: object
+      description: Details surrounding the identified merchant of the transaction
+      required:
+      - id
+      - name
+      - logo
+      - confidence
+      properties:
+        id:
+          type: string
+          description: A unique ID for the identified merchant
+        name:
+          type: string
+          description: The clean name of the identified merchant
+        logo:
+          type: string
+          description: The merchant's logo image URL location
+        confidence:
+          type: string
+          description: The level of certainty that the model has predicted the merchant
+    IncomeTransactionV2:
+      allOf:
+      - $ref: '#/components/schemas/BasicTransactionV2'
+      - title: Income Transaction
+        required:
+        - enrichment
+        properties:
+          enrichment:
+            $ref: '#/components/schemas/IncomeEnrichmentsV2'
+    CategoriserCategory:
+      title: Categoriser Category
+      type: object
+      description: The details in relation to a specific category level, as taken from the output of Bud's categorsiation service.
+      required:
+      - name
+      - confidence
+      - label
+      properties:
+        name:
+          type: string
+          description: Internal name (identifier) of the category
+        confidence:
+          type: string
+          description: The level of certainty that the model has predicted the category
+        label:
+          type: string
+          description: Humanised category name
+    OperationId:
+      title: Operation Id Field
+      type: string
+      description: A unique identifier/reference associated with a given endpoint/operation
+    BasicTransaction:
+      title: Basic Transaction Schema
+      type: object
+      description: Basic transaction schema
+      required:
+      - transaction_id
+      - account_id
+      - transaction_description
+      - provider
+      - date
+      - amount
+      - credit_debit_indicator
+      properties:
+        transaction_id:
+          type: string
+          description: A unique identifier for the transaction
+        account_id:
+          type: string
+          description: A unique identifier for the Customer bank account
+        transaction_description:
+          type: string
+          description: Any Customer defined input, e.g. a bank transfer reference
+        provider:
+          type: string
+          description: The name of the relevant provider relevant to the source of the original transaction data
+        date:
+          type: string
+          description: "The date of the transaction in the format [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339).\n\nExamples:\n  - `2023-03-17T17:29:51Z`\n  - `2023-03-17T17:29:51-08:00`\n"
+        amount:
+          $ref: '#/components/schemas/LegacyBudAmount'
+        credit_debit_indicator:
+          type: string
+          description: Indication as to whether the transaction was a credit or debit
+          enum:
+          - Credit
+          - Debit
+  parameters:
+    CustomerIdempotentIdentifier:
+      in: header
+      name: X-Customer-Idempotent-Identifier
+      schema:
+        type: string
+      description: 'Use the internal client identifier, provided in the `client_metadata` object when creating the customer in __Create Customer V3__, in place of an `X-Customer-Id` header.
+
+        '
+    SmartFinderTo:
+      in: header
+      name: X-To
+      required: false
+      schema:
+        type: string
+      examples:
+        date_only:
+          value: '2022-03-30'
+        RFC3339:
+          value: '2019-03-30T07:20:50.52Z'
+      description: Transaction to date, this works in pair with the 'X-From' parameter
+    CustomerSecret:
+      in: header
+      name: X-Customer-Secret
+      schema:
+        type: string
+      required: false
+      description: The Bud Customer secret used to encrypt customer data. This is required only if the customer secret is not already stored with Bud.
+    SmartFinderFrom:
+      in: header
+      name: X-From
+      required: false
+      schema:
+        type: string
+      examples:
+        date_only:
+          value: '2022-02-28'
+        RFC3339:
+          value: '2019-02-28T07:20:50.52Z'
+      description: Transaction from date, this works in pair with the 'X-To' parameter
+    ClientId:
+      in: header
+      name: X-Client-Id
+      schema:
+        type: string
+      required: true
+      description: The API Client Identifier (Service Application Identifier).
+      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
+    CustomerId:
+      in: header
+      name: X-Customer-Id
+      schema:
+        type: string
+        format: uuid
+      required: true
+      description: A unique identifier for a Customer, as registered on Bud's platform.
+      example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
   securitySchemes:
     Basic:
       type: http

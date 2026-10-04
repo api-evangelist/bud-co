@@ -416,129 +416,6 @@ paths:
           description: An unexpected error occurred on the server side
 components:
   schemas:
-    TransactionsLinks:
-      title: Affordability Transaction Links
-      type: object
-      description: Transaction Links
-      required:
-      - transactions
-      properties:
-        transactions:
-          type: string
-    ReportTotal:
-      required:
-      - predicted_monthly
-      - _links
-      properties:
-        overall_total:
-          allOf:
-          - $ref: '#/components/schemas/BudAmount'
-          - description: 'Overall total over the report period.
-
-              '
-        monthly_totals:
-          type: array
-          items:
-            $ref: '#/components/schemas/MonthlyTotal'
-          description: 'Total per month over the report period.
-
-            '
-        predicted_monthly:
-          $ref: '#/components/schemas/BudAmount'
-        _links:
-          $ref: '#/components/schemas/TransactionsLinks'
-    AffordabilityReportResponse:
-      title: Retrieve Affordability Report Schema
-      type: object
-      description: Expected response structure
-      required:
-      - operation_id
-      - data
-      properties:
-        operation_id:
-          type: string
-          enum:
-          - v1_affordability_report
-        data:
-          $ref: '#/components/schemas/AffordabilityReport'
-    TimezoneIdentifier:
-      type: string
-      description: 'Timezone identifier (e.g. `Europe/London`) to make dates relativised to the target location.
-
-
-        In the case of daylight savings in a location, this ensures that the overall start/end date accounts for those shifts.
-
-
-        See [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) for list of valid timezone identifiers under `TZ identifier`.'
-      default: Etc/UTC
-    CriteriaInternalTransfers:
-      type: string
-      description: 'Internal transfers criteria returns all credit/debit transactions deemed to be made between an individual financial pool. If we drill down to the account level, wealth has been gained/lost however if we drill up we see no change in net sum.
-
-        '
-      enum:
-      - internal_transfers
-    schemas-DateTimeISO8601:
-      title: Date/Time (ISO 8601)
-      type: string
-      description: ISO Date Format
-      example: '2022-03-05T13:34:33Z'
-    MonthlyRangePrediction:
-      title: Monthly Range Prediction
-      type: object
-      description: Monthly Range
-      required:
-      - predicted_monthly_range
-      - _links
-      properties:
-        overall_total:
-          allOf:
-          - $ref: '#/components/schemas/BudAmount'
-          - description: 'Overall total over the report period.
-
-              '
-        monthly_totals:
-          type: array
-          items:
-            $ref: '#/components/schemas/MonthlyTotal'
-          description: 'Total per month over the report period.
-
-            '
-        predicted_monthly_range:
-          required:
-          - low
-          - high
-          - average
-          properties:
-            low:
-              $ref: '#/components/schemas/BudAmount'
-            high:
-              $ref: '#/components/schemas/BudAmount'
-            average:
-              $ref: '#/components/schemas/BudAmount'
-        _links:
-          $ref: '#/components/schemas/TransactionsLinks'
-    SpendingGroupCategories:
-      title: Spending Group Categories
-      type: object
-      description: Spending Group Categories
-      required:
-      - l1
-      - l2
-      properties:
-        l1:
-          description: The name of the category returned by the model.
-          type: string
-        l2:
-          description: The name of the sub category returned by the model.
-          type: string
-    CriteriaNonessentialExpenditure:
-      type: string
-      description: 'Non essential expenditure criteria will include all transactions which fall under categories deemed to be non essential to a persons day to day life. These expenditure can be seen as "wants" rather than "needs". For example, shopping/hobbies expenditure are essential compared to food_and_drink/groceries.
-
-        '
-      enum:
-      - non_essential_expenditure
     LegacyBudAmount:
       title: Legacy Bud Amount
       type: object
@@ -551,15 +428,25 @@ components:
           $ref: '#/components/schemas/BudMonetaryValue'
         currency:
           $ref: '#/components/schemas/BudCurrency'
-    BudCurrency:
-      title: Currency
-      description: 'The three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) of the monetary amount.
-
-
-        Example: `GBP`
+    CriteriaNonessentialExpenditure:
+      type: string
+      description: 'Non essential expenditure criteria will include all transactions which fall under categories deemed to be non essential to a persons day to day life. These expenditure can be seen as "wants" rather than "needs". For example, shopping/hobbies expenditure are essential compared to food_and_drink/groceries.
 
         '
-      type: string
+      enum:
+      - non_essential_expenditure
+    BudAmount:
+      title: Standard Bud Amount
+      type: object
+      description: The monetary amount.
+      required:
+      - value
+      - currency
+      properties:
+        value:
+          $ref: '#/components/schemas/BudMonetaryValue'
+        currency:
+          $ref: '#/components/schemas/BudCurrency'
     SpendingGroupTransaction:
       title: Spending Groups Transaction Response Data
       type: object
@@ -597,6 +484,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AffordabilityCriteria'
+    TimezoneIdentifier:
+      type: string
+      description: 'Timezone identifier (e.g. `Europe/London`) to make dates relativised to the target location.
+
+
+        In the case of daylight savings in a location, this ensures that the overall start/end date accounts for those shifts.
+
+
+        See [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) for list of valid timezone identifiers under `TZ identifier`.'
+      default: Etc/UTC
+    BudCurrency:
+      title: Currency
+      description: 'The three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) of the monetary amount.
+
+
+        Example: `GBP`
+
+        '
+      type: string
     MonthlyTotal:
       required:
       - month
@@ -609,18 +515,60 @@ components:
             '
         amount:
           $ref: '#/components/schemas/BudAmount'
-    IncomeAndExpenditureTransactionsLinks:
-      title: Income & Expenditure Transactions Links
-      type: object
-      description: Income & Expenditure Transactions Links
+    schemas-DateTimeISO8601:
+      title: Date/Time (ISO 8601)
+      type: string
+      description: ISO Date Format
+      example: '2022-03-05T13:34:33Z'
+    ReportTotal:
       required:
-      - income_transactions
-      - expenditure_transactions
+      - predicted_monthly
+      - _links
       properties:
-        income_transactions:
+        overall_total:
+          allOf:
+          - $ref: '#/components/schemas/BudAmount'
+          - description: 'Overall total over the report period.
+
+              '
+        monthly_totals:
+          type: array
+          items:
+            $ref: '#/components/schemas/MonthlyTotal'
+          description: 'Total per month over the report period.
+
+            '
+        predicted_monthly:
+          $ref: '#/components/schemas/BudAmount'
+        _links:
+          $ref: '#/components/schemas/TransactionsLinks'
+    CriteriaFixedExpenditure:
+      type: string
+      description: 'Fixed expenditure criteria will include all transactions which fall under the categories defined/expected to be consistent. Consistent in the sense of both time and financial commitment, i.e. a subscription to a healthcare provider.
+
+        '
+      enum:
+      - fixed_expenditure
+    CriteriaNetDisposableIncome:
+      type: string
+      description: 'Net Disposable Income criteria will return all transactions falling within the income category grouping. Typically includes exclusively credit transactions.
+
+        '
+      enum:
+      - net_disposable_income
+    TransactionsLinks:
+      title: Affordability Transaction Links
+      type: object
+      description: Transaction Links
+      required:
+      - transactions
+      properties:
+        transactions:
           type: string
-        expenditure_transactions:
-          type: string
+    BudMonetaryValue:
+      title: Monetary Value
+      description: "The value of the monetary amount. The value is formatted with the number of decimal places for the respective currency. \n\nExample: `10.98`\n"
+      type: string
     AffordabilityReport:
       title: Retrieve Affordability Report Response
       type: object
@@ -713,13 +661,55 @@ components:
                   description: An expense that a customer does not necessarily need to make per month, and isn’t necessarily the same in £ amount each month.
                   allOf:
                   - $ref: '#/components/schemas/ReportTotal'
-    CriteriaFixedExpenditure:
-      type: string
-      description: 'Fixed expenditure criteria will include all transactions which fall under the categories defined/expected to be consistent. Consistent in the sense of both time and financial commitment, i.e. a subscription to a healthcare provider.
+    MonthlyRangePrediction:
+      title: Monthly Range Prediction
+      type: object
+      description: Monthly Range
+      required:
+      - predicted_monthly_range
+      - _links
+      properties:
+        overall_total:
+          allOf:
+          - $ref: '#/components/schemas/BudAmount'
+          - description: 'Overall total over the report period.
 
-        '
-      enum:
-      - fixed_expenditure
+              '
+        monthly_totals:
+          type: array
+          items:
+            $ref: '#/components/schemas/MonthlyTotal'
+          description: 'Total per month over the report period.
+
+            '
+        predicted_monthly_range:
+          required:
+          - low
+          - high
+          - average
+          properties:
+            low:
+              $ref: '#/components/schemas/BudAmount'
+            high:
+              $ref: '#/components/schemas/BudAmount'
+            average:
+              $ref: '#/components/schemas/BudAmount'
+        _links:
+          $ref: '#/components/schemas/TransactionsLinks'
+    AffordabilityReportResponse:
+      title: Retrieve Affordability Report Schema
+      type: object
+      description: Expected response structure
+      required:
+      - operation_id
+      - data
+      properties:
+        operation_id:
+          type: string
+          enum:
+          - v1_affordability_report
+        data:
+          $ref: '#/components/schemas/AffordabilityReport'
     CriteriaEssentialExpenditure:
       type: string
       description: 'Essential expenditure criteria will include all transactions which fall under categories deemed to be essential to a persons day to day life. These expenditure can be seen as "needs" rather than "wants". For example, food_and_drink/groceries expenditure are essential compared to shopping/hobbies.
@@ -727,22 +717,40 @@ components:
         '
       enum:
       - essential_expenditure
-    BudAmount:
-      title: Standard Bud Amount
+    SpendingGroupCategories:
+      title: Spending Group Categories
       type: object
-      description: The monetary amount.
+      description: Spending Group Categories
       required:
-      - value
-      - currency
+      - l1
+      - l2
       properties:
-        value:
-          $ref: '#/components/schemas/BudMonetaryValue'
-        currency:
-          $ref: '#/components/schemas/BudCurrency'
-    BudMonetaryValue:
-      title: Monetary Value
-      description: "The value of the monetary amount. The value is formatted with the number of decimal places for the respective currency. \n\nExample: `10.98`\n"
-      type: string
+        l1:
+          description: The name of the category returned by the model.
+          type: string
+        l2:
+          description: The name of the sub category returned by the model.
+          type: string
+    IncomeAndExpenditureTransactionsLinks:
+      title: Income & Expenditure Transactions Links
+      type: object
+      description: Income & Expenditure Transactions Links
+      required:
+      - income_transactions
+      - expenditure_transactions
+      properties:
+        income_transactions:
+          type: string
+        expenditure_transactions:
+          type: string
+    AffordabilityCriteria:
+      oneOf:
+      - $ref: '#/components/schemas/CriteriaNetDisposableIncome'
+      - $ref: '#/components/schemas/CriteriaFixedExpenditure'
+      - $ref: '#/components/schemas/CriteriaFlexibleExpenditure'
+      - $ref: '#/components/schemas/CriteriaEssentialExpenditure'
+      - $ref: '#/components/schemas/CriteriaNonessentialExpenditure'
+      - $ref: '#/components/schemas/CriteriaInternalTransfers'
     SpendingGroupsTransactionsResponse:
       title: Spending Groups Transactions Response
       type: object
@@ -784,21 +792,6 @@ components:
           $ref: '#/components/schemas/BudAmount'
         _links:
           $ref: '#/components/schemas/IncomeAndExpenditureTransactionsLinks'
-    AffordabilityCriteria:
-      oneOf:
-      - $ref: '#/components/schemas/CriteriaNetDisposableIncome'
-      - $ref: '#/components/schemas/CriteriaFixedExpenditure'
-      - $ref: '#/components/schemas/CriteriaFlexibleExpenditure'
-      - $ref: '#/components/schemas/CriteriaEssentialExpenditure'
-      - $ref: '#/components/schemas/CriteriaNonessentialExpenditure'
-      - $ref: '#/components/schemas/CriteriaInternalTransfers'
-    CriteriaNetDisposableIncome:
-      type: string
-      description: 'Net Disposable Income criteria will return all transactions falling within the income category grouping. Typically includes exclusively credit transactions.
-
-        '
-      enum:
-      - net_disposable_income
     CriteriaFlexibleExpenditure:
       type: string
       description: 'Flexible expenditure criteria will include all transactions which fall under the categories defined/expected to be inconsistent. inconsistent in the sense of both time and financial commitment, i.e. transactions falling under food_and_drink/eating_out_and_takeaways
@@ -806,12 +799,14 @@ components:
         '
       enum:
       - flexible_expenditure
+    CriteriaInternalTransfers:
+      type: string
+      description: 'Internal transfers criteria returns all credit/debit transactions deemed to be made between an individual financial pool. If we drill down to the account level, wealth has been gained/lost however if we drill up we see no change in net sum.
+
+        '
+      enum:
+      - internal_transfers
   parameters:
-    DateTo:
-      in: query
-      name: date_to
-      schema:
-        $ref: '#/components/schemas/schemas-DateTimeISO8601'
     CustomerIdempotentIdentifier:
       in: header
       name: X-Customer-Idempotent-Identifier
@@ -820,21 +815,15 @@ components:
       description: 'Use the internal client identifier, provided in the `client_metadata` object when creating the customer in __Create Customer V3__, in place of an `X-Customer-Id` header.
 
         '
-    CustomerSecret:
-      in: header
-      name: X-Customer-Secret
-      schema:
-        type: string
-      required: false
-      description: The Bud Customer secret used to encrypt customer data. This is required only if the customer secret is not already stored with Bud.
-    URLMonthTo:
+    Criteria:
       in: query
-      name: month_to
-      required: false
+      name: criteria
+      style: form
+      explode: false
       schema:
-        type: string
-        example: 2019-03
-        description: Month (`YYYY-MM`) from which the transactions should be returned to, this works in pair with the `month_from` parameter.
+        type: array
+        items:
+          $ref: '#/components/schemas/AffordabilityCriteria'
     OverallTotals:
       in: query
       name: overall_totals
@@ -851,6 +840,26 @@ components:
         description: 'If `true`, shows the monthly totals in the affordability report (under `monthly_totals` property).
 
           '
+    URLMonthTo:
+      in: query
+      name: month_to
+      required: false
+      schema:
+        type: string
+        example: 2019-03
+        description: Month (`YYYY-MM`) from which the transactions should be returned to, this works in pair with the `month_from` parameter.
+    CustomerSecret:
+      in: header
+      name: X-Customer-Secret
+      schema:
+        type: string
+      required: false
+      description: The Bud Customer secret used to encrypt customer data. This is required only if the customer secret is not already stored with Bud.
+    DateFrom:
+      in: query
+      name: date_from
+      schema:
+        $ref: '#/components/schemas/schemas-DateTimeISO8601'
     URLMonthFrom:
       in: query
       name: month_from
@@ -867,25 +876,11 @@ components:
       required: true
       description: The API Client Identifier (Service Application Identifier).
       example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
-    Criteria:
+    DateTo:
       in: query
-      name: criteria
-      style: form
-      explode: false
-      schema:
-        type: array
-        items:
-          $ref: '#/components/schemas/AffordabilityCriteria'
-    DateFrom:
-      in: query
-      name: date_from
+      name: date_to
       schema:
         $ref: '#/components/schemas/schemas-DateTimeISO8601'
-    Timezone:
-      in: query
-      name: timezone
-      schema:
-        $ref: '#/components/schemas/TimezoneIdentifier'
     CustomerId:
       in: header
       name: X-Customer-Id
@@ -895,6 +890,11 @@ components:
       required: true
       description: A unique identifier for a Customer, as registered on Bud's platform.
       example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
+    Timezone:
+      in: query
+      name: timezone
+      schema:
+        $ref: '#/components/schemas/TimezoneIdentifier'
   securitySchemes:
     Basic:
       type: http

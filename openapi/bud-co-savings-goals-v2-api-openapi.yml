@@ -468,67 +468,20 @@ paths:
                 code_id: unknown
                 message: 'An error occurred while processing your request. Get in touch with us and provide us your request id: 7ef63242-ba6d-4661-8014-f9eaa9cb2ad8'
 components:
-  parameters:
-    PathSavingsGoalIDV2:
-      name: savings_goal_id
-      in: path
-      schema:
-        type: string
-        format: uuid
-      required: true
-      description: 'The ID of the savings goal.
-
-
-        Example: `81a68821-dca6-4771-80d4-002c7fce412e`
-
-        '
-      example: 81a68821-dca6-4771-80d4-002c7fce412e
-    CustomerIdempotentIdentifier:
-      in: header
-      name: X-Customer-Idempotent-Identifier
-      schema:
-        type: string
-      description: 'Use the internal client identifier, provided in the `client_metadata` object when creating the customer in __Create Customer V3__, in place of an `X-Customer-Id` header.
-
-        '
-    ClientId:
-      in: header
-      name: X-Client-Id
-      schema:
-        type: string
-      required: true
-      description: The API Client Identifier (Service Application Identifier).
-      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
-    QueryBudAccountID:
-      in: query
-      name: account_id
-      schema:
-        type: string
-      example: RxsYshVGded4JeilkXgWKdXA
-      description: 'Use this parameter to filter the results on data associated with the given account id.
-
-
-        Example: `RxsYshVGded4JeilkXgWKdXA`
-
-        '
-    CustomerId:
-      in: header
-      name: X-Customer-Id
-      schema:
-        type: string
-        format: uuid
-      required: true
-      description: A unique identifier for a Customer, as registered on Bud's platform.
-      example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
   schemas:
-    Errors:
-      title: Array of Error Object
-      description: Contains a list of error messages
-      type: object
-      additionalProperties:
-        type: array
-        items:
+    CreateSavingsGoalV2Response:
+      title: Create Savings Goal V2 Response
+      required:
+      - operation_id
+      - data
+      properties:
+        operation_id:
+          title: Operation ID
           type: string
+          enum:
+          - goals_v2_savings_goal_post
+        data:
+          $ref: '#/components/schemas/SavingsGoalV2'
     BadRequestResponse:
       title: Bad Request Response
       type: object
@@ -550,19 +503,125 @@ components:
           anyOf:
           - $ref: '#/components/schemas/Error'
           - $ref: '#/components/schemas/Errors'
-    UpdateSavingsGoalV2Response:
-      title: Update Savings Goal V2 Response
+    CreateSavingsGoalV2Request:
+      title: Create Savings Goal V2 Request
       required:
-      - operation_id
-      - data
+      - account_id
+      - name
+      - target_amount
+      - allocation_ratio
       properties:
-        operation_id:
-          title: Operation ID
+        account_id:
+          title: Account ID
           type: string
-          enum:
-          - goals_v2_savings_goal_patch
-        data:
-          $ref: '#/components/schemas/SavingsGoalV2'
+          description: 'The account ID the savings goal is associated with.
+
+
+            Example: `RxsYshVGded4JeilkXgWKdXA`
+
+            '
+          example: RxsYshVGded4JeilkXgWKdXA
+        name:
+          title: Name
+          type: string
+          description: 'The name of the savings goal.
+
+
+            Example: `Holiday`
+
+            '
+          example: Holiday
+        target_amount:
+          title: Target Amount
+          type: object
+          description: 'The target amount of money to be saved for this goal.
+
+            '
+          required:
+          - value
+          - currency
+          properties:
+            value:
+              $ref: '#/components/schemas/BudMonetaryValue'
+            currency:
+              $ref: '#/components/schemas/BudCurrency'
+        target_datetime:
+          title: Target Datetime
+          type: string
+          description: "The optional target date by which the savings goal should be reached, in the format [RFC-3339](https://www.rfc-editor.org/rfc/rfc3339). Must be a future date.\n\nExamples:\n  - `2025-12-31T00:00:00Z`\n  - `2025-12-31T00:00:00+01:00`\n"
+        allocation_ratio:
+          title: Allocation Ratio
+          type: number
+          format: float
+          description: 'The proportion of the account balance to allocate to this savings goal. Must be greater than `0` and at most `1`.
+
+
+            Example: `0.2`
+
+            '
+          example: 0.2
+    Error:
+      title: Error Object
+      type:
+      - object
+      - 'null'
+      description: Contains a field specific error message
+      additionalProperties:
+        type: string
+    UpdateSavingsGoalV2Request:
+      title: Update Savings Goal V2 Request
+      properties:
+        account_id:
+          title: Account ID
+          type: string
+          description: 'The account ID the savings goal is associated with.
+
+
+            Example: `RxsYshVGded4JeilkXgWKdXA`
+
+            '
+          example: RxsYshVGded4JeilkXgWKdXA
+        name:
+          title: Name
+          type: string
+          description: 'The name of the savings goal.
+
+
+            Example: `Holiday`
+
+            '
+          example: Holiday
+        target_amount:
+          title: Target Amount
+          type: object
+          description: 'The target amount of money to be saved for this goal.
+
+            '
+          required:
+          - value
+          - currency
+          properties:
+            value:
+              $ref: '#/components/schemas/BudMonetaryValue'
+            currency:
+              $ref: '#/components/schemas/BudCurrency'
+        target_datetime:
+          title: Target Datetime
+          type:
+          - string
+          - 'null'
+          description: "The target date by which the savings goal should be reached, in the format [RFC-3339](https://www.rfc-editor.org/rfc/rfc3339). Must be a future date. Set to `null` to remove the target date.\n\nExamples:\n  - `2025-12-31T00:00:00Z`\n  - `2025-12-31T00:00:00+01:00`\n"
+        allocation_ratio:
+          title: Allocation Ratio
+          type: number
+          format: float
+          description: 'The proportion of the account balance to allocate to this savings goal. Must be greater than `0` and at most `1`.
+
+
+            Example: `0.25`
+
+            '
+          example: 0.25
     RetrieveSavingsGoalsV2Response:
       title: Retrieve Savings Goals V2 Response
       required:
@@ -578,10 +637,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SavingsGoalV2'
-    OperationId:
-      title: Operation Id Field
-      type: string
-      description: A unique identifier/reference associated with a given endpoint/operation
     BudCurrency:
       title: Currency
       description: 'The three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) of the monetary amount.
@@ -591,8 +646,20 @@ components:
 
         '
       type: string
-    CreateSavingsGoalV2Response:
-      title: Create Savings Goal V2 Response
+    Errors:
+      title: Array of Error Object
+      description: Contains a list of error messages
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          type: string
+    BudMonetaryValue:
+      title: Monetary Value
+      description: "The value of the monetary amount. The value is formatted with the number of decimal places for the respective currency. \n\nExample: `10.98`\n"
+      type: string
+    RetrieveSavingsGoalV2Response:
+      title: Retrieve Savings Goal V2 Response
       required:
       - operation_id
       - data
@@ -601,9 +668,29 @@ components:
           title: Operation ID
           type: string
           enum:
-          - goals_v2_savings_goal_post
+          - goals_v2_savings_goal_get
         data:
           $ref: '#/components/schemas/SavingsGoalV2'
+    ServerErrorResponse:
+      title: Server Error Response
+      type: object
+      required:
+      - operation_id
+      - code_id
+      - message
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        code_id:
+          type: string
+          description: A descriptive enough string that is linked to the reason for the error.
+        message:
+          type: string
+          description: An actual user friendly error message.
+        errors:
+          anyOf:
+          - $ref: '#/components/schemas/Error'
+          - $ref: '#/components/schemas/Errors'
     SavingsGoalV2:
       title: Savings Goal V2
       required:
@@ -696,40 +783,12 @@ components:
           title: Created At
           type: string
           description: "The date and time the savings goal was created in the format [RFC-3339](https://www.rfc-editor.org/rfc/rfc3339).\n\nExamples:\n  - `2023-01-17T17:29:51Z`\n  - `2023-01-17T17:29:51-08:00`\n"
-    BudMonetaryValue:
-      title: Monetary Value
-      description: "The value of the monetary amount. The value is formatted with the number of decimal places for the respective currency. \n\nExample: `10.98`\n"
+    OperationId:
+      title: Operation Id Field
       type: string
-    Error:
-      title: Error Object
-      type:
-      - object
-      - 'null'
-      description: Contains a field specific error message
-      additionalProperties:
-        type: string
-    ServerErrorResponse:
-      title: Server Error Response
-      type: object
-      required:
-      - operation_id
-      - code_id
-      - message
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        code_id:
-          type: string
-          description: A descriptive enough string that is linked to the reason for the error.
-        message:
-          type: string
-          description: An actual user friendly error message.
-        errors:
-          anyOf:
-          - $ref: '#/components/schemas/Error'
-          - $ref: '#/components/schemas/Errors'
-    RetrieveSavingsGoalV2Response:
-      title: Retrieve Savings Goal V2 Response
+      description: A unique identifier/reference associated with a given endpoint/operation
+    UpdateSavingsGoalV2Response:
+      title: Update Savings Goal V2 Response
       required:
       - operation_id
       - data
@@ -738,120 +797,61 @@ components:
           title: Operation ID
           type: string
           enum:
-          - goals_v2_savings_goal_get
+          - goals_v2_savings_goal_patch
         data:
           $ref: '#/components/schemas/SavingsGoalV2'
-    UpdateSavingsGoalV2Request:
-      title: Update Savings Goal V2 Request
-      properties:
-        account_id:
-          title: Account ID
-          type: string
-          description: 'The account ID the savings goal is associated with.
+  parameters:
+    CustomerIdempotentIdentifier:
+      in: header
+      name: X-Customer-Idempotent-Identifier
+      schema:
+        type: string
+      description: 'Use the internal client identifier, provided in the `client_metadata` object when creating the customer in __Create Customer V3__, in place of an `X-Customer-Id` header.
+
+        '
+    QueryBudAccountID:
+      in: query
+      name: account_id
+      schema:
+        type: string
+      example: RxsYshVGded4JeilkXgWKdXA
+      description: 'Use this parameter to filter the results on data associated with the given account id.
 
 
-            Example: `RxsYshVGded4JeilkXgWKdXA`
+        Example: `RxsYshVGded4JeilkXgWKdXA`
 
-            '
-          example: RxsYshVGded4JeilkXgWKdXA
-        name:
-          title: Name
-          type: string
-          description: 'The name of the savings goal.
-
-
-            Example: `Holiday`
-
-            '
-          example: Holiday
-        target_amount:
-          title: Target Amount
-          type: object
-          description: 'The target amount of money to be saved for this goal.
-
-            '
-          required:
-          - value
-          - currency
-          properties:
-            value:
-              $ref: '#/components/schemas/BudMonetaryValue'
-            currency:
-              $ref: '#/components/schemas/BudCurrency'
-        target_datetime:
-          title: Target Datetime
-          type:
-          - string
-          - 'null'
-          description: "The target date by which the savings goal should be reached, in the format [RFC-3339](https://www.rfc-editor.org/rfc/rfc3339). Must be a future date. Set to `null` to remove the target date.\n\nExamples:\n  - `2025-12-31T00:00:00Z`\n  - `2025-12-31T00:00:00+01:00`\n"
-        allocation_ratio:
-          title: Allocation Ratio
-          type: number
-          format: float
-          description: 'The proportion of the account balance to allocate to this savings goal. Must be greater than `0` and at most `1`.
+        '
+    PathSavingsGoalIDV2:
+      name: savings_goal_id
+      in: path
+      schema:
+        type: string
+        format: uuid
+      required: true
+      description: 'The ID of the savings goal.
 
 
-            Example: `0.25`
+        Example: `81a68821-dca6-4771-80d4-002c7fce412e`
 
-            '
-          example: 0.25
-    CreateSavingsGoalV2Request:
-      title: Create Savings Goal V2 Request
-      required:
-      - account_id
-      - name
-      - target_amount
-      - allocation_ratio
-      properties:
-        account_id:
-          title: Account ID
-          type: string
-          description: 'The account ID the savings goal is associated with.
-
-
-            Example: `RxsYshVGded4JeilkXgWKdXA`
-
-            '
-          example: RxsYshVGded4JeilkXgWKdXA
-        name:
-          title: Name
-          type: string
-          description: 'The name of the savings goal.
-
-
-            Example: `Holiday`
-
-            '
-          example: Holiday
-        target_amount:
-          title: Target Amount
-          type: object
-          description: 'The target amount of money to be saved for this goal.
-
-            '
-          required:
-          - value
-          - currency
-          properties:
-            value:
-              $ref: '#/components/schemas/BudMonetaryValue'
-            currency:
-              $ref: '#/components/schemas/BudCurrency'
-        target_datetime:
-          title: Target Datetime
-          type: string
-          description: "The optional target date by which the savings goal should be reached, in the format [RFC-3339](https://www.rfc-editor.org/rfc/rfc3339). Must be a future date.\n\nExamples:\n  - `2025-12-31T00:00:00Z`\n  - `2025-12-31T00:00:00+01:00`\n"
-        allocation_ratio:
-          title: Allocation Ratio
-          type: number
-          format: float
-          description: 'The proportion of the account balance to allocate to this savings goal. Must be greater than `0` and at most `1`.
-
-
-            Example: `0.2`
-
-            '
-          example: 0.2
+        '
+      example: 81a68821-dca6-4771-80d4-002c7fce412e
+    ClientId:
+      in: header
+      name: X-Client-Id
+      schema:
+        type: string
+      required: true
+      description: The API Client Identifier (Service Application Identifier).
+      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
+    CustomerId:
+      in: header
+      name: X-Customer-Id
+      schema:
+        type: string
+        format: uuid
+      required: true
+      description: A unique identifier for a Customer, as registered on Bud's platform.
+      example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
   securitySchemes:
     Basic:
       type: http

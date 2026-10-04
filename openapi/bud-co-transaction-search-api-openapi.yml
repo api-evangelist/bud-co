@@ -159,8 +159,8 @@ paths:
           description: Not Found
 components:
   schemas:
-    SearchTransactionsResponseBody:
-      title: Search Transactions Response
+    SearchInsightTransactionsResponseBody:
+      title: Search Insight Transactions Response
       type: object
       required:
       - operation_id
@@ -170,13 +170,12 @@ components:
         operation_id:
           type: string
           enum:
-          - search_beta_transactions_get
+          - search_beta_transactions_insight_transactions_get
         data:
           type: object
           required:
           - id
           - results
-          - suggested_searches
           properties:
             id:
               title: Search ID
@@ -186,79 +185,95 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/TransactionSearchResult'
-            suggested_searches:
-              type: array
-              items:
-                $ref: '#/components/schemas/SuggestedTransactionSearch'
-            insight:
+        metadata:
+          $ref: '#/components/schemas/TransactionSearchMetadata'
+    TransactionFilter:
+      title: Transaction Filter
+      type: object
+      required:
+      - type
+      - value
+      - logo
+      properties:
+        type:
+          $ref: '#/components/schemas/TransactionFilterType'
+        value:
+          type: string
+        logo:
+          type: string
+          description: An icon to allow the user to distinguish between different types of filter, possibly with the same value e.g. searching for a tag of 'bills' vs 'bills' contained in the description search.
+          format: url
+    SearchTransactionsInsightResponseBody:
+      title: Search Transactions Insight Response
+      type: object
+      required:
+      - operation_id
+      - data
+      - metadata
+      properties:
+        operation_id:
+          type: string
+          enum:
+          - search_beta_transactions_insight_get
+        data:
+          type: object
+          required:
+          - id
+          - status
+          properties:
+            id:
+              title: Search ID
+              type: string
+              format: uuid
+            status:
+              title: Insight Generation Status
+              description: Status of the insight generation. Once this moves from `pending` to `completed`, `content` & `transactions` will be returned.
+              type: string
+              enum:
+              - pending
+              - completed
+              - error
+            content:
+              type: object
+              required:
+              - text
+              - matched_searches
+              properties:
+                text:
+                  title: Insight text
+                  type: string
+                matched_searches:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/InsightMatchedTransactionSearch'
+            transactions:
+              description: Information relating to the transactions used in calculating the insight.
               type: object
               required:
               - url
-              - url_delay
+              - results
+              - merchants
               properties:
                 url:
+                  description: A path to the transactions used in calculating the insight.
                   type: string
-                  description: The URL (relative path) to fetch the insight linked to this search
-                url_delay:
+                results:
+                  description: The number of transactions used in calculating the insight
                   type: integer
-                  format: milliseconds
-                  description: The recomended time (in milliseconds) to wait before trying to fetch the insight.
+                merchants:
+                  description: The set of merchants found in the transactions,
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      display_name:
+                        type: string
+                        description: UI friendly display name for the merchant.
+                      logo:
+                        type: string
+                        description: URL supplying merchant logo, if available.
         metadata:
-          $ref: '#/components/schemas/TransactionSearchMetadata'
-    TransactionSearchResult:
-      title: Transaction Search Result
-      type: object
-      required:
-      - matches
-      - transaction
-      properties:
-        matches:
-          title: Matches
-          type: array
-          items:
-            $ref: '#/components/schemas/TransactionSearchResultMatches'
-        transaction:
-          $ref: '#/components/schemas/Transaction'
-    Regularity:
-      title: Regularity
-      type: object
-      description: 'Regularity enrichment associated with a Transaction, as generated by Bud''s artificial intelligence models.  Transactions that are similar and have a known frequency will all have the same regularity enrichment.
-
-        '
-      properties:
-        frequency:
-          type: string
-          description: Detected frequency of the Transaction.
-          enum:
-          - unknown
-          - daily
-          - weekly
-          - biweekly
-          - monthly
-          - quarterly
-        predicted_date_times:
-          type: array
-          description: Expected date times for the Transaction to repeat.
-          items:
-            type: string
-        group_label:
-          type: string
-          description: Unique label applied to multiple transactions in the same group.
-    TransactionIdSearchResult:
-      title: Transaction ID Search Result
-      type: object
-      required:
-      - matches
-      - transaction_id
-      properties:
-        matches:
-          title: Matches
-          type: array
-          items:
-            $ref: '#/components/schemas/TransactionSearchResultMatches'
-        transaction_id:
-          type: string
-          description: Unique identifier for the transaction. May be mutable depending on original ingestion source.
+          $ref: '#/components/schemas/TransactionSearchInsightMetadata'
     BudTransactionType:
       title: transaction_type
       type: object
@@ -306,165 +321,7 @@ components:
             example: `Contactless POS`
 
             '
-    TransactionFilterType:
-      title: Transaction Filter Type
-      type: string
-      description: 'Transaction field used to match the search query to transactions.
-
-
-        Current list of valid values:
-
-
-        - `merchant_name`
-
-        - `category_l1`
-
-        - `category_l2`
-
-        - `description`
-
-        - `tag`
-
-        '
-    Categories:
-      title: Categories
-      type: object
-      description: 'Categories enrichment associated with a Transaction, as generated by Bud''s artificial intelligence models.  Currently two levels of category are supported, with `l1` being a coarse-grained category level and `l2` being more refined.
-
-        '
-      properties:
-        l1:
-          $ref: '#/components/schemas/Category'
-          description: Level 1 Category
-        l2:
-          $ref: '#/components/schemas/Category'
-          description: Level 2 Category
-    SearchTransactionsResponseBodyTransactionId:
-      title: Search Transactions Response
-      type: object
-      required:
-      - operation_id
-      - data
-      - metadata
-      properties:
-        operation_id:
-          type: string
-          enum:
-          - search_beta_transactions_get
-        data:
-          type: object
-          required:
-          - id
-          - results
-          - suggested_searches
-          properties:
-            id:
-              title: Search ID
-              type: string
-              format: uuid
-            results:
-              type: array
-              items:
-                $ref: '#/components/schemas/TransactionIdSearchResult'
-            suggested_searches:
-              type: array
-              items:
-                $ref: '#/components/schemas/SuggestedTransactionSearch'
-            insight:
-              type: object
-              required:
-              - url
-              - url_delay
-              properties:
-                url:
-                  type: string
-                  description: The URL (relative path) to fetch the insight linked to this search
-                url_delay:
-                  type: integer
-                  format: milliseconds
-                  description: The recomended time (in milliseconds) to wait before trying to fetch the insight.
-        metadata:
-          $ref: '#/components/schemas/TransactionSearchMetadata'
-    Token:
-      title: Token
-      type: object
-      description: The token item.
-      required:
-      - value
-      - confidence
-      properties:
-        value:
-          type: string
-        confidence:
-          type: string
-          description: Degree of belief of correct assignment, expressed as a probability.
-    BudCurrency:
-      title: Currency
-      description: 'The three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) of the monetary amount.
-
-
-        Example: `GBP`
-
-        '
-      type: string
-    TransactionSearchMetadata:
-      title: Transaction Search Metadata
-      type: object
-      required:
-      - query
-      - expires_in
-      properties:
-        query:
-          $ref: '#/components/schemas/TransactionSearchQuery'
-        next_page_token:
-          $ref: '#/components/schemas/NextPageToken'
-        results:
-          $ref: '#/components/schemas/Results'
-        expires_in:
-          $ref: '#/components/schemas/TransactionSearchExpirySeconds'
-    TransactionsContentType:
-      title: Transactions Content Type
-      type: string
-      enum:
-      - application/bud-transaction-v3+json
-      - application/bud-transaction-id+json
-      default: application/bud-transaction-v3+json
-      description: 'Defines the transactions'' format for the response.
-
-
-        | MIME type                           | Description                                                                                                   |
-
-        |:-----------------------------------:|:-------------------------------------------------------------------------------------------------------------:|
-
-        | application/bud-transaction-v3+json | The full transactcion model, including all of Bud''s enrichments                                               |
-
-        | application/bud-transaction-id+json | Just the IDs of each transaction, useful if your transactions are stored / cached outside of the Bud platform |'
-    ClientAttributes:
-      title: Client Attributes
-      type: object
-      description: 'An optional map of key-value string pairs that allows clients to attach arbitrary metadata to the transaction.
-
-        This field can be used to store any relevant information specific to the client''s needs, such as:
-
-        These attributes can be added using the [Ingest Transactions](#operation/v2_ingest_transactions_post) endpoint.
-
-        '
-      properties:
-        key:
-          type: string
-          description: An arbitrary key-value pair for the client attribute.
-    TransactionSearchInsightMetadata:
-      title: Transaction Search Insight Metadata
-      type: object
-      required:
-      - query
-      - expires_in
-      properties:
-        query:
-          $ref: '#/components/schemas/TransactionSearchQuery'
-        expires_in:
-          $ref: '#/components/schemas/TransactionSearchExpirySeconds'
-    SearchInsightTransactionsResponseBody:
+    SearchInsightTransactionsResponseBodyTransactionId:
       title: Search Insight Transactions Response
       type: object
       required:
@@ -489,56 +346,23 @@ components:
             results:
               type: array
               items:
-                $ref: '#/components/schemas/TransactionSearchResult'
+                $ref: '#/components/schemas/TransactionIdSearchResult'
         metadata:
           $ref: '#/components/schemas/TransactionSearchMetadata'
-    TransactionSearchResultMatches:
+    TransactionSearchResult:
+      title: Transaction Search Result
       type: object
       required:
-      - type
-      - content
+      - matches
+      - transaction
       properties:
-        type:
-          $ref: '#/components/schemas/TransactionFilterType'
-        content:
-          type: string
-          description: the content which matched in the transaction field, to facilitate highlighting to the user
-    Enrichments:
-      title: Enrichments
-      type: object
-      description: Contextual enrichments associated with a Transaction
-      properties:
-        categories:
-          $ref: '#/components/schemas/Categories'
-        merchant:
-          $ref: '#/components/schemas/Merchant'
-        processor:
-          $ref: '#/components/schemas/Processor'
-        regularity:
-          $ref: '#/components/schemas/Regularity'
-        location:
-          $ref: '#/components/schemas/Location'
-        transaction_types:
+        matches:
+          title: Matches
           type: array
-          description: Transaction types associated with the transaction
           items:
-            type: string
-        names:
-          type: array
-          description: Names that were detected in the transaction description
-          items:
-            type: string
-    SuggestedTransactionSearch:
-      title: Suggested Transaction Search
-      type: object
-      required:
-      - filter
-      - url
-      properties:
-        filter:
-          $ref: '#/components/schemas/TransactionFilter'
-        url:
-          type: string
+            $ref: '#/components/schemas/TransactionSearchResultMatches'
+        transaction:
+          $ref: '#/components/schemas/Transaction'
     BudAmount:
       title: Standard Bud Amount
       type: object
@@ -551,6 +375,10 @@ components:
           $ref: '#/components/schemas/BudMonetaryValue'
         currency:
           $ref: '#/components/schemas/BudCurrency'
+    TransactionSearchExpirySeconds:
+      type: integer
+      format: seconds
+      description: The number of seconds the search is stored. After this duration elapses, the search will expire and all requestes using it's ID will return `Not Found` errors.
     Transaction:
       title: Transaction
       type: object
@@ -681,10 +509,6 @@ components:
             type: string
         client_attributes:
           $ref: '#/components/schemas/ClientAttributes'
-    BudMonetaryValue:
-      title: Monetary Value
-      description: "The value of the monetary amount. The value is formatted with the number of decimal places for the respective currency. \n\nExample: `10.98`\n"
-      type: string
     Location:
       title: Location
       type: object
@@ -736,239 +560,26 @@ components:
           description: A list of substrings from the description identified as being relevant to the transaction location.
           items:
             type: string
-    Merchant:
-      title: Merchant
-      type: object
-      description: 'Merchant enrichment associated with a Transaction, as generated using a combination of Bud''s artificial  intelligence models and database of known merchants.
+    BudCurrency:
+      title: Currency
+      description: 'The three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) of the monetary amount.
+
+
+        Example: `GBP`
 
         '
-      properties:
-        id:
-          type: string
-          description: UUID corresponding to the merchant, if available. Subject to version control.
-        slug:
-          type: string
-          description: Unique human readable identifier of the merchant. Not subject to version control.
-        display_name:
-          type: string
-          description: UI friendly display name for the merchant.
-        logo:
-          type: string
-          description: URL supplying merchant logo, if available.
-        tokens:
-          type: array
-          description: 'A list of tokens calculated from the transaction model, used to identify the Merchant.  This list is often present even if the merchant details (id, slug, disply_name, logo) are not returned.
-
-            '
-          items:
-            $ref: '#/components/schemas/Token'
-        website:
-          type: string
-          description: URL supplying merchant website, if available.
-        tags:
-          type: array
-          items:
-            type: string
-          description: A list of tags describing the merchant
-    SearchInsightTransactionsResponseBodyTransactionId:
-      title: Search Insight Transactions Response
-      type: object
-      required:
-      - operation_id
-      - data
-      - metadata
-      properties:
-        operation_id:
-          type: string
-          enum:
-          - search_beta_transactions_insight_transactions_get
-        data:
-          type: object
-          required:
-          - id
-          - results
-          properties:
-            id:
-              title: Search ID
-              type: string
-              format: uuid
-            results:
-              type: array
-              items:
-                $ref: '#/components/schemas/TransactionIdSearchResult'
-        metadata:
-          $ref: '#/components/schemas/TransactionSearchMetadata'
-    TransactionFilter:
-      title: Transaction Filter
+      type: string
+    TransactionSearchResultMatches:
       type: object
       required:
       - type
-      - value
-      - logo
+      - content
       properties:
         type:
           $ref: '#/components/schemas/TransactionFilterType'
-        value:
+        content:
           type: string
-        logo:
-          type: string
-          description: An icon to allow the user to distinguish between different types of filter, possibly with the same value e.g. searching for a tag of 'bills' vs 'bills' contained in the description search.
-          format: url
-    TransactionSearchExpirySeconds:
-      type: integer
-      format: seconds
-      description: The number of seconds the search is stored. After this duration elapses, the search will expire and all requestes using it's ID will return `Not Found` errors.
-    Results:
-      type: integer
-      description: The number of results included in this page.
-    SearchTransactionsInsightResponseBody:
-      title: Search Transactions Insight Response
-      type: object
-      required:
-      - operation_id
-      - data
-      - metadata
-      properties:
-        operation_id:
-          type: string
-          enum:
-          - search_beta_transactions_insight_get
-        data:
-          type: object
-          required:
-          - id
-          - status
-          properties:
-            id:
-              title: Search ID
-              type: string
-              format: uuid
-            status:
-              title: Insight Generation Status
-              description: Status of the insight generation. Once this moves from `pending` to `completed`, `content` & `transactions` will be returned.
-              type: string
-              enum:
-              - pending
-              - completed
-              - error
-            content:
-              type: object
-              required:
-              - text
-              - matched_searches
-              properties:
-                text:
-                  title: Insight text
-                  type: string
-                matched_searches:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/InsightMatchedTransactionSearch'
-            transactions:
-              description: Information relating to the transactions used in calculating the insight.
-              type: object
-              required:
-              - url
-              - results
-              - merchants
-              properties:
-                url:
-                  description: A path to the transactions used in calculating the insight.
-                  type: string
-                results:
-                  description: The number of transactions used in calculating the insight
-                  type: integer
-                merchants:
-                  description: The set of merchants found in the transactions,
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      display_name:
-                        type: string
-                        description: UI friendly display name for the merchant.
-                      logo:
-                        type: string
-                        description: URL supplying merchant logo, if available.
-        metadata:
-          $ref: '#/components/schemas/TransactionSearchInsightMetadata'
-    InsightMatchedTransactionSearch:
-      title: Insight Search Term
-      description: A search term which has been detected in the insight text. This can be exposed as an interaction for the customer using the links & text positions provided.
-      type: object
-      required:
-      - filter
-      - url
-      - text_positions
-      properties:
-        filter:
-          $ref: '#/components/schemas/TransactionFilter'
-        url:
-          type: string
-        text_positions:
-          type: array
-          description: All byte positions of the search term in the insight text (assuming utf-16 string encoding).
-          items:
-            type: object
-            description: 'The start and end position of the search term in the text. The end position is exclusive.
-
-              E.g. "hello" in "hello world" would have start: 0, end: 5.'
-            required:
-            - start
-            - end
-            properties:
-              start:
-                type: integer
-              end:
-                type: integer
-    Processor:
-      title: Processor
-      type: object
-      description: 'Processor enrichment associated with a Transaction, as generated using a combination of Bud''s artificial  intelligence models and database of known payment processors.
-
-        '
-      properties:
-        id:
-          type: string
-          description: UUID corresponding to the processor, if available. Subject to version control.
-        slug:
-          type: string
-          description: Unique human readable identifier of the processor. Not subject to version control.
-        display_name:
-          type: string
-          description: UI friendly display name for the processor.
-        logo:
-          type: string
-          description: URL supplying processor logo, if available.
-        tokens:
-          type: array
-          description: 'A list of tokens calculated from the transaction model, used to identify the Merchant.  This list is often present even if the merchant details (id, slug, disply_name, logo) are not returned.
-
-            '
-          items:
-            $ref: '#/components/schemas/Token'
-        website:
-          type: string
-          description: URL supplying merchant website, if available.
-    Category:
-      title: Category
-      type: object
-      description: Category associated with a Transaction
-      required:
-      - slug
-      - confidence
-      properties:
-        slug:
-          type: string
-          description: Unique human readable identifier of the category. Not subject to version control.
-        confidence:
-          type: string
-          description: Degree of belief of correct assignment, expressed as a probability.
-    NextPageToken:
-      type: string
-      description: 'The token to use to fetch the next page of results. This is only set if there are more results to fetch.
-
-        '
+          description: the content which matched in the transaction field, to facilitate highlighting to the user
     TransactionSearchQuery:
       title: Transaction Search Query
       type: object
@@ -1010,7 +621,424 @@ components:
           type: string
         amount_max:
           type: string
+    ClientAttributes:
+      title: Client Attributes
+      type: object
+      description: 'An optional map of key-value string pairs that allows clients to attach arbitrary metadata to the transaction.
+
+        This field can be used to store any relevant information specific to the client''s needs, such as:
+
+        These attributes can be added using the [Ingest Transactions](#operation/v2_ingest_transactions_post) endpoint.
+
+        '
+      properties:
+        key:
+          type: string
+          description: An arbitrary key-value pair for the client attribute.
+    Category:
+      title: Category
+      type: object
+      description: Category associated with a Transaction
+      required:
+      - slug
+      - confidence
+      properties:
+        slug:
+          type: string
+          description: Unique human readable identifier of the category. Not subject to version control.
+        confidence:
+          type: string
+          description: Degree of belief of correct assignment, expressed as a probability.
+    TransactionFilterType:
+      title: Transaction Filter Type
+      type: string
+      description: 'Transaction field used to match the search query to transactions.
+
+
+        Current list of valid values:
+
+
+        - `merchant_name`
+
+        - `category_l1`
+
+        - `category_l2`
+
+        - `description`
+
+        - `tag`
+
+        '
+    TransactionSearchInsightMetadata:
+      title: Transaction Search Insight Metadata
+      type: object
+      required:
+      - query
+      - expires_in
+      properties:
+        query:
+          $ref: '#/components/schemas/TransactionSearchQuery'
+        expires_in:
+          $ref: '#/components/schemas/TransactionSearchExpirySeconds'
+    TransactionsContentType:
+      title: Transactions Content Type
+      type: string
+      enum:
+      - application/bud-transaction-v3+json
+      - application/bud-transaction-id+json
+      default: application/bud-transaction-v3+json
+      description: 'Defines the transactions'' format for the response.
+
+
+        | MIME type                           | Description                                                                                                   |
+
+        |:-----------------------------------:|:-------------------------------------------------------------------------------------------------------------:|
+
+        | application/bud-transaction-v3+json | The full transactcion model, including all of Bud''s enrichments                                               |
+
+        | application/bud-transaction-id+json | Just the IDs of each transaction, useful if your transactions are stored / cached outside of the Bud platform |'
+    BudMonetaryValue:
+      title: Monetary Value
+      description: "The value of the monetary amount. The value is formatted with the number of decimal places for the respective currency. \n\nExample: `10.98`\n"
+      type: string
+    SearchTransactionsResponseBody:
+      title: Search Transactions Response
+      type: object
+      required:
+      - operation_id
+      - data
+      - metadata
+      properties:
+        operation_id:
+          type: string
+          enum:
+          - search_beta_transactions_get
+        data:
+          type: object
+          required:
+          - id
+          - results
+          - suggested_searches
+          properties:
+            id:
+              title: Search ID
+              type: string
+              format: uuid
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/TransactionSearchResult'
+            suggested_searches:
+              type: array
+              items:
+                $ref: '#/components/schemas/SuggestedTransactionSearch'
+            insight:
+              type: object
+              required:
+              - url
+              - url_delay
+              properties:
+                url:
+                  type: string
+                  description: The URL (relative path) to fetch the insight linked to this search
+                url_delay:
+                  type: integer
+                  format: milliseconds
+                  description: The recomended time (in milliseconds) to wait before trying to fetch the insight.
+        metadata:
+          $ref: '#/components/schemas/TransactionSearchMetadata'
+    Enrichments:
+      title: Enrichments
+      type: object
+      description: Contextual enrichments associated with a Transaction
+      properties:
+        categories:
+          $ref: '#/components/schemas/Categories'
+        merchant:
+          $ref: '#/components/schemas/Merchant'
+        processor:
+          $ref: '#/components/schemas/Processor'
+        regularity:
+          $ref: '#/components/schemas/Regularity'
+        location:
+          $ref: '#/components/schemas/Location'
+        transaction_types:
+          type: array
+          description: Transaction types associated with the transaction
+          items:
+            type: string
+        names:
+          type: array
+          description: Names that were detected in the transaction description
+          items:
+            type: string
+    SearchTransactionsResponseBodyTransactionId:
+      title: Search Transactions Response
+      type: object
+      required:
+      - operation_id
+      - data
+      - metadata
+      properties:
+        operation_id:
+          type: string
+          enum:
+          - search_beta_transactions_get
+        data:
+          type: object
+          required:
+          - id
+          - results
+          - suggested_searches
+          properties:
+            id:
+              title: Search ID
+              type: string
+              format: uuid
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/TransactionIdSearchResult'
+            suggested_searches:
+              type: array
+              items:
+                $ref: '#/components/schemas/SuggestedTransactionSearch'
+            insight:
+              type: object
+              required:
+              - url
+              - url_delay
+              properties:
+                url:
+                  type: string
+                  description: The URL (relative path) to fetch the insight linked to this search
+                url_delay:
+                  type: integer
+                  format: milliseconds
+                  description: The recomended time (in milliseconds) to wait before trying to fetch the insight.
+        metadata:
+          $ref: '#/components/schemas/TransactionSearchMetadata'
+    TransactionIdSearchResult:
+      title: Transaction ID Search Result
+      type: object
+      required:
+      - matches
+      - transaction_id
+      properties:
+        matches:
+          title: Matches
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionSearchResultMatches'
+        transaction_id:
+          type: string
+          description: Unique identifier for the transaction. May be mutable depending on original ingestion source.
+    SuggestedTransactionSearch:
+      title: Suggested Transaction Search
+      type: object
+      required:
+      - filter
+      - url
+      properties:
+        filter:
+          $ref: '#/components/schemas/TransactionFilter'
+        url:
+          type: string
+    Token:
+      title: Token
+      type: object
+      description: The token item.
+      required:
+      - value
+      - confidence
+      properties:
+        value:
+          type: string
+        confidence:
+          type: string
+          description: Degree of belief of correct assignment, expressed as a probability.
+    Processor:
+      title: Processor
+      type: object
+      description: 'Processor enrichment associated with a Transaction, as generated using a combination of Bud''s artificial  intelligence models and database of known payment processors.
+
+        '
+      properties:
+        id:
+          type: string
+          description: UUID corresponding to the processor, if available. Subject to version control.
+        slug:
+          type: string
+          description: Unique human readable identifier of the processor. Not subject to version control.
+        display_name:
+          type: string
+          description: UI friendly display name for the processor.
+        logo:
+          type: string
+          description: URL supplying processor logo, if available.
+        tokens:
+          type: array
+          description: 'A list of tokens calculated from the transaction model, used to identify the Merchant.  This list is often present even if the merchant details (id, slug, disply_name, logo) are not returned.
+
+            '
+          items:
+            $ref: '#/components/schemas/Token'
+        website:
+          type: string
+          description: URL supplying merchant website, if available.
+    Merchant:
+      title: Merchant
+      type: object
+      description: 'Merchant enrichment associated with a Transaction, as generated using a combination of Bud''s artificial  intelligence models and database of known merchants.
+
+        '
+      properties:
+        id:
+          type: string
+          description: UUID corresponding to the merchant, if available. Subject to version control.
+        slug:
+          type: string
+          description: Unique human readable identifier of the merchant. Not subject to version control.
+        display_name:
+          type: string
+          description: UI friendly display name for the merchant.
+        logo:
+          type: string
+          description: URL supplying merchant logo, if available.
+        tokens:
+          type: array
+          description: 'A list of tokens calculated from the transaction model, used to identify the Merchant.  This list is often present even if the merchant details (id, slug, disply_name, logo) are not returned.
+
+            '
+          items:
+            $ref: '#/components/schemas/Token'
+        website:
+          type: string
+          description: URL supplying merchant website, if available.
+        tags:
+          type: array
+          items:
+            type: string
+          description: A list of tags describing the merchant
+    TransactionSearchMetadata:
+      title: Transaction Search Metadata
+      type: object
+      required:
+      - query
+      - expires_in
+      properties:
+        query:
+          $ref: '#/components/schemas/TransactionSearchQuery'
+        next_page_token:
+          $ref: '#/components/schemas/NextPageToken'
+        results:
+          $ref: '#/components/schemas/Results'
+        expires_in:
+          $ref: '#/components/schemas/TransactionSearchExpirySeconds'
+    Categories:
+      title: Categories
+      type: object
+      description: 'Categories enrichment associated with a Transaction, as generated by Bud''s artificial intelligence models.  Currently two levels of category are supported, with `l1` being a coarse-grained category level and `l2` being more refined.
+
+        '
+      properties:
+        l1:
+          $ref: '#/components/schemas/Category'
+          description: Level 1 Category
+        l2:
+          $ref: '#/components/schemas/Category'
+          description: Level 2 Category
+    Results:
+      type: integer
+      description: The number of results included in this page.
+    InsightMatchedTransactionSearch:
+      title: Insight Search Term
+      description: A search term which has been detected in the insight text. This can be exposed as an interaction for the customer using the links & text positions provided.
+      type: object
+      required:
+      - filter
+      - url
+      - text_positions
+      properties:
+        filter:
+          $ref: '#/components/schemas/TransactionFilter'
+        url:
+          type: string
+        text_positions:
+          type: array
+          description: All byte positions of the search term in the insight text (assuming utf-16 string encoding).
+          items:
+            type: object
+            description: 'The start and end position of the search term in the text. The end position is exclusive.
+
+              E.g. "hello" in "hello world" would have start: 0, end: 5.'
+            required:
+            - start
+            - end
+            properties:
+              start:
+                type: integer
+              end:
+                type: integer
+    NextPageToken:
+      type: string
+      description: 'The token to use to fetch the next page of results. This is only set if there are more results to fetch.
+
+        '
+    Regularity:
+      title: Regularity
+      type: object
+      description: 'Regularity enrichment associated with a Transaction, as generated by Bud''s artificial intelligence models.  Transactions that are similar and have a known frequency will all have the same regularity enrichment.
+
+        '
+      properties:
+        frequency:
+          type: string
+          description: Detected frequency of the Transaction.
+          enum:
+          - unknown
+          - daily
+          - weekly
+          - biweekly
+          - monthly
+          - quarterly
+        predicted_date_times:
+          type: array
+          description: Expected date times for the Transaction to repeat.
+          items:
+            type: string
+        group_label:
+          type: string
+          description: Unique label applied to multiple transactions in the same group.
   parameters:
+    QueryDescription:
+      name: description
+      in: query
+      schema:
+        type: string
+        maxLength: 512
+      required: false
+    QueryBudPageToken:
+      in: query
+      name: page_token
+      schema:
+        type: string
+      example: eyJoZWxsbyI6ICJ3b3JsZCJ9Cg==
+      description: Use this parameter to fetch a specific page of results. Provided by the next_page_token field in the previous request.
+    QueryUserInput:
+      name: user_input
+      in: query
+      schema:
+        type: string
+        maxLength: 512
+      required: false
+    QueryTag:
+      name: tag
+      in: query
+      schema:
+        type: string
+        maxLength: 512
+      required: false
     CustomerIdempotentIdentifier:
       in: header
       name: X-Customer-Idempotent-Identifier
@@ -1026,48 +1054,21 @@ components:
         type: string
       example: '2019-02-29T12:23:00Z'
       description: "The date up to when results are to be retrieved in the format [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339).\n\nExamples:\n  - `2023-03-17T17:29:51Z`\n  - `2023-03-17T17:29:51-08:00`\n"
-    QueryCreditDebitIndicator:
-      name: credit_debit_indicator
-      in: query
+    PathSearchId:
+      in: path
+      name: search_id
       schema:
         type: string
-        enum:
-        - credit
-        - debit
-      required: false
-    QueryAmountMax:
-      name: amount_max
+        format: uuid
+      example: 2f6c8ebe-b408-43f8-9152-80e2275deec5
+      required: true
+    QueryFromBudDate:
       in: query
-      schema:
-        type: number
-      required: false
-      description: 'Include transactions with an amount value less than or equal to the specified value. Must be greater than 0.
-
-        '
-    QueryCategoryL1:
-      name: category_l1
-      in: query
+      name: from
       schema:
         type: string
-        maxLength: 512
-      required: false
-    QueryTag:
-      name: tag
-      in: query
-      schema:
-        type: string
-        maxLength: 512
-      required: false
-    QueryAmountMin:
-      name: amount_min
-      in: query
-      schema:
-        type: number
-        minimum: 0
-      required: false
-      description: 'Include transactions with an amount value greater than or equal to the specified value
-
-        '
+      example: '2019-02-29T12:23:00Z'
+      description: "The date from when results are to be retrieved in the format [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339).\n\nExamples:\n  - `2023-01-17T17:29:51Z`\n  - `2023-01-17T17:29:51-08:00`\n"
     QueryAccountId:
       name: account_id
       in: query
@@ -1079,61 +1080,18 @@ components:
       description: 'Account id used to filter results. If multiple account ids are supplied, transactions from all of the supplied accounts will be included in results.
 
         '
-    PathSearchId:
-      in: path
-      name: search_id
+    QueryAmountMin:
+      name: amount_min
+      in: query
       schema:
-        type: string
-        format: uuid
-      example: 2f6c8ebe-b408-43f8-9152-80e2275deec5
-      required: true
+        type: number
+        minimum: 0
+      required: false
+      description: 'Include transactions with an amount value greater than or equal to the specified value
+
+        '
     QueryCategoryL2:
       name: category_l2
-      in: query
-      schema:
-        type: string
-        maxLength: 512
-      required: false
-    QueryUserInput:
-      name: user_input
-      in: query
-      schema:
-        type: string
-        maxLength: 512
-      required: false
-    QueryFromBudDate:
-      in: query
-      name: from
-      schema:
-        type: string
-      example: '2019-02-29T12:23:00Z'
-      description: "The date from when results are to be retrieved in the format [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339).\n\nExamples:\n  - `2023-01-17T17:29:51Z`\n  - `2023-01-17T17:29:51-08:00`\n"
-    ClientId:
-      in: header
-      name: X-Client-Id
-      schema:
-        type: string
-      required: true
-      description: The API Client Identifier (Service Application Identifier).
-      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
-    CustomerId:
-      in: header
-      name: X-Customer-Id
-      schema:
-        type: string
-        format: uuid
-      required: true
-      description: A unique identifier for a Customer, as registered on Bud's platform.
-      example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
-    QueryBudPageToken:
-      in: query
-      name: page_token
-      schema:
-        type: string
-      example: eyJoZWxsbyI6ICJ3b3JsZCJ9Cg==
-      description: Use this parameter to fetch a specific page of results. Provided by the next_page_token field in the previous request.
-    QueryMerchantName:
-      name: merchant_name
       in: query
       schema:
         type: string
@@ -1146,13 +1104,6 @@ components:
         $ref: '#/components/schemas/TransactionsContentType'
       required: false
       description: The requested transaction format (e.g. full transaction model vs only IDs)
-    QueryDescription:
-      name: description
-      in: query
-      schema:
-        type: string
-        maxLength: 512
-      required: false
     HeaderTimezone:
       in: header
       name: X-Timezone
@@ -1173,7 +1124,285 @@ components:
         type: integer
       example: 25
       description: Use this parameter to set the maximum number of results to be returned. This defaults to 25, and has a maximum of 100.
+    ClientId:
+      in: header
+      name: X-Client-Id
+      schema:
+        type: string
+      required: true
+      description: The API Client Identifier (Service Application Identifier).
+      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
+    CustomerId:
+      in: header
+      name: X-Customer-Id
+      schema:
+        type: string
+        format: uuid
+      required: true
+      description: A unique identifier for a Customer, as registered on Bud's platform.
+      example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
+    QueryMerchantName:
+      name: merchant_name
+      in: query
+      schema:
+        type: string
+        maxLength: 512
+      required: false
+    QueryCategoryL1:
+      name: category_l1
+      in: query
+      schema:
+        type: string
+        maxLength: 512
+      required: false
+    QueryCreditDebitIndicator:
+      name: credit_debit_indicator
+      in: query
+      schema:
+        type: string
+        enum:
+        - credit
+        - debit
+      required: false
+    QueryAmountMax:
+      name: amount_max
+      in: query
+      schema:
+        type: number
+      required: false
+      description: 'Include transactions with an amount value less than or equal to the specified value. Must be greater than 0.
+
+        '
   responses:
+    SearchTransactionsInsightResponse:
+      description: OK
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+          description: Time in milliseconds to wait before retrying.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SearchTransactionsInsightResponseBody'
+          examples:
+            pending:
+              value:
+                operation_id: search_beta_transactions_insight_get
+                data:
+                  id: 234029b1-37ee-4942-b56d-5588f293f571
+                  status: pending
+                metadata:
+                  query:
+                    user_input: Dunki
+                    from: '2025-01-01T00:00:00Z'
+                    to: '2025-02-01T00:00:00Z'
+                  expires_in: 60
+            completed:
+              value:
+                operation_id: search_beta_transactions_insight_get
+                data:
+                  id: 234029b1-37ee-4942-b56d-5588f293f571
+                  status: completed
+                  content:
+                    text: You have spent $20 at Dunkin', this is up 50% of your coffee spend....
+                    matched_searches:
+                    - filter:
+                        type: merchant
+                        value: Dunkin'
+                        logo: https://assets.thisibud.com/5c97ffcf-9604-4fd9-bef1-1496ccce2d12.png
+                      url: /search/beta/transactions?merchant=Dunkin'
+                      text_positions:
+                      - start: 22
+                        end: 59
+                    - filter:
+                        type: category_l2
+                        value: coffee
+                        logo: https://assets.thisibud.com/5c97ffcf-9604-4fd9-bef1-1496ccce2d12.png
+                      url: /search/beta/transactions?category_l2=coffee
+                      text_positions:
+                      - start: 64
+                        end: 70
+                  transactions:
+                    url: /search/beta/transactions/234029b1-37ee-4942-b56d-5588f293f571/insight/transactions
+                    results: 10
+                    merchants:
+                    - display_name: Dunkin'
+                      logo: https://assets.thisibud.com/5c97ffcf-9604-4fd9-bef1-1496ccce2d12.png
+                metadata:
+                  query:
+                    user_input: Dunki
+                    from: '2025-01-01T00:00:00Z'
+                    to: '2025-02-01T00:00:00Z'
+                  expires_in: 60
+    SearchInsightTransactionsResponse:
+      description: OK
+      headers:
+        Content-Type:
+          description: Defines the transactions' format for the response.
+          schema:
+            $ref: '#/components/schemas/TransactionsContentType'
+      content:
+        application/bud-transaction-v3+json:
+          schema:
+            $ref: '#/components/schemas/SearchInsightTransactionsResponseBody'
+          example:
+            operation_id: search_beta_transactions_insight_transactions_get
+            data:
+              id: 8a567b41-1b61-4f8f-a1ea-8fcb10d08d9f
+              results:
+              - matches:
+                - type: merchant_name
+                  content: Dunkin'
+                - type: category_l2
+                  content: coffee
+                transaction:
+                  transaction_id: '378'
+                  account_id: 5ce0749e-551c-4693-87f8-400d2551fdd1
+                  provider: Chase
+                  description: DUNKIN DONUTS COFFEE BROOKLYN NEW YORK
+                  credit_debit_indicator: debit
+                  amount:
+                    value: '8.87'
+                    currency: USD
+                  date_time: '2025-03-02T00:00:00Z'
+                  posted_date_time: '2025-03-02T00:00:00Z'
+                  value_date_time: '2025-03-02T00:00:00Z'
+                  status: booked
+                  suggested_description: Dunkin'
+                  suggested_logo: https://assets.thisisbud.com/datasci-images/merchant_logos/ba8ef908-b624-4116-8b26-571e48d1bf4c/v3/dunkin.jpeg
+                  enrichments:
+                    merchant:
+                      id: ba8ef908-b624-4116-8b26-571e48d1bf4c
+                      slug: dunkin
+                      display_name: Dunkin'
+                      logo: https://assets.thisisbud.com/datasci-images/merchant_logos/ba8ef908-b624-4116-8b26-571e48d1bf4c/v3/dunkin.jpeg
+                      website: https://www.dunkindonuts.com
+                      tokens:
+                      - confidence: '1.00'
+                        value: DUNKIN DONUTS COFFEE
+                    categories:
+                      l1:
+                        slug: food_and_drink
+                        confidence: '0.98'
+                      l2:
+                        slug: coffee
+                        confidence: '0.96'
+                    regularity:
+                      frequency: biweekly
+                      predicted_date_times:
+                      - '2025-03-17T00:00:00Z'
+                      - '2025-03-31T00:00:00Z'
+                      - '2025-04-14T00:00:00Z'
+                      - '2025-04-28T00:00:00Z'
+                      - '2025-05-12T00:00:00Z'
+                      - '2025-05-27T00:00:00Z'
+                      - '2025-06-09T00:00:00Z'
+                      - '2025-06-23T00:00:00Z'
+                      group_label: 3e1b2ea4df1579fe9dcda6cf6b032492d8551e78404d023ca3d57ca8b1ae2159-4
+                    location:
+                      address:
+                        city: New York
+                        region: NY
+                        country: US
+                      geolocation:
+                        longitude: -73.9872777778
+                        latitude: 40.6919444444
+                  tags:
+                  - regular-transaction
+              - matches:
+                - type: merchant_name
+                  content: Dunkin'
+                - type: category_l2
+                  content: coffee
+                transaction:
+                  transaction_id: '377'
+                  account_id: 5ce0749e-551c-4693-87f8-400d2551fdd1
+                  provider: Chase
+                  description: DUNKIN DONUTS COFFEE BROOKLYN NEW YORK
+                  credit_debit_indicator: debit
+                  amount:
+                    value: '6.54'
+                    currency: USD
+                  date_time: '2025-02-28T00:00:00Z'
+                  posted_date_time: '2025-02-28T00:00:00Z'
+                  value_date_time: '2025-02-28T00:00:00Z'
+                  status: booked
+                  suggested_description: Dunkin'
+                  suggested_logo: https://assets.thisisbud.com/datasci-images/merchant_logos/ba8ef908-b624-4116-8b26-571e48d1bf4c/v3/dunkin.jpeg
+                  enrichments:
+                    merchant:
+                      id: ba8ef908-b624-4116-8b26-571e48d1bf4c
+                      slug: dunkin
+                      display_name: Dunkin'
+                      logo: https://assets.thisisbud.com/datasci-images/merchant_logos/ba8ef908-b624-4116-8b26-571e48d1bf4c/v3/dunkin.jpeg
+                      website: https://www.dunkindonuts.com
+                      tokens:
+                      - confidence: '1.00'
+                        value: DUNKIN DONUTS COFFEE
+                    categories:
+                      l1:
+                        slug: food_and_drink
+                        confidence: '0.98'
+                      l2:
+                        slug: coffee
+                        confidence: '0.97'
+                    regularity:
+                      frequency: biweekly
+                      predicted_date_times:
+                      - '2025-03-14T00:00:00Z'
+                      - '2025-03-28T00:00:00Z'
+                      - '2025-04-11T00:00:00Z'
+                      - '2025-04-25T00:00:00Z'
+                      - '2025-05-09T00:00:00Z'
+                      - '2025-05-23T00:00:00Z'
+                      - '2025-06-06T00:00:00Z'
+                      - '2025-06-20T00:00:00Z'
+                      group_label: 3e1b2ea4df1579fe9dcda6cf6b032492d8551e78404d023ca3d57ca8b1ae2159-3
+                    location:
+                      address:
+                        city: New York
+                        region: NY
+                        country: US
+                      geolocation:
+                        longitude: -73.9872777778
+                        latitude: 40.6919444444
+                  tags:
+                  - regular-transaction
+            metadata:
+              query:
+                user_input: Dunki
+                from: '2025-01-01T00:00:00Z'
+                to: '2025-02-01T00:00:00Z'
+              next_page_token: eyJoZWxsbyI6ICJ3b3JsZCJ9Cg==
+              expires_in: 60
+        application/bud-transaction-id+json:
+          schema:
+            $ref: '#/components/schemas/SearchInsightTransactionsResponseBodyTransactionId'
+          example:
+            operation_id: search_beta_transactions_insight_transactions_get
+            data:
+              id: 8a567b41-1b61-4f8f-a1ea-8fcb10d08d9f
+              results:
+              - transaction_id: '378'
+                matches:
+                - type: merchant_name
+                  content: Dunkin'
+                - type: category_l2
+                  content: coffee
+              - transaction_id: '377'
+                matches:
+                - type: merchant_name
+                  content: Dunkin'
+                - type: category_l2
+                  content: coffee
+            metadata:
+              query:
+                user_input: Dunki
+                from: '2025-01-01T00:00:00Z'
+                to: '2025-02-01T00:00:00Z'
+              next_page_token: eyJoZWxsbyI6ICJ3b3JsZCJ9Cg==
+              expires_in: 60
     SearchTransactionsResponse:
       description: OK
       headers:
@@ -1372,235 +1601,6 @@ components:
               next_page_token: eyJoZWxsbyI6ICJ3b3JsZCJ9Cg==
               results: 2
               expires_in: 60
-    SearchInsightTransactionsResponse:
-      description: OK
-      headers:
-        Content-Type:
-          description: Defines the transactions' format for the response.
-          schema:
-            $ref: '#/components/schemas/TransactionsContentType'
-      content:
-        application/bud-transaction-v3+json:
-          schema:
-            $ref: '#/components/schemas/SearchInsightTransactionsResponseBody'
-          example:
-            operation_id: search_beta_transactions_insight_transactions_get
-            data:
-              id: 8a567b41-1b61-4f8f-a1ea-8fcb10d08d9f
-              results:
-              - matches:
-                - type: merchant_name
-                  content: Dunkin'
-                - type: category_l2
-                  content: coffee
-                transaction:
-                  transaction_id: '378'
-                  account_id: 5ce0749e-551c-4693-87f8-400d2551fdd1
-                  provider: Chase
-                  description: DUNKIN DONUTS COFFEE BROOKLYN NEW YORK
-                  credit_debit_indicator: debit
-                  amount:
-                    value: '8.87'
-                    currency: USD
-                  date_time: '2025-03-02T00:00:00Z'
-                  posted_date_time: '2025-03-02T00:00:00Z'
-                  value_date_time: '2025-03-02T00:00:00Z'
-                  status: booked
-                  suggested_description: Dunkin'
-                  suggested_logo: https://assets.thisisbud.com/datasci-images/merchant_logos/ba8ef908-b624-4116-8b26-571e48d1bf4c/v3/dunkin.jpeg
-                  enrichments:
-                    merchant:
-                      id: ba8ef908-b624-4116-8b26-571e48d1bf4c
-                      slug: dunkin
-                      display_name: Dunkin'
-                      logo: https://assets.thisisbud.com/datasci-images/merchant_logos/ba8ef908-b624-4116-8b26-571e48d1bf4c/v3/dunkin.jpeg
-                      website: https://www.dunkindonuts.com
-                      tokens:
-                      - confidence: '1.00'
-                        value: DUNKIN DONUTS COFFEE
-                    categories:
-                      l1:
-                        slug: food_and_drink
-                        confidence: '0.98'
-                      l2:
-                        slug: coffee
-                        confidence: '0.96'
-                    regularity:
-                      frequency: biweekly
-                      predicted_date_times:
-                      - '2025-03-17T00:00:00Z'
-                      - '2025-03-31T00:00:00Z'
-                      - '2025-04-14T00:00:00Z'
-                      - '2025-04-28T00:00:00Z'
-                      - '2025-05-12T00:00:00Z'
-                      - '2025-05-27T00:00:00Z'
-                      - '2025-06-09T00:00:00Z'
-                      - '2025-06-23T00:00:00Z'
-                      group_label: 3e1b2ea4df1579fe9dcda6cf6b032492d8551e78404d023ca3d57ca8b1ae2159-4
-                    location:
-                      address:
-                        city: New York
-                        region: NY
-                        country: US
-                      geolocation:
-                        longitude: -73.9872777778
-                        latitude: 40.6919444444
-                  tags:
-                  - regular-transaction
-              - matches:
-                - type: merchant_name
-                  content: Dunkin'
-                - type: category_l2
-                  content: coffee
-                transaction:
-                  transaction_id: '377'
-                  account_id: 5ce0749e-551c-4693-87f8-400d2551fdd1
-                  provider: Chase
-                  description: DUNKIN DONUTS COFFEE BROOKLYN NEW YORK
-                  credit_debit_indicator: debit
-                  amount:
-                    value: '6.54'
-                    currency: USD
-                  date_time: '2025-02-28T00:00:00Z'
-                  posted_date_time: '2025-02-28T00:00:00Z'
-                  value_date_time: '2025-02-28T00:00:00Z'
-                  status: booked
-                  suggested_description: Dunkin'
-                  suggested_logo: https://assets.thisisbud.com/datasci-images/merchant_logos/ba8ef908-b624-4116-8b26-571e48d1bf4c/v3/dunkin.jpeg
-                  enrichments:
-                    merchant:
-                      id: ba8ef908-b624-4116-8b26-571e48d1bf4c
-                      slug: dunkin
-                      display_name: Dunkin'
-                      logo: https://assets.thisisbud.com/datasci-images/merchant_logos/ba8ef908-b624-4116-8b26-571e48d1bf4c/v3/dunkin.jpeg
-                      website: https://www.dunkindonuts.com
-                      tokens:
-                      - confidence: '1.00'
-                        value: DUNKIN DONUTS COFFEE
-                    categories:
-                      l1:
-                        slug: food_and_drink
-                        confidence: '0.98'
-                      l2:
-                        slug: coffee
-                        confidence: '0.97'
-                    regularity:
-                      frequency: biweekly
-                      predicted_date_times:
-                      - '2025-03-14T00:00:00Z'
-                      - '2025-03-28T00:00:00Z'
-                      - '2025-04-11T00:00:00Z'
-                      - '2025-04-25T00:00:00Z'
-                      - '2025-05-09T00:00:00Z'
-                      - '2025-05-23T00:00:00Z'
-                      - '2025-06-06T00:00:00Z'
-                      - '2025-06-20T00:00:00Z'
-                      group_label: 3e1b2ea4df1579fe9dcda6cf6b032492d8551e78404d023ca3d57ca8b1ae2159-3
-                    location:
-                      address:
-                        city: New York
-                        region: NY
-                        country: US
-                      geolocation:
-                        longitude: -73.9872777778
-                        latitude: 40.6919444444
-                  tags:
-                  - regular-transaction
-            metadata:
-              query:
-                user_input: Dunki
-                from: '2025-01-01T00:00:00Z'
-                to: '2025-02-01T00:00:00Z'
-              next_page_token: eyJoZWxsbyI6ICJ3b3JsZCJ9Cg==
-              expires_in: 60
-        application/bud-transaction-id+json:
-          schema:
-            $ref: '#/components/schemas/SearchInsightTransactionsResponseBodyTransactionId'
-          example:
-            operation_id: search_beta_transactions_insight_transactions_get
-            data:
-              id: 8a567b41-1b61-4f8f-a1ea-8fcb10d08d9f
-              results:
-              - transaction_id: '378'
-                matches:
-                - type: merchant_name
-                  content: Dunkin'
-                - type: category_l2
-                  content: coffee
-              - transaction_id: '377'
-                matches:
-                - type: merchant_name
-                  content: Dunkin'
-                - type: category_l2
-                  content: coffee
-            metadata:
-              query:
-                user_input: Dunki
-                from: '2025-01-01T00:00:00Z'
-                to: '2025-02-01T00:00:00Z'
-              next_page_token: eyJoZWxsbyI6ICJ3b3JsZCJ9Cg==
-              expires_in: 60
-    SearchTransactionsInsightResponse:
-      description: OK
-      headers:
-        Retry-After:
-          schema:
-            type: integer
-          description: Time in milliseconds to wait before retrying.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SearchTransactionsInsightResponseBody'
-          examples:
-            pending:
-              value:
-                operation_id: search_beta_transactions_insight_get
-                data:
-                  id: 234029b1-37ee-4942-b56d-5588f293f571
-                  status: pending
-                metadata:
-                  query:
-                    user_input: Dunki
-                    from: '2025-01-01T00:00:00Z'
-                    to: '2025-02-01T00:00:00Z'
-                  expires_in: 60
-            completed:
-              value:
-                operation_id: search_beta_transactions_insight_get
-                data:
-                  id: 234029b1-37ee-4942-b56d-5588f293f571
-                  status: completed
-                  content:
-                    text: You have spent $20 at Dunkin', this is up 50% of your coffee spend....
-                    matched_searches:
-                    - filter:
-                        type: merchant
-                        value: Dunkin'
-                        logo: https://assets.thisibud.com/5c97ffcf-9604-4fd9-bef1-1496ccce2d12.png
-                      url: /search/beta/transactions?merchant=Dunkin'
-                      text_positions:
-                      - start: 22
-                        end: 59
-                    - filter:
-                        type: category_l2
-                        value: coffee
-                        logo: https://assets.thisibud.com/5c97ffcf-9604-4fd9-bef1-1496ccce2d12.png
-                      url: /search/beta/transactions?category_l2=coffee
-                      text_positions:
-                      - start: 64
-                        end: 70
-                  transactions:
-                    url: /search/beta/transactions/234029b1-37ee-4942-b56d-5588f293f571/insight/transactions
-                    results: 10
-                    merchants:
-                    - display_name: Dunkin'
-                      logo: https://assets.thisibud.com/5c97ffcf-9604-4fd9-bef1-1496ccce2d12.png
-                metadata:
-                  query:
-                    user_input: Dunki
-                    from: '2025-01-01T00:00:00Z'
-                    to: '2025-02-01T00:00:00Z'
-                  expires_in: 60
   securitySchemes:
     Basic:
       type: http

@@ -222,79 +222,19 @@ paths:
         '401':
           description: Unauthorized request
 components:
-  parameters:
-    FutureTransactionsMonthsProjection:
-      in: query
-      name: months
-      schema:
-        type: integer
-        default: 3
-      required: false
-      example: 6
-      description: To specify how many months we return the prediction for, the default is 3 months.
-    CustomerIdempotentIdentifier:
-      in: header
-      name: X-Customer-Idempotent-Identifier
-      schema:
-        type: string
-      description: 'Use the internal client identifier, provided in the `client_metadata` object when creating the customer in __Create Customer V3__, in place of an `X-Customer-Id` header.
-
-        '
-    CustomerSecret:
-      in: header
-      name: X-Customer-Secret
-      schema:
-        type: string
-      required: false
-      description: The Bud Customer secret used to encrypt customer data. This is required only if the customer secret is not already stored with Bud.
-    FutureTransactionsChangePercentage:
-      in: query
-      name: change_percentage[subcategory]
-      schema:
-        type: number
-        default: 2
-      required: false
-      description: To set a percentage value used in the calculation of the forecasted amount for the future transactions categorised with specific transaction subcategory; for example `change_percentage[loans]=2.0`. This can be a positive or negative float number. To apply the same percentage to all transactions use the `subcategory=all`.
-    ClientId:
-      in: header
-      name: X-Client-Id
-      schema:
-        type: string
-      required: true
-      description: The API Client Identifier (Service Application Identifier).
-      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
-    CustomerId:
-      in: header
-      name: X-Customer-Id
-      schema:
-        type: string
-        format: uuid
-      required: true
-      description: A unique identifier for a Customer, as registered on Bud's platform.
-      example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
   schemas:
-    RegularTransactionsResponse:
-      title: Regular Transactions (Aggregated) Response
+    LegacyBudAmount:
+      title: Legacy Bud Amount
       type: object
-      description: Regular Transactions from Aggregated Data Response
+      description: The monetary amount.
+      required:
+      - amount
+      - currency
       properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        data:
-          type: array
-          description: Information surrounding possible groups of Regular transactions
-          items:
-            $ref: '#/components/schemas/RegularTransaction'
-        metadata:
-          $ref: '#/components/schemas/ResultsMetadata'
-    Errors:
-      title: Array of Error Object
-      description: Contains a list of error messages
-      type: object
-      additionalProperties:
-        type: array
-        items:
-          type: string
+        amount:
+          $ref: '#/components/schemas/BudMonetaryValue'
+        currency:
+          $ref: '#/components/schemas/BudCurrency'
     BadRequestResponse:
       title: Bad Request Response
       type: object
@@ -316,6 +256,208 @@ components:
           anyOf:
           - $ref: '#/components/schemas/Error'
           - $ref: '#/components/schemas/Errors'
+    BudAmount:
+      title: Standard Bud Amount
+      type: object
+      description: The monetary amount.
+      required:
+      - value
+      - currency
+      properties:
+        value:
+          $ref: '#/components/schemas/BudMonetaryValue'
+        currency:
+          $ref: '#/components/schemas/BudCurrency'
+    RegularTransaction:
+      title: Regular Transaction Group
+      description: Information surrounding a possible group of Regular transactions
+      allOf:
+      - $ref: '#/components/schemas/RegularPaymentsConfirmed'
+      - type: object
+        required:
+        - transactions
+        properties:
+          transactions:
+            type: array
+            items:
+              $ref: '#/components/schemas/BasicTransactionWithNullableMerchant'
+    FutureTransactionV2Response:
+      allOf:
+      - type: object
+        required:
+        - operation_id
+        - data
+        - metadata
+        properties:
+          operation_id:
+            $ref: '#/components/schemas/OperationId'
+          data:
+            type: array
+            items:
+              $ref: '#/components/schemas/FutureTransactionV2'
+          metadata:
+            type: object
+            required:
+            - results
+            - months
+            properties:
+              results:
+                type: number
+                description: The number of different upcoming transactions that have been found
+              months:
+                type: number
+                description: The number of months for which the upcoming transactions have been projected
+              change_percentages:
+                type: array
+                description: A list of all of the percentage value changes that have been applied to different Level 2 categories
+                items:
+                  type: object
+                  required:
+                  - l2
+                  - value
+                  properties:
+                    l2:
+                      type: string
+                      description: The l2 category that a percentage change has been applied to
+                      example: bills
+                    value:
+                      type: number
+                      description: The percentage of change that has been applied to the given l2 category
+                      example: 2
+    NullableMerchant:
+      title: Bud Merchant Object
+      type:
+      - object
+      - 'null'
+      description: Details regarding a merchant associated with a transaction
+      required:
+      - id
+      - name
+      - logo
+      properties:
+        id:
+          type: string
+          description: Identifier for the detected merchant
+        name:
+          type: string
+          description: Display name for the detected merchant
+        logo:
+          type: string
+          description: URL for logo of the detected merchant
+    ResultsMetadata:
+      title: Results Metadata Object
+      type: object
+      description: Metadata associated with the response schema
+      properties:
+        results:
+          type: number
+          description: The number of results returned
+    RegularTransactionsResponse:
+      title: Regular Transactions (Aggregated) Response
+      type: object
+      description: Regular Transactions from Aggregated Data Response
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          type: array
+          description: Information surrounding possible groups of Regular transactions
+          items:
+            $ref: '#/components/schemas/RegularTransaction'
+        metadata:
+          $ref: '#/components/schemas/ResultsMetadata'
+    Error:
+      title: Error Object
+      type:
+      - object
+      - 'null'
+      description: Contains a field specific error message
+      additionalProperties:
+        type: string
+    BasicTransactionWithNullableMerchant:
+      title: Basic Transaction With Nullable Merchant Schema
+      type: object
+      description: Basic transaction with nullable merchant schema
+      required:
+      - transaction_id
+      - account_id
+      - transaction_description
+      - provider
+      - date
+      - amount
+      - credit_debit_indicator
+      properties:
+        transaction_id:
+          type: string
+          description: A unique identifier for the transaction
+        account_id:
+          type: string
+          description: A unique identifier for the Customer bank account
+        transaction_description:
+          type: string
+          description: Any Customer defined input, e.g. a bank transfer reference
+        provider:
+          type: string
+          description: The name of the relevant provider relevant to the source of the original transaction data
+        date:
+          type: string
+          description: The date (YYYY-MM-DD) that the transaction took place
+        amount:
+          $ref: '#/components/schemas/LegacyBudAmount'
+        credit_debit_indicator:
+          type: string
+          description: Indication as to whether the transaction was a credit or debit
+          enum:
+          - Credit
+          - Debit
+        merchant:
+          $ref: '#/components/schemas/NullableMerchant'
+    RegularPaymentsConfirmed:
+      title: Regular Payment Object
+      type: object
+      description: Details surrounding the regularity of the transaction
+      required:
+      - label
+      - period
+      - score
+      properties:
+        label:
+          type: string
+          description: A recurring transaction group identifier label associating regular transactions e.g. all Spotify transactions that are regular by the same monthly period will share the same label.   The format of the label includes a hash of the transaction description and the amount, followed by an integer corresponding to the number of regular groups found, i.e. <hash>-<i>.
+        period:
+          type: string
+          description: To describe the period between each transaction in a regular group.
+          enum:
+          - daily
+          - weekly
+          - biweekly
+          - monthly
+          - quarterly
+          - unknown
+        score:
+          type: string
+          description: A floating point number between 0 and 1, to define the confidence level that the transaction is regular or not.
+    BudCurrency:
+      title: Currency
+      description: 'The three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) of the monetary amount.
+
+
+        Example: `GBP`
+
+        '
+      type: string
+    Errors:
+      title: Array of Error Object
+      description: Contains a list of error messages
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          type: string
+    BudMonetaryValue:
+      title: Monetary Value
+      description: "The value of the monetary amount. The value is formatted with the number of decimal places for the respective currency. \n\nExample: `10.98`\n"
+      type: string
     FutureTransactionV2:
       allOf:
       - type: object
@@ -406,202 +548,60 @@ components:
                 amount:
                   type: object
                   $ref: '#/components/schemas/BudAmount'
-    FutureTransactionV2Response:
-      allOf:
-      - type: object
-        required:
-        - operation_id
-        - data
-        - metadata
-        properties:
-          operation_id:
-            $ref: '#/components/schemas/OperationId'
-          data:
-            type: array
-            items:
-              $ref: '#/components/schemas/FutureTransactionV2'
-          metadata:
-            type: object
-            required:
-            - results
-            - months
-            properties:
-              results:
-                type: number
-                description: The number of different upcoming transactions that have been found
-              months:
-                type: number
-                description: The number of months for which the upcoming transactions have been projected
-              change_percentages:
-                type: array
-                description: A list of all of the percentage value changes that have been applied to different Level 2 categories
-                items:
-                  type: object
-                  required:
-                  - l2
-                  - value
-                  properties:
-                    l2:
-                      type: string
-                      description: The l2 category that a percentage change has been applied to
-                      example: bills
-                    value:
-                      type: number
-                      description: The percentage of change that has been applied to the given l2 category
-                      example: 2
     OperationId:
       title: Operation Id Field
       type: string
       description: A unique identifier/reference associated with a given endpoint/operation
-    LegacyBudAmount:
-      title: Legacy Bud Amount
-      type: object
-      description: The monetary amount.
-      required:
-      - amount
-      - currency
-      properties:
-        amount:
-          $ref: '#/components/schemas/BudMonetaryValue'
-        currency:
-          $ref: '#/components/schemas/BudCurrency'
-    BudCurrency:
-      title: Currency
-      description: 'The three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) of the monetary amount.
-
-
-        Example: `GBP`
+  parameters:
+    FutureTransactionsChangePercentage:
+      in: query
+      name: change_percentage[subcategory]
+      schema:
+        type: number
+        default: 2
+      required: false
+      description: To set a percentage value used in the calculation of the forecasted amount for the future transactions categorised with specific transaction subcategory; for example `change_percentage[loans]=2.0`. This can be a positive or negative float number. To apply the same percentage to all transactions use the `subcategory=all`.
+    CustomerIdempotentIdentifier:
+      in: header
+      name: X-Customer-Idempotent-Identifier
+      schema:
+        type: string
+      description: 'Use the internal client identifier, provided in the `client_metadata` object when creating the customer in __Create Customer V3__, in place of an `X-Customer-Id` header.
 
         '
-      type: string
-    RegularTransaction:
-      title: Regular Transaction Group
-      description: Information surrounding a possible group of Regular transactions
-      allOf:
-      - $ref: '#/components/schemas/RegularPaymentsConfirmed'
-      - type: object
-        required:
-        - transactions
-        properties:
-          transactions:
-            type: array
-            items:
-              $ref: '#/components/schemas/BasicTransactionWithNullableMerchant'
-    BasicTransactionWithNullableMerchant:
-      title: Basic Transaction With Nullable Merchant Schema
-      type: object
-      description: Basic transaction with nullable merchant schema
-      required:
-      - transaction_id
-      - account_id
-      - transaction_description
-      - provider
-      - date
-      - amount
-      - credit_debit_indicator
-      properties:
-        transaction_id:
-          type: string
-          description: A unique identifier for the transaction
-        account_id:
-          type: string
-          description: A unique identifier for the Customer bank account
-        transaction_description:
-          type: string
-          description: Any Customer defined input, e.g. a bank transfer reference
-        provider:
-          type: string
-          description: The name of the relevant provider relevant to the source of the original transaction data
-        date:
-          type: string
-          description: The date (YYYY-MM-DD) that the transaction took place
-        amount:
-          $ref: '#/components/schemas/LegacyBudAmount'
-        credit_debit_indicator:
-          type: string
-          description: Indication as to whether the transaction was a credit or debit
-          enum:
-          - Credit
-          - Debit
-        merchant:
-          $ref: '#/components/schemas/NullableMerchant'
-    ResultsMetadata:
-      title: Results Metadata Object
-      type: object
-      description: Metadata associated with the response schema
-      properties:
-        results:
-          type: number
-          description: The number of results returned
-    BudAmount:
-      title: Standard Bud Amount
-      type: object
-      description: The monetary amount.
-      required:
-      - value
-      - currency
-      properties:
-        value:
-          $ref: '#/components/schemas/BudMonetaryValue'
-        currency:
-          $ref: '#/components/schemas/BudCurrency'
-    BudMonetaryValue:
-      title: Monetary Value
-      description: "The value of the monetary amount. The value is formatted with the number of decimal places for the respective currency. \n\nExample: `10.98`\n"
-      type: string
-    Error:
-      title: Error Object
-      type:
-      - object
-      - 'null'
-      description: Contains a field specific error message
-      additionalProperties:
+    CustomerSecret:
+      in: header
+      name: X-Customer-Secret
+      schema:
         type: string
-    NullableMerchant:
-      title: Bud Merchant Object
-      type:
-      - object
-      - 'null'
-      description: Details regarding a merchant associated with a transaction
-      required:
-      - id
-      - name
-      - logo
-      properties:
-        id:
-          type: string
-          description: Identifier for the detected merchant
-        name:
-          type: string
-          description: Display name for the detected merchant
-        logo:
-          type: string
-          description: URL for logo of the detected merchant
-    RegularPaymentsConfirmed:
-      title: Regular Payment Object
-      type: object
-      description: Details surrounding the regularity of the transaction
-      required:
-      - label
-      - period
-      - score
-      properties:
-        label:
-          type: string
-          description: A recurring transaction group identifier label associating regular transactions e.g. all Spotify transactions that are regular by the same monthly period will share the same label.   The format of the label includes a hash of the transaction description and the amount, followed by an integer corresponding to the number of regular groups found, i.e. <hash>-<i>.
-        period:
-          type: string
-          description: To describe the period between each transaction in a regular group.
-          enum:
-          - daily
-          - weekly
-          - biweekly
-          - monthly
-          - quarterly
-          - unknown
-        score:
-          type: string
-          description: A floating point number between 0 and 1, to define the confidence level that the transaction is regular or not.
+      required: false
+      description: The Bud Customer secret used to encrypt customer data. This is required only if the customer secret is not already stored with Bud.
+    FutureTransactionsMonthsProjection:
+      in: query
+      name: months
+      schema:
+        type: integer
+        default: 3
+      required: false
+      example: 6
+      description: To specify how many months we return the prediction for, the default is 3 months.
+    ClientId:
+      in: header
+      name: X-Client-Id
+      schema:
+        type: string
+      required: true
+      description: The API Client Identifier (Service Application Identifier).
+      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
+    CustomerId:
+      in: header
+      name: X-Customer-Id
+      schema:
+        type: string
+        format: uuid
+      required: true
+      description: A unique identifier for a Customer, as registered on Bud's platform.
+      example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
   securitySchemes:
     Basic:
       type: http

@@ -390,30 +390,92 @@ paths:
 
                     '
 components:
+  parameters:
+    PaymentProviderTypeFilter:
+      in: query
+      required: false
+      name: type
+      description: A comma separated list of Bud support provider types to be shown. If no filter is applied, all the providers are returned.
+      schema:
+        type: string
+        enum:
+        - sandbox
+        - business
+        - retail
+    SigningIdHeaderParameter:
+      in: header
+      name: X-Signing-ID
+      description: The public key ID which should be used to verify the X-Signature header. Bud's list of public keys can be found at https://assets.thisisbud.com/bud-callback.jwks
+      required: true
+      schema:
+        type: string
+    PaymentProviderRegionFilter:
+      in: query
+      name: country
+      description: Country filter as a comma separated list of country codes following the ISO 3166 alpha-3 code format.
+      example: GBR,DEU
+      schema:
+        type: string
+    PaymentProviderServiceFilter:
+      in: query
+      name: product
+      description: Product filter as a comma separated list of bud supported products
+      schema:
+        $ref: '#/components/schemas/PaymentServices'
+    ClientId:
+      in: header
+      name: X-Client-Id
+      schema:
+        type: string
+      required: true
+      description: The API Client Identifier (Service Application Identifier).
+      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
+    SignatureHeaderParameter:
+      in: header
+      name: X-Signature
+      description: The signed request body JWT
+      required: true
+      schema:
+        type: string
   schemas:
-    BudPayResponse:
-      title: Bud Pay URL Response
+    PaymentSupportedCurrencies:
+      title: Payment provider supported currencies
+      description: The currencies supported by the payment provider
+      type: array
+      minItems: 1
+      items:
+        type: string
+        enum:
+        - GBP
+        - EUR
+    PaymentSender:
+      title: Payment Sender
       type: object
-      description: Bud Pay Response Object
+      description: Details of the payment sender
       required:
-      - operation_id
-      - data
+      - user_id
+      - name
       properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        data:
-          title: Bud_Pay_URL
-          description: Bud Pay URL Object
-          required:
-          - bud_pay_url
-          - payment_id
-          properties:
-            bud_pay_url:
-              type: string
-              description: A Bud Pay URL, allowing Customers to complete (authenticate) a relevant payment resource with the relevant payment service provider.
-            payment_id:
-              type: string
-              description: Unique identifier for the payment
+        user_id:
+          type: string
+          description: A string that can be used to uniquely identify a user within the Client's application
+          minLength: 1
+          maxLength: 120
+        type:
+          $ref: '#/components/schemas/PaymentAccountType'
+        name:
+          type: string
+          description: Account holder name of the sender
+          minLength: 1
+          maxLength: 70
+        account_number:
+          type: string
+          description: Account identifier of the sender
+          minLength: 14
+          maxLength: 32
+        provider:
+          type: string
+          description: The name (identifier) of the payment provider
     PaymentStatusUpdatedNotificationBody:
       title: Payment Status Update Notification Body
       type: object
@@ -449,21 +511,21 @@ components:
               - payment.success
               - payment.failure
               description: The event related to the payment
-    Errors:
-      title: Array of Error Object
-      description: Contains a list of error messages
+    PaymentProvidersResponse:
+      title: Payment Providers Response
       type: object
-      additionalProperties:
-        type: array
-        items:
-          type: string
-    PaymentAccountType:
-      title: Account Type
-      type: string
-      description: The account type structure for the payment sender or receiver
-      enum:
-      - SortCodeAccountNumber
-      - IBAN
+      required:
+      - operation_id
+      - data
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          title: Retrieve Providers
+          description: A list of the supported payment providers
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentProvider'
     BadRequestResponse:
       title: Bad Request Response
       type: object
@@ -485,127 +547,50 @@ components:
           anyOf:
           - $ref: '#/components/schemas/Error'
           - $ref: '#/components/schemas/Errors'
-    PaymentServices:
-      title: Payment Services
-      description: A payment service supported by a payment provider
-      type: array
-      minItems: 1
-      items:
-        type: string
-        enum:
-        - domestic-single-payment
-        - domestic-standing-order
-        - domestic-scheduled-payment
-    PaymentSender:
-      title: Payment Sender
+    BudAmount:
+      title: Standard Bud Amount
       type: object
-      description: Details of the payment sender
+      description: The monetary amount.
       required:
-      - user_id
-      - name
+      - value
+      - currency
       properties:
-        user_id:
-          type: string
-          description: A string that can be used to uniquely identify a user within the Client's application
-          minLength: 1
-          maxLength: 120
-        type:
-          $ref: '#/components/schemas/PaymentAccountType'
-        name:
-          type: string
-          description: Account holder name of the sender
-          minLength: 1
-          maxLength: 70
-        account_number:
-          type: string
-          description: Account identifier of the sender
-          minLength: 14
-          maxLength: 32
-        provider:
-          type: string
-          description: The name (identifier) of the payment provider
-    PaymentRecipient:
-      title: Payment Recipient
-      type: object
-      description: Details of the recipient of the payment
-      required:
-      - type
-      - name
-      - account_number
-      properties:
-        type:
-          $ref: '#/components/schemas/PaymentAccountType'
-        name:
-          type: string
-          description: Account holder name of the recipient
-          minLength: 1
-          maxLength: 70
-        account_number:
-          type: string
-          description: Account identifier of the recipient
-          minLength: 14
-          maxLength: 32
-    PaymentsStandingOrderBudPayURLRequest:
-      title: Payments Standing Order Bud Pay URL Payload
-      type: object
-      required:
-      - redirect_url
-      - provider
-      - standing_order_details
-      properties:
-        redirect_url:
-          type: string
-          description: URL where the user will be redirected to once they have completed the TPP Connection flow. This can be a web based URL or a mobile application internal URL.
-        provider:
-          type: string
-          description: The name (identifier) of the payment provider
-        provider_types:
-          $ref: '#/components/schemas/ProviderTypes'
-        standing_order_details:
-          $ref: '#/components/schemas/StandingOrderDetails'
-    ProviderTypes:
-      title: Provider Types
-      type: array
-      description: One or more provider types that can be used to filter the list of providers that are shown to the customer during the connection flow. If no filter is applied, all types of provider are returned. Note that on Bud's sandbox environment, only sandbox providers will be returned.
-      items:
-        type: string
-        enum:
-        - business
-        - retail
-        - sandbox
-    PaymentSupportedCurrencies:
-      title: Payment provider supported currencies
-      description: The currencies supported by the payment provider
-      type: array
-      minItems: 1
-      items:
-        type: string
-        enum:
-        - GBP
-        - EUR
-    SinglePaymentDetails:
-      title: Single Payment Details
-      type: object
-      description: Payment details required to make a Single Payment
-      required:
-      - reference
-      - recipient
-      - sender
-      - amount
-      properties:
-        reference:
-          type: string
-          description: The payment reference
-        recipient:
-          $ref: '#/components/schemas/PaymentRecipient'
-        sender:
-          $ref: '#/components/schemas/PaymentSender'
-        amount:
-          $ref: '#/components/schemas/BudAmount'
-    OperationId:
-      title: Operation Id Field
+        value:
+          $ref: '#/components/schemas/BudMonetaryValue'
+        currency:
+          $ref: '#/components/schemas/BudCurrency'
+    PaymentAccountType:
+      title: Account Type
       type: string
-      description: A unique identifier/reference associated with a given endpoint/operation
+      description: The account type structure for the payment sender or receiver
+      enum:
+      - SortCodeAccountNumber
+      - IBAN
+    Error:
+      title: Error Object
+      type:
+      - object
+      - 'null'
+      description: Contains a field specific error message
+      additionalProperties:
+        type: string
+    BudCurrency:
+      title: Currency
+      description: 'The three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) of the monetary amount.
+
+
+        Example: `GBP`
+
+        '
+      type: string
+    Errors:
+      title: Array of Error Object
+      description: Contains a list of error messages
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          type: string
     MaintenanceWindowObject:
       title: Maintenance Window Object
       type: object
@@ -619,97 +604,54 @@ components:
           - string
           - 'null'
           description: The end datetime (ISO8601) of the maintenance window. When this value is `null` it means Bud will manually remove the maintenance flag when the provider is back healthy.
-    ScheduledDetails:
-      title: Scheduled Payment Details
+    BudPayResponse:
+      title: Bud Pay URL Response
       type: object
-      additionalProperties: false
-      description: Details of the scheduled payment
+      description: Bud Pay Response Object
       required:
-      - reference
-      - recipient
-      - sender
-      - amount
-      - requested_execution_date
+      - operation_id
+      - data
       properties:
-        reference:
-          type: string
-          description: Reference to use for the payment made through this scheduled instruction
-          maxLength: 18
-        recipient:
-          $ref: '#/components/schemas/PaymentRecipient'
-        sender:
-          $ref: '#/components/schemas/PaymentSender'
-        amount:
-          $ref: '#/components/schemas/BudAmount'
-        requested_execution_date:
-          type: string
-          format: date-time
-          description: Date-time (ISO 8601) the payment should be made. Must be at least one day in the future.
-          example: '2020-06-01T15:00:00Z'
-    BudCurrency:
-      title: Currency
-      description: 'The three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) of the monetary amount.
-
-
-        Example: `GBP`
-
-        '
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          title: Bud_Pay_URL
+          description: Bud Pay URL Object
+          required:
+          - bud_pay_url
+          - payment_id
+          properties:
+            bud_pay_url:
+              type: string
+              description: A Bud Pay URL, allowing Customers to complete (authenticate) a relevant payment resource with the relevant payment service provider.
+            payment_id:
+              type: string
+              description: Unique identifier for the payment
+    PaymentServices:
+      title: Payment Services
+      description: A payment service supported by a payment provider
+      type: array
+      minItems: 1
+      items:
+        type: string
+        enum:
+        - domestic-single-payment
+        - domestic-standing-order
+        - domestic-scheduled-payment
+    BudMonetaryValue:
+      title: Monetary Value
+      description: "The value of the monetary amount. The value is formatted with the number of decimal places for the respective currency. \n\nExample: `10.98`\n"
       type: string
-    StandingOrderDetails:
-      title: Standing Order Details
-      type: object
-      additionalProperties: false
-      description: Details of the standing order
-      required:
-      - reference
-      - recipient
-      - sender
-      - recurring_amount
-      - first_payment_date
-      - frequency
-      properties:
-        reference:
-          type: string
-          description: Reference to use for payments made through this Standing Order
-          maxLength: 18
-        recipient:
-          $ref: '#/components/schemas/PaymentRecipient'
-        sender:
-          $ref: '#/components/schemas/PaymentSender'
-        recurring_amount:
-          $ref: '#/components/schemas/BudAmount'
-        first_payment_date:
-          type: string
-          format: date-time
-          description: Date-time (ISO 8601) the first payment should be made. Must be a minimum of 3 business days in the future and must be on a business day.
-          example: '2020-06-01T15:00:00Z'
-        last_payment_date:
-          type: string
-          format: date-time
-          description: Date-time (ISO 8601) after which payments should stop. Must be after `first_payment_date`.
-          example: '2020-06-01T15:00:00Z'
-        frequency:
-          $ref: '#/components/schemas/StandingOrderFrequencyEnum'
-    PaymentsSingleBudPayURLRequest:
-      title: Payments Single Bud Pay URL Payload
-      type: object
-      required:
-      - redirect_url
-      - provider
-      - payment_details
-      properties:
-        redirect_url:
-          type: string
-          description: URL where the user will be redirected to once they have completed the TPP Connection flow. This can be a web based URL or a mobile application internal URL.
-          maxLength: 2083
-        provider:
-          type: string
-          description: The name (identifier) of the payment provider
-        provider_types:
-          $ref: '#/components/schemas/ProviderTypes'
-        payment_details:
-          type: object
-          $ref: '#/components/schemas/SinglePaymentDetails'
+    ProviderTypes:
+      title: Provider Types
+      type: array
+      description: One or more provider types that can be used to filter the list of providers that are shown to the customer during the connection flow. If no filter is applied, all types of provider are returned. Note that on Bud's sandbox environment, only sandbox providers will be returned.
+      items:
+        type: string
+        enum:
+        - business
+        - retail
+        - sandbox
     PaymentProvider:
       title: Payment Provider
       description: Information surrounding a supported payment provider
@@ -782,6 +724,162 @@ components:
             - confirm_single_payment
             - confirm_standing_order
             - confirm_scheduled_payment
+    ScheduledDetails:
+      title: Scheduled Payment Details
+      type: object
+      additionalProperties: false
+      description: Details of the scheduled payment
+      required:
+      - reference
+      - recipient
+      - sender
+      - amount
+      - requested_execution_date
+      properties:
+        reference:
+          type: string
+          description: Reference to use for the payment made through this scheduled instruction
+          maxLength: 18
+        recipient:
+          $ref: '#/components/schemas/PaymentRecipient'
+        sender:
+          $ref: '#/components/schemas/PaymentSender'
+        amount:
+          $ref: '#/components/schemas/BudAmount'
+        requested_execution_date:
+          type: string
+          format: date-time
+          description: Date-time (ISO 8601) the payment should be made. Must be at least one day in the future.
+          example: '2020-06-01T15:00:00Z'
+    SinglePaymentDetails:
+      title: Single Payment Details
+      type: object
+      description: Payment details required to make a Single Payment
+      required:
+      - reference
+      - recipient
+      - sender
+      - amount
+      properties:
+        reference:
+          type: string
+          description: The payment reference
+        recipient:
+          $ref: '#/components/schemas/PaymentRecipient'
+        sender:
+          $ref: '#/components/schemas/PaymentSender'
+        amount:
+          $ref: '#/components/schemas/BudAmount'
+    PaymentsSingleBudPayURLRequest:
+      title: Payments Single Bud Pay URL Payload
+      type: object
+      required:
+      - redirect_url
+      - provider
+      - payment_details
+      properties:
+        redirect_url:
+          type: string
+          description: URL where the user will be redirected to once they have completed the TPP Connection flow. This can be a web based URL or a mobile application internal URL.
+          maxLength: 2083
+        provider:
+          type: string
+          description: The name (identifier) of the payment provider
+        provider_types:
+          $ref: '#/components/schemas/ProviderTypes'
+        payment_details:
+          type: object
+          $ref: '#/components/schemas/SinglePaymentDetails'
+    PaymentsStandingOrderBudPayURLRequest:
+      title: Payments Standing Order Bud Pay URL Payload
+      type: object
+      required:
+      - redirect_url
+      - provider
+      - standing_order_details
+      properties:
+        redirect_url:
+          type: string
+          description: URL where the user will be redirected to once they have completed the TPP Connection flow. This can be a web based URL or a mobile application internal URL.
+        provider:
+          type: string
+          description: The name (identifier) of the payment provider
+        provider_types:
+          $ref: '#/components/schemas/ProviderTypes'
+        standing_order_details:
+          $ref: '#/components/schemas/StandingOrderDetails'
+    StandingOrderDetails:
+      title: Standing Order Details
+      type: object
+      additionalProperties: false
+      description: Details of the standing order
+      required:
+      - reference
+      - recipient
+      - sender
+      - recurring_amount
+      - first_payment_date
+      - frequency
+      properties:
+        reference:
+          type: string
+          description: Reference to use for payments made through this Standing Order
+          maxLength: 18
+        recipient:
+          $ref: '#/components/schemas/PaymentRecipient'
+        sender:
+          $ref: '#/components/schemas/PaymentSender'
+        recurring_amount:
+          $ref: '#/components/schemas/BudAmount'
+        first_payment_date:
+          type: string
+          format: date-time
+          description: Date-time (ISO 8601) the first payment should be made. Must be a minimum of 3 business days in the future and must be on a business day.
+          example: '2020-06-01T15:00:00Z'
+        last_payment_date:
+          type: string
+          format: date-time
+          description: Date-time (ISO 8601) after which payments should stop. Must be after `first_payment_date`.
+          example: '2020-06-01T15:00:00Z'
+        frequency:
+          $ref: '#/components/schemas/StandingOrderFrequencyEnum'
+    StandingOrderFrequencyEnum:
+      title: Standing Order Frequency
+      type: string
+      description: The payment frequency for a Standing Order
+      enum:
+      - daily
+      - weekly
+      - fortnightly
+      - monthly
+      - quarterly
+      - semiannually
+      - yearly
+    PaymentRecipient:
+      title: Payment Recipient
+      type: object
+      description: Details of the recipient of the payment
+      required:
+      - type
+      - name
+      - account_number
+      properties:
+        type:
+          $ref: '#/components/schemas/PaymentAccountType'
+        name:
+          type: string
+          description: Account holder name of the recipient
+          minLength: 1
+          maxLength: 70
+        account_number:
+          type: string
+          description: Account identifier of the recipient
+          minLength: 14
+          maxLength: 32
+    OperationId:
+      title: Operation Id Field
+      type: string
+      description: A unique identifier/reference associated with a given endpoint/operation
     PaymentsScheduledPaymentBudPayURLRequest:
       title: Scheduled Payment Bud Pay URL Payload
       type: object
@@ -800,104 +898,6 @@ components:
           $ref: '#/components/schemas/ProviderTypes'
         scheduled_payment_details:
           $ref: '#/components/schemas/ScheduledDetails'
-    BudAmount:
-      title: Standard Bud Amount
-      type: object
-      description: The monetary amount.
-      required:
-      - value
-      - currency
-      properties:
-        value:
-          $ref: '#/components/schemas/BudMonetaryValue'
-        currency:
-          $ref: '#/components/schemas/BudCurrency'
-    BudMonetaryValue:
-      title: Monetary Value
-      description: "The value of the monetary amount. The value is formatted with the number of decimal places for the respective currency. \n\nExample: `10.98`\n"
-      type: string
-    StandingOrderFrequencyEnum:
-      title: Standing Order Frequency
-      type: string
-      description: The payment frequency for a Standing Order
-      enum:
-      - daily
-      - weekly
-      - fortnightly
-      - monthly
-      - quarterly
-      - semiannually
-      - yearly
-    PaymentProvidersResponse:
-      title: Payment Providers Response
-      type: object
-      required:
-      - operation_id
-      - data
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        data:
-          title: Retrieve Providers
-          description: A list of the supported payment providers
-          type: array
-          items:
-            $ref: '#/components/schemas/PaymentProvider'
-    Error:
-      title: Error Object
-      type:
-      - object
-      - 'null'
-      description: Contains a field specific error message
-      additionalProperties:
-        type: string
-  parameters:
-    SigningIdHeaderParameter:
-      in: header
-      name: X-Signing-ID
-      description: The public key ID which should be used to verify the X-Signature header. Bud's list of public keys can be found at https://assets.thisisbud.com/bud-callback.jwks
-      required: true
-      schema:
-        type: string
-    PaymentProviderRegionFilter:
-      in: query
-      name: country
-      description: Country filter as a comma separated list of country codes following the ISO 3166 alpha-3 code format.
-      example: GBR,DEU
-      schema:
-        type: string
-    PaymentProviderServiceFilter:
-      in: query
-      name: product
-      description: Product filter as a comma separated list of bud supported products
-      schema:
-        $ref: '#/components/schemas/PaymentServices'
-    PaymentProviderTypeFilter:
-      in: query
-      required: false
-      name: type
-      description: A comma separated list of Bud support provider types to be shown. If no filter is applied, all the providers are returned.
-      schema:
-        type: string
-        enum:
-        - sandbox
-        - business
-        - retail
-    SignatureHeaderParameter:
-      in: header
-      name: X-Signature
-      description: The signed request body JWT
-      required: true
-      schema:
-        type: string
-    ClientId:
-      in: header
-      name: X-Client-Id
-      schema:
-        type: string
-      required: true
-      description: The API Client Identifier (Service Application Identifier).
-      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
   securitySchemes:
     Basic:
       type: http

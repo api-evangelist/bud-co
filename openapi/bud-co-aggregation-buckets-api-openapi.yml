@@ -749,323 +749,7 @@ paths:
         '404':
           description: Bucket not found
 components:
-  parameters:
-    CategoryLookup:
-      in: query
-      name: category_lookup
-      description: 'Include to ensure that `category_lookup` is present in the `metadata` of the response.
-
-        '
-      allowEmptyValue: true
-      schema:
-        type: boolean
-    DateTo:
-      in: query
-      name: date_to
-      schema:
-        $ref: '#/components/schemas/schemas-DateTimeISO8601'
-    CustomerIdempotentIdentifier:
-      in: header
-      name: X-Customer-Idempotent-Identifier
-      schema:
-        type: string
-      description: 'Use the internal client identifier, provided in the `client_metadata` object when creating the customer in __Create Customer V3__, in place of an `X-Customer-Id` header.
-
-        '
-    BucketID:
-      in: path
-      name: bucket_id
-      required: true
-      description: 'ID of the bucket (whose criteria can be used to calculate totals).
-
-        '
-      schema:
-        anyOf:
-        - title: Fixed ID
-          type: string
-          description: 'Fixed IDs for buckets that are usable in any environment for particular
-
-            use-cases (e.g. `assess-dashboard` for the Assess Dashboard).
-
-            '
-          enum:
-          - assess-dashboard
-        - title: UUID
-          type: string
-          format: uuid
-          description: 'UUID of buckets that you have generated.
-
-            '
-    CustomerSecret:
-      in: header
-      name: X-Customer-Secret
-      schema:
-        type: string
-      required: false
-      description: The Bud Customer secret used to encrypt customer data. This is required only if the customer secret is not already stored with Bud.
-    UnbucketedCategories:
-      in: query
-      name: unbucketed_categories
-      description: 'Include to ensure that `unbucketed_categories` is present in the `metadata` of the response.
-
-        '
-      allowEmptyValue: true
-      schema:
-        type: boolean
-    GroupBy:
-      in: query
-      name: group_by
-      required: true
-      style: form
-      explode: false
-      description: 'Defines hierarchy of groupings for the resulting totals. For example:
-
-
-        ```
-
-        group_by=bucket_l1,bucket_l2
-
-        ```
-
-
-        Will result in getting groups by L1 buckets, then within those, their respective L2 buckets.
-
-        '
-      schema:
-        type: array
-        minItems: 1
-        items:
-          $ref: '#/components/schemas/GroupType'
-        uniqueItems: true
-    DeprecatedURLMonthFrom:
-      in: query
-      name: month_from
-      required: false
-      deprecated: true
-      description: 'Use `date_from` instead.
-
-        '
-      schema:
-        $ref: '#/components/schemas/schema'
-    DeprecatedURLMonthTo:
-      in: query
-      name: month_to
-      required: false
-      deprecated: true
-      description: 'Use `date_to` instead.
-
-        '
-      schema:
-        $ref: '#/components/schemas/URLMonthTo-schema'
-    ClientId:
-      in: header
-      name: X-Client-Id
-      schema:
-        type: string
-      required: true
-      description: The API Client Identifier (Service Application Identifier).
-      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
-    BucketLookup:
-      in: query
-      name: bucket_lookup
-      description: 'Include to ensure that `bucket_lookup` is present in the `metadata` of the response.
-
-        '
-      allowEmptyValue: true
-      schema:
-        type: boolean
-    DateFrom:
-      in: query
-      name: date_from
-      schema:
-        $ref: '#/components/schemas/schemas-DateTimeISO8601'
-    QueryCurrency:
-      in: query
-      name: currency
-      schema:
-        type: string
-      example: GBP
-      description: Use this parameter to filter the results returned on the `currency` associated with each result. Multiple values are accepted. If this parameter is not provided then results of any `currency` will be returned.
-    Timezone:
-      in: query
-      name: timezone
-      schema:
-        $ref: '#/components/schemas/TimezoneIdentifier'
-    CustomerId:
-      in: header
-      name: X-Customer-Id
-      schema:
-        type: string
-        format: uuid
-      required: true
-      description: A unique identifier for a Customer, as registered on Bud's platform.
-      example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
   schemas:
-    TimezoneIdentifier:
-      type: string
-      description: 'Timezone identifier (e.g. `Europe/London`) to make dates relativised to the target location.
-
-
-        In the case of daylight savings in a location, this ensures that the overall start/end date accounts for those shifts.
-
-
-        See [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) for list of valid timezone identifiers under `TZ identifier`.'
-      default: Etc/UTC
-    CreateBucketResponse:
-      title: Create Bucket Response
-      required:
-      - operation_id
-      - data
-      properties:
-        operation_id:
-          type: string
-          enum:
-          - aggregations_v2_buckets_post
-        data:
-          required:
-          - bucket_id
-          properties:
-            bucket_id:
-              type: string
-              format: uuid
-              description: 'UUID of newly created bucket.
-
-                '
-    schemas-DateTimeISO8601:
-      title: Date/Time (ISO 8601)
-      type: string
-      description: ISO Date Format
-      example: '2022-03-05T13:34:33Z'
-    GroupTransactionLinks:
-      title: Transaction Links
-      required:
-      - transactions
-      properties:
-        transactions:
-          type: string
-          description: 'An absolute path to the subset of transactions that derived this particular total.
-
-
-            Prepend with the API host to get a fully resolved URL.
-
-
-            The same headers as [Retrieve Transactions V2](https://docs.thisisbud.com/reference/v2_transactions_get) apply.
-
-            The response structure matches the [Retrieve Transactions V2](https://docs.thisisbud.com/reference/v2_transactions_get) endpoint.
-
-            '
-    BucketDefinition:
-      title: Bucket Definition
-      required:
-      - bucket_id
-      - name
-      - categorisation_model
-      - buckets
-      properties:
-        bucket_id:
-          type: string
-          description: 'Permanent ID for the bucket.
-
-            '
-        name:
-          $ref: '#/components/schemas/Slug'
-        categorisation_model:
-          type: string
-          description: 'Categorisation model that the categories in this bucket relate to.
-
-
-            See [V2 Categories](https://docs.thisisbud.com/reference/resources_v2_categories_get) for details.
-
-            '
-        buckets:
-          type: array
-          items:
-            $ref: '#/components/schemas/Bucket'
-    schema:
-      type: string
-      example: 2019-02
-      description: Month (`YYYY-MM`) from which the transactions should be returned from, this works in pair with the `month_to` parameter.
-    Criteria:
-      title: Bucket Criteria
-      required:
-      - bucket_l2
-      - category_l1
-      - category_l2
-      properties:
-        bucket_l2:
-          $ref: '#/components/schemas/Slug'
-        category_l1:
-          $ref: '#/components/schemas/Slug'
-        category_l2:
-          $ref: '#/components/schemas/Slug'
-        additional_data:
-          $ref: '#/components/schemas/AdditionalData'
-    GetBucketResponse:
-      title: Retrieve Bucket Response
-      required:
-      - operation_id
-      - data
-      - metadata
-      properties:
-        operation_id:
-          type: string
-          enum:
-          - aggregations_v2_bucket_get
-        data:
-          $ref: '#/components/schemas/BucketDefinition'
-        metadata:
-          properties:
-            category_lookup:
-              description: "A nested object mapping used to quickly find the category_l1/l2 pairings of a bucket.\n\nE.g. if you know you have a bucket pairing `BL1`/`BL2`, you can find the `category_l1`/`l2`` it\nbelongs to by looking it up with `$.metadata.category_lookup[BL1][BL2]`, and it will return\nthe pairing\n\n```json\n{\n  \"category_l1\": \"...\",\n  \"category_l2\": \"...\"\n}\n```\n\nUse this if you are planning to use category corrections, and want to ensure that your\ntotals correspond to the correct categories after the correction.\n"
-              additionalProperties:
-                additionalProperties:
-                  $ref: '#/components/schemas/CategoryPair'
-            bucket_lookup:
-              description: "A nested object mapping used to quickly find the bucket to which a particular category_l1/l2 pairing\nbelongs.\n\nE.g. if you know you have a category pair `C1`/`C2`, you can find the `bucket_l1`/`l2`` it\nbelongs to by looking it up with `$.metadata.bucket_lookup[C1][C2]`, and it will return\nthe pairing\n\n```json\n{\n  \"bucket_l1\": \"...\",\n  \"bucket_l2\": \"...\"\n}\n```\n"
-              additionalProperties:
-                additionalProperties:
-                  $ref: '#/components/schemas/BucketPair'
-            unbucketed_categories:
-              description: 'List of categories from the model which do not fit within a category bucket.
-
-
-                Use this to see if your category bucket is possibly missing out on important
-
-                categories for your analysis.
-
-                '
-              type: array
-              items:
-                $ref: '#/components/schemas/CategoryPair'
-    OperationId:
-      title: Operation Id Field
-      type: string
-      description: A unique identifier/reference associated with a given endpoint/operation
-    BudCurrency:
-      title: Currency
-      description: 'The three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) of the monetary amount.
-
-
-        Example: `GBP`
-
-        '
-      type: string
-    BadRequestNotFoundResponse:
-      title: Bad Request Not Found Response
-      type: object
-      required:
-      - operation_id
-      - code_id
-      - message
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        code_id:
-          type: string
-          description: A descriptive enough string that is linked to the reason for the error.
-        message:
-          type: string
-          description: An actual user friendly error message.
     GetBucketsResponse:
       title: Retrieve Buckets Response
       required:
@@ -1102,26 +786,10 @@ components:
                 type: array
                 items:
                   type: string
-    BucketPair:
-      title: Bucket L1/L2 Pair
-      required:
-      - bucket_l1
-      - bucket_l2
-      properties:
-        bucket_l1:
-          $ref: '#/components/schemas/Slug'
-        bucket_l2:
-          $ref: '#/components/schemas/Slug'
-    CategoryPair:
-      title: Category L1/L2 Pair
-      required:
-      - category_l1
-      - category_l2
-      properties:
-        category_l1:
-          $ref: '#/components/schemas/Slug'
-        category_l2:
-          $ref: '#/components/schemas/Slug'
+    URLMonthTo-schema:
+      type: string
+      example: 2019-03
+      description: Month (`YYYY-MM`) from which the transactions should be returned to, this works in pair with the `month_from` parameter.
     BudAmount:
       title: Standard Bud Amount
       type: object
@@ -1134,83 +802,33 @@ components:
           $ref: '#/components/schemas/BudMonetaryValue'
         currency:
           $ref: '#/components/schemas/BudCurrency'
-    BudMonetaryValue:
-      title: Monetary Value
-      description: "The value of the monetary amount. The value is formatted with the number of decimal places for the respective currency. \n\nExample: `10.98`\n"
-      type: string
-    GroupStatistic:
-      title: Group Statistic
+    BucketDefinition:
+      title: Bucket Definition
       required:
-      - total
-      - transaction_count
-      - _links
+      - bucket_id
+      - name
+      - categorisation_model
+      - buckets
       properties:
-        total:
-          $ref: '#/components/schemas/BudAmount'
-        monthly_average:
-          $ref: '#/components/schemas/BudAmount'
-        transaction_count:
-          type: integer
-        _links:
-          $ref: '#/components/schemas/GroupTransactionLinks'
-    GetBucketTotalsResponse:
-      title: Retrieve Bucket Totals Response
-      required:
-      - operation_id
-      - data
-      - metadata
-      properties:
-        operation_id:
+        bucket_id:
           type: string
-          enum:
-          - aggregations_v2_bucket_totals_get
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/TotalGroup'
-        metadata:
-          required:
-          - date_from
-          - date_to
-          - group_by
-          - currency
-          properties:
-            date_from:
-              $ref: '#/components/schemas/DateTimeISO8601'
-            date_to:
-              $ref: '#/components/schemas/DateTimeISO8601'
-            group_by:
-              type: array
-              items:
-                $ref: '#/components/schemas/GroupType'
-            currency:
-              $ref: '#/components/schemas/BudCurrency'
-    Slug:
-      type: string
-      pattern: ^[a-zA-Z-_0-9]*$
-    Bucket:
-      title: Bucket
-      required:
-      - bucket_l1
-      - criteria
-      properties:
-        bucket_l1:
+          description: 'Permanent ID for the bucket.
+
+            '
+        name:
           $ref: '#/components/schemas/Slug'
-        criteria:
+        categorisation_model:
+          type: string
+          description: 'Categorisation model that the categories in this bucket relate to.
+
+
+            See [V2 Categories](https://docs.thisisbud.com/reference/resources_v2_categories_get) for details.
+
+            '
+        buckets:
           type: array
           items:
-            $ref: '#/components/schemas/Criteria'
-        additional_data:
-          $ref: '#/components/schemas/AdditionalData'
-    CategorisationModel:
-      title: Categorisation Model
-      type: string
-      description: 'Categorisation model that the categories in this bucket relate to.
-
-
-        See [V2 Categories](https://docs.thisisbud.com/reference/resources_v2_categories_get) for details.
-
-        '
+            $ref: '#/components/schemas/Bucket'
     DateTimeISO8601:
       title: Date/Time (ISO 8601) - YYYY-MM-DDTHH:MM:SSTZ
       type: string
@@ -1218,27 +836,16 @@ components:
 
         '
       example: '2022-05-11T15:30:39Z'
-    URLMonthTo-schema:
+    TimezoneIdentifier:
       type: string
-      example: 2019-03
-      description: Month (`YYYY-MM`) from which the transactions should be returned to, this works in pair with the `month_from` parameter.
-    CreateBucketRequest:
-      title: Create Bucket Request
-      required:
-      - name
-      - categorisation_model
-      - buckets
-      properties:
-        name:
-          $ref: '#/components/schemas/Slug'
-        categorisation_model:
-          $ref: '#/components/schemas/CategorisationModel'
-        buckets:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/Bucket'
-      additionalProperties: false
+      description: 'Timezone identifier (e.g. `Europe/London`) to make dates relativised to the target location.
+
+
+        In the case of daylight savings in a location, this ensures that the overall start/end date accounts for those shifts.
+
+
+        See [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) for list of valid timezone identifiers under `TZ identifier`.'
+      default: Etc/UTC
     TotalGroup:
       title: Total Group
       required:
@@ -1304,6 +911,24 @@ components:
             '
         _links:
           $ref: '#/components/schemas/GroupTransactionLinks'
+    BudCurrency:
+      title: Currency
+      description: 'The three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) of the monetary amount.
+
+
+        Example: `GBP`
+
+        '
+      type: string
+    schemas-DateTimeISO8601:
+      title: Date/Time (ISO 8601)
+      type: string
+      description: ISO Date Format
+      example: '2022-03-05T13:34:33Z'
+    AdditionalData:
+      title: Additional Data
+      description: "Set your own additional properties for a bucket for your own use-cases, e.g.\n\n```json\n{\n  \"additional_data\": {\n    \"display_name\": \"Bucket name\",\n    \"some_custom_field\": \"value_1\"\n  }\n}\n```\n"
+      additionalProperties: true
     GroupType:
       title: Group
       type: string
@@ -1311,10 +936,385 @@ components:
       - bucket_l1
       - bucket_l2
       - month
-    AdditionalData:
-      title: Additional Data
-      description: "Set your own additional properties for a bucket for your own use-cases, e.g.\n\n```json\n{\n  \"additional_data\": {\n    \"display_name\": \"Bucket name\",\n    \"some_custom_field\": \"value_1\"\n  }\n}\n```\n"
-      additionalProperties: true
+    CategorisationModel:
+      title: Categorisation Model
+      type: string
+      description: 'Categorisation model that the categories in this bucket relate to.
+
+
+        See [V2 Categories](https://docs.thisisbud.com/reference/resources_v2_categories_get) for details.
+
+        '
+    CreateBucketResponse:
+      title: Create Bucket Response
+      required:
+      - operation_id
+      - data
+      properties:
+        operation_id:
+          type: string
+          enum:
+          - aggregations_v2_buckets_post
+        data:
+          required:
+          - bucket_id
+          properties:
+            bucket_id:
+              type: string
+              format: uuid
+              description: 'UUID of newly created bucket.
+
+                '
+    BudMonetaryValue:
+      title: Monetary Value
+      description: "The value of the monetary amount. The value is formatted with the number of decimal places for the respective currency. \n\nExample: `10.98`\n"
+      type: string
+    CreateBucketRequest:
+      title: Create Bucket Request
+      required:
+      - name
+      - categorisation_model
+      - buckets
+      properties:
+        name:
+          $ref: '#/components/schemas/Slug'
+        categorisation_model:
+          $ref: '#/components/schemas/CategorisationModel'
+        buckets:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Bucket'
+      additionalProperties: false
+    BadRequestNotFoundResponse:
+      title: Bad Request Not Found Response
+      type: object
+      required:
+      - operation_id
+      - code_id
+      - message
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        code_id:
+          type: string
+          description: A descriptive enough string that is linked to the reason for the error.
+        message:
+          type: string
+          description: An actual user friendly error message.
+    Criteria:
+      title: Bucket Criteria
+      required:
+      - bucket_l2
+      - category_l1
+      - category_l2
+      properties:
+        bucket_l2:
+          $ref: '#/components/schemas/Slug'
+        category_l1:
+          $ref: '#/components/schemas/Slug'
+        category_l2:
+          $ref: '#/components/schemas/Slug'
+        additional_data:
+          $ref: '#/components/schemas/AdditionalData'
+    GroupTransactionLinks:
+      title: Transaction Links
+      required:
+      - transactions
+      properties:
+        transactions:
+          type: string
+          description: 'An absolute path to the subset of transactions that derived this particular total.
+
+
+            Prepend with the API host to get a fully resolved URL.
+
+
+            The same headers as [Retrieve Transactions V2](https://docs.thisisbud.com/reference/v2_transactions_get) apply.
+
+            The response structure matches the [Retrieve Transactions V2](https://docs.thisisbud.com/reference/v2_transactions_get) endpoint.
+
+            '
+    GroupStatistic:
+      title: Group Statistic
+      required:
+      - total
+      - transaction_count
+      - _links
+      properties:
+        total:
+          $ref: '#/components/schemas/BudAmount'
+        monthly_average:
+          $ref: '#/components/schemas/BudAmount'
+        transaction_count:
+          type: integer
+        _links:
+          $ref: '#/components/schemas/GroupTransactionLinks'
+    Slug:
+      type: string
+      pattern: ^[a-zA-Z-_0-9]*$
+    BucketPair:
+      title: Bucket L1/L2 Pair
+      required:
+      - bucket_l1
+      - bucket_l2
+      properties:
+        bucket_l1:
+          $ref: '#/components/schemas/Slug'
+        bucket_l2:
+          $ref: '#/components/schemas/Slug'
+    CategoryPair:
+      title: Category L1/L2 Pair
+      required:
+      - category_l1
+      - category_l2
+      properties:
+        category_l1:
+          $ref: '#/components/schemas/Slug'
+        category_l2:
+          $ref: '#/components/schemas/Slug'
+    GetBucketResponse:
+      title: Retrieve Bucket Response
+      required:
+      - operation_id
+      - data
+      - metadata
+      properties:
+        operation_id:
+          type: string
+          enum:
+          - aggregations_v2_bucket_get
+        data:
+          $ref: '#/components/schemas/BucketDefinition'
+        metadata:
+          properties:
+            category_lookup:
+              description: "A nested object mapping used to quickly find the category_l1/l2 pairings of a bucket.\n\nE.g. if you know you have a bucket pairing `BL1`/`BL2`, you can find the `category_l1`/`l2`` it\nbelongs to by looking it up with `$.metadata.category_lookup[BL1][BL2]`, and it will return\nthe pairing\n\n```json\n{\n  \"category_l1\": \"...\",\n  \"category_l2\": \"...\"\n}\n```\n\nUse this if you are planning to use category corrections, and want to ensure that your\ntotals correspond to the correct categories after the correction.\n"
+              additionalProperties:
+                additionalProperties:
+                  $ref: '#/components/schemas/CategoryPair'
+            bucket_lookup:
+              description: "A nested object mapping used to quickly find the bucket to which a particular category_l1/l2 pairing\nbelongs.\n\nE.g. if you know you have a category pair `C1`/`C2`, you can find the `bucket_l1`/`l2`` it\nbelongs to by looking it up with `$.metadata.bucket_lookup[C1][C2]`, and it will return\nthe pairing\n\n```json\n{\n  \"bucket_l1\": \"...\",\n  \"bucket_l2\": \"...\"\n}\n```\n"
+              additionalProperties:
+                additionalProperties:
+                  $ref: '#/components/schemas/BucketPair'
+            unbucketed_categories:
+              description: 'List of categories from the model which do not fit within a category bucket.
+
+
+                Use this to see if your category bucket is possibly missing out on important
+
+                categories for your analysis.
+
+                '
+              type: array
+              items:
+                $ref: '#/components/schemas/CategoryPair'
+    schema:
+      type: string
+      example: 2019-02
+      description: Month (`YYYY-MM`) from which the transactions should be returned from, this works in pair with the `month_to` parameter.
+    Bucket:
+      title: Bucket
+      required:
+      - bucket_l1
+      - criteria
+      properties:
+        bucket_l1:
+          $ref: '#/components/schemas/Slug'
+        criteria:
+          type: array
+          items:
+            $ref: '#/components/schemas/Criteria'
+        additional_data:
+          $ref: '#/components/schemas/AdditionalData'
+    GetBucketTotalsResponse:
+      title: Retrieve Bucket Totals Response
+      required:
+      - operation_id
+      - data
+      - metadata
+      properties:
+        operation_id:
+          type: string
+          enum:
+          - aggregations_v2_bucket_totals_get
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TotalGroup'
+        metadata:
+          required:
+          - date_from
+          - date_to
+          - group_by
+          - currency
+          properties:
+            date_from:
+              $ref: '#/components/schemas/DateTimeISO8601'
+            date_to:
+              $ref: '#/components/schemas/DateTimeISO8601'
+            group_by:
+              type: array
+              items:
+                $ref: '#/components/schemas/GroupType'
+            currency:
+              $ref: '#/components/schemas/BudCurrency'
+    OperationId:
+      title: Operation Id Field
+      type: string
+      description: A unique identifier/reference associated with a given endpoint/operation
+  parameters:
+    DeprecatedURLMonthTo:
+      in: query
+      name: month_to
+      required: false
+      deprecated: true
+      description: 'Use `date_to` instead.
+
+        '
+      schema:
+        $ref: '#/components/schemas/URLMonthTo-schema'
+    CategoryLookup:
+      in: query
+      name: category_lookup
+      description: 'Include to ensure that `category_lookup` is present in the `metadata` of the response.
+
+        '
+      allowEmptyValue: true
+      schema:
+        type: boolean
+    BucketID:
+      in: path
+      name: bucket_id
+      required: true
+      description: 'ID of the bucket (whose criteria can be used to calculate totals).
+
+        '
+      schema:
+        anyOf:
+        - title: Fixed ID
+          type: string
+          description: 'Fixed IDs for buckets that are usable in any environment for particular
+
+            use-cases (e.g. `assess-dashboard` for the Assess Dashboard).
+
+            '
+          enum:
+          - assess-dashboard
+        - title: UUID
+          type: string
+          format: uuid
+          description: 'UUID of buckets that you have generated.
+
+            '
+    DeprecatedURLMonthFrom:
+      in: query
+      name: month_from
+      required: false
+      deprecated: true
+      description: 'Use `date_from` instead.
+
+        '
+      schema:
+        $ref: '#/components/schemas/schema'
+    CustomerIdempotentIdentifier:
+      in: header
+      name: X-Customer-Idempotent-Identifier
+      schema:
+        type: string
+      description: 'Use the internal client identifier, provided in the `client_metadata` object when creating the customer in __Create Customer V3__, in place of an `X-Customer-Id` header.
+
+        '
+    BucketLookup:
+      in: query
+      name: bucket_lookup
+      description: 'Include to ensure that `bucket_lookup` is present in the `metadata` of the response.
+
+        '
+      allowEmptyValue: true
+      schema:
+        type: boolean
+    CustomerSecret:
+      in: header
+      name: X-Customer-Secret
+      schema:
+        type: string
+      required: false
+      description: The Bud Customer secret used to encrypt customer data. This is required only if the customer secret is not already stored with Bud.
+    UnbucketedCategories:
+      in: query
+      name: unbucketed_categories
+      description: 'Include to ensure that `unbucketed_categories` is present in the `metadata` of the response.
+
+        '
+      allowEmptyValue: true
+      schema:
+        type: boolean
+    DateFrom:
+      in: query
+      name: date_from
+      schema:
+        $ref: '#/components/schemas/schemas-DateTimeISO8601'
+    GroupBy:
+      in: query
+      name: group_by
+      required: true
+      style: form
+      explode: false
+      description: 'Defines hierarchy of groupings for the resulting totals. For example:
+
+
+        ```
+
+        group_by=bucket_l1,bucket_l2
+
+        ```
+
+
+        Will result in getting groups by L1 buckets, then within those, their respective L2 buckets.
+
+        '
+      schema:
+        type: array
+        minItems: 1
+        items:
+          $ref: '#/components/schemas/GroupType'
+        uniqueItems: true
+    ClientId:
+      in: header
+      name: X-Client-Id
+      schema:
+        type: string
+      required: true
+      description: The API Client Identifier (Service Application Identifier).
+      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
+    CustomerId:
+      in: header
+      name: X-Customer-Id
+      schema:
+        type: string
+        format: uuid
+      required: true
+      description: A unique identifier for a Customer, as registered on Bud's platform.
+      example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
+    DateTo:
+      in: query
+      name: date_to
+      schema:
+        $ref: '#/components/schemas/schemas-DateTimeISO8601'
+    QueryCurrency:
+      in: query
+      name: currency
+      schema:
+        type: string
+      example: GBP
+      description: Use this parameter to filter the results returned on the `currency` associated with each result. Multiple values are accepted. If this parameter is not provided then results of any `currency` will be returned.
+    Timezone:
+      in: query
+      name: timezone
+      schema:
+        $ref: '#/components/schemas/TimezoneIdentifier'
   securitySchemes:
     Basic:
       type: http

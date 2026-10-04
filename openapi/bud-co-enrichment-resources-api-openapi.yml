@@ -164,28 +164,6 @@ paths:
           description: An unexpected error occurred on the server side
 components:
   schemas:
-    GetCategoriesV2Response:
-      title: Categories Response
-      type: object
-      description: Expected response structure for the get categories endpoint.
-      required:
-      - operation_id
-      - data
-      - metadata
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        data:
-          oneOf:
-          - $ref: '#/components/schemas/CategoriesFlat'
-          - $ref: '#/components/schemas/CategoriesMap'
-        metadata:
-          type: object
-          required:
-          - model
-          properties:
-            model:
-              $ref: '#/components/schemas/schemas-CategorisationModel'
     CategoriesFlat:
       title: Category List
       type: object
@@ -201,22 +179,6 @@ components:
           description: List of all the available subcategories.
           items:
             type: string
-    OperationId:
-      title: Operation Id Field
-      type: string
-      description: A unique identifier/reference associated with a given endpoint/operation
-    GetModelsResponse:
-      title: Models Response
-      required:
-      - operation_id
-      - data
-      properties:
-        operation_id:
-          type: string
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/schemas-CategorisationModel'
     schemas-CategorisationModel:
       title: Categorisation Model
       type: object
@@ -286,6 +248,44 @@ components:
                   - essential
                   items:
                     type: string
+    GetModelsResponse:
+      title: Models Response
+      required:
+      - operation_id
+      - data
+      properties:
+        operation_id:
+          type: string
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/schemas-CategorisationModel'
+    GetCategoriesV2Response:
+      title: Categories Response
+      type: object
+      description: Expected response structure for the get categories endpoint.
+      required:
+      - operation_id
+      - data
+      - metadata
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          oneOf:
+          - $ref: '#/components/schemas/CategoriesFlat'
+          - $ref: '#/components/schemas/CategoriesMap'
+        metadata:
+          type: object
+          required:
+          - model
+          properties:
+            model:
+              $ref: '#/components/schemas/schemas-CategorisationModel'
+    OperationId:
+      title: Operation Id Field
+      type: string
+      description: A unique identifier/reference associated with a given endpoint/operation
   parameters:
     ClientId:
       in: header

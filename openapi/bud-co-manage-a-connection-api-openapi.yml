@@ -1182,38 +1182,193 @@ paths:
                     '
 components:
   schemas:
-    HasNewTransactions:
+    TaskStatusCaps:
+      title: The Task Status
+      type: string
+      description: The general status of a task
+      enum:
+      - Pending
+      - Completed
+      - Failed
+    TaskView:
+      title: Task View
+      description: A task view.
+      type: object
+      properties:
+        task_id:
+          $ref: '#/components/schemas/TaskId'
+        provider:
+          type: string
+          description: The provider (ASPSP) associated with this task
+        result:
+          $ref: '#/components/schemas/ConnectResultCodes'
+        status:
+          $ref: '#/components/schemas/TaskStatusCaps'
+        reconnect_required:
+          $ref: '#/components/schemas/ReconnectRequired'
+        step:
+          type: number
+          description: The step that this task is currently where 4 = Completed.
+          enum:
+          - 1
+          - 2
+          - 3
+          - 4
+        text:
+          type: string
+          description: A description of the step this task is currently at. In order from step 1 to step 4.
+          enum:
+          - Fetching access token
+          - Fetching accounts
+          - Fetching balances and transactions
+          - Completed
+    RevokeAccountAccessIntentRequest:
+      title: Revoke Account Access Intent Payload
+      type: object
+      required:
+      - provider
+      properties:
+        provider:
+          type: string
+          description: The name of the provider (ASPSP) the Customer is requesting to have their consent revoked for
+    ReconnectRequired:
       type: boolean
-      description: 'To describe whether new transactions have been pulled from the relevant
-
-        ASPSP during the refresh. Note that if this field is set to `false` then
-
-        there is no need to make a request to any other downstream endpoints to
-
-        collect the data related to that customer.
-
-        '
-    OpenBankingRefreshRequestV2:
-      title: Open Banking Refresh V2 Payload
+      description: Indicator as to whether the account needs to be connected again, through SCA authentication.
+    BadRequestResponse:
+      title: Bad Request Response
+      type: object
+      description: Expected response structure
+      required:
+      - operation_id
+      - code_id
+      - message
+      - errors
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        code_id:
+          type: string
+          description: A descriptive enough string that is linked to the reason for the error.
+        message:
+          type: string
+        errors:
+          anyOf:
+          - $ref: '#/components/schemas/Error'
+          - $ref: '#/components/schemas/Errors'
+    TaskCreatedView:
+      title: Task Created View
+      description: Standard successful task created response.
+      type: object
+      required:
+      - task_id
+      - provider
+      properties:
+        task_id:
+          $ref: '#/components/schemas/TaskId'
+        provider:
+          type: string
+          description: The provider (ASPSP) associated with this task
+    ResultsMetadata:
+      title: Results Metadata Object
+      type: object
+      description: Metadata associated with the response schema
+      properties:
+        results:
+          type: number
+          description: The number of results returned
+    OpenBankingRefreshRequest:
+      title: Open Banking Refresh Payload
       type: object
       description: Expected request payload structure
+      required:
+      - provider
       properties:
-        providers:
-          type: array
-          description: Optional parameter defining the name of the providers that a refresh should be completed for. If this is not specified a refresh is completed for all providers that a customer has an authorised consent with.
-          items:
-            type: string
+        provider:
+          type: string
+          description: The name of the provider the task is trying to connect to
         from:
           type: string
-          description: "The datetime (ISO 8601) that defines the time since when the Customer's data needs to be collected. \nDefaults to the datetime of the last pull of transactions less seven days to account for any potential changes to the most recent set of transactions. \nRefreshes can only go back to a maximum of 90 days from the current date.\n"
+          description: 'The datetime (ISO 8601) that defines the time since when the Customer''s data needs to be collected.
+
+            Defaults to the datetime of the last pull of transactions less seven days to account for any potential changes to the most recent set of transactions.
+
+            Refreshes can only go back to a maximum of 90 days from the current date.
+
+            '
         to:
           type: string
-          description: "The datetime (ISO 8601) that defines the time up to which the Customer's data needs to be collected. Defaults to the current datetime. \n"
-        resources:
+          description: 'The datetime (ISO 8601) that defines the time up to which the Customer''s data needs to be collected. Defaults to the current datetime.
+
+            Refreshes can only go back to a maximum of 90 days from the current date.
+
+            '
+    Error:
+      title: Error Object
+      type:
+      - object
+      - 'null'
+      description: Contains a field specific error message
+      additionalProperties:
+        type: string
+    ConsentReconfirmation:
+      title: Consent Reconfirmation Outcome
+      type: object
+      description: Result of performing a reconfirmation of consent task
+      required:
+      - provider_id
+      - reconnect_required
+      properties:
+        provider_id:
+          type: string
+          description: The provider that the reconfirmation of consent was performed against
+        reconnect_required:
+          $ref: '#/components/schemas/ReconnectRequired'
+    RevokeAccountAccessIntentTaskStatusValidationError:
+      title: Revoke Account Access Intent Status Validation Error
+      type: object
+      required:
+      - operation_id
+      - code_id
+      - message
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        code_id:
+          type: string
+          enum:
+          - failed_validation
+        message:
+          type: string
+          enum:
+          - invalid request
+        errors:
+          type: object
+          description: Extra information on the validation errors
+    TaskV2View:
+      title: Task V2 View
+      description: A task view.
+      type: object
+      properties:
+        task_id:
+          $ref: '#/components/schemas/TaskId'
+        result:
+          $ref: '#/components/schemas/ConnectResultCodes'
+        status:
+          $ref: '#/components/schemas/TaskStatusCaps'
+        has_new_transactions:
+          $ref: '#/components/schemas/HasNewTransactions'
+        sub_tasks:
           type: array
-          description: Optional list of resources that should be refreshed. Default behaviour is to refresh all resources defined on the customers consent
           items:
-            $ref: '#/components/schemas/OBResources'
+            $ref: '#/components/schemas/SubTaskV2View'
+    Errors:
+      title: Array of Error Object
+      description: Contains a list of error messages
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          type: string
     OBConsentWebhookBody:
       title: OB Consent Webhook Payload
       type: object
@@ -1269,6 +1424,109 @@ components:
               - duplicate_accounts
               - access_token_error
               - consent_invalid
+    OpenBankingRefreshResponse:
+      title: Refresh Task Response
+      type: object
+      description: Expected response structure
+      required:
+      - operation_id
+      - data
+      - metadata
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          $ref: '#/components/schemas/TaskView'
+        metadata:
+          type: object
+          description: Refresh Response Metadata
+          properties:
+            has_new_transactions:
+              $ref: '#/components/schemas/HasNewTransactions'
+            status:
+              $ref: '#/components/schemas/TaskStatusCaps'
+            next_url:
+              description: The URL to call to obtain the results of the task
+              type: string
+            next_url_delay:
+              description: Recommended delay in milliseconds before next call
+              type: integer
+    TaskCreatedResponseOB:
+      title: Task Created Response
+      type: object
+      description: Expected response structure
+      required:
+      - operation_id
+      - data
+      - metadata
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          $ref: '#/components/schemas/TaskCreatedView'
+        metadata:
+          $ref: '#/components/schemas/AsyncTaskMetadata'
+    TaskType:
+      type: string
+      enum:
+      - connect
+      - refresh
+      - revoke
+      - consent-refresh
+      description: The type of task that completed
+    RevokeAccountAccessIntentTastStatusResponse:
+      title: Revoke Account Access Intent Response
+      type: object
+      description: Expected response from a get status request for a revoke account access intent call
+      required:
+      - operation_id
+      - data
+      - metadata
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          type: object
+          title: Revoke Task Data
+          required:
+          - task_id
+          - provider
+          - status
+          properties:
+            task_id:
+              $ref: '#/components/schemas/TaskId'
+            provider:
+              type: string
+              description: The provider (ASPSP) associated with this task
+            status:
+              type: string
+              description: The status of the job associated with the specified task id
+              enum:
+              - Completed
+              - Pending
+              - Failed
+            result:
+              type: string
+              description: The result of the operation.
+        metadata:
+          type: object
+          title: Revoke Task Metadata
+          required:
+          - status
+          properties:
+            status:
+              type: string
+              description: The status of the job associated with the specified task id
+              enum:
+              - Completed
+              - Pending
+              - Failed
+            next_url:
+              type: string
+              description: The url to try next if the `status` property returned is `Pending`
+            next_url_delay:
+              type: number
+              description: The time in milliseconds that the client should wait before polling again, if the `status` property returned is `Pending`
     OBRefreshWebhookBody:
       title: OB Webhook Payload
       type: object
@@ -1329,6 +1587,397 @@ components:
             consent_id:
               type: string
               description: The consent identifier that the event relates to
+    SubTaskV2View:
+      title: SubTask V2 View
+      description: A task view.
+      type: object
+      properties:
+        task_id:
+          $ref: '#/components/schemas/TaskId'
+        provider:
+          type: string
+          description: The provider (ASPSP) associated with this task
+        result:
+          $ref: '#/components/schemas/ConnectResultCodes'
+        status:
+          $ref: '#/components/schemas/TaskStatusCaps'
+        reconnect_required:
+          $ref: '#/components/schemas/ReconnectRequired'
+        has_new_transactions:
+          $ref: '#/components/schemas/HasNewTransactions'
+    ConnectResultCodes:
+      type: string
+      description: The result of the operation. Either success or various error codes.
+      enum:
+      - success
+      - auth_denied
+      - auth_expired
+      - auth_used
+      - awaiting_authorisation
+      - connection_expired
+      - connection_not_found
+      - connection_permission
+      - connection_reauthenticate
+      - connection_revoked
+      - connection_status
+      - consent_not_found
+      - extension_not_permitted
+      - failed_body_decode
+      - failed_validation
+      - internal_auth_error
+      - internal_error
+      - internal_timeout
+      - internal_transient_error
+      - provider_unauthorised
+      - provider_unavailable
+      - provider_endpoint_deprecated
+      - provider_endpoint_unimplemented
+      - provider_endpoint_unsupported
+      - provider_failure
+      - provider_maintenance
+      - provider_marked_account_invalid
+      - provider_not_found
+      - provider_request_limit
+      - provider_timeout
+      - resource_not_found
+      - task_not_found
+    TaskV2CreatedView:
+      title: Refresh V2 Task Created View
+      description: Standard successful task created response.
+      type: object
+      required:
+      - task_id
+      - sub_tasks
+      properties:
+        task_id:
+          $ref: '#/components/schemas/TaskId'
+        sub_tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskCreatedView'
+    TaskId:
+      title: Task Id
+      type: string
+      description: Bud Task identifier returned from an async task for the requested action
+    OperationId:
+      title: Operation Id Field
+      type: string
+      description: A unique identifier/reference associated with a given endpoint/operation
+    OBV2WebhookBody:
+      title: OB V2 Webhook Payload
+      type: object
+      description: 'The payload sent to the client defined webhook (via the console) when an Open Banking refresh V2 task completes.
+
+        '
+      required:
+      - customer_id
+      - event
+      - has_new_transactions
+      - task_id
+      - result
+      - status
+      properties:
+        customer_id:
+          description: The customer the event relates to
+          type: string
+          example: 19677d9f-90e7-44a6-a32e-566990623da4
+        event:
+          type: string
+          description: The task type for the event.
+        has_new_transactions:
+          $ref: '#/components/schemas/HasNewTransactions'
+        task_id:
+          description: The task identifier that the event relates to
+          type: string
+          example: e145c656-4a90-45db-a025-af7765482c8c
+        result:
+          $ref: '#/components/schemas/ConnectResultCodes'
+        status:
+          type: string
+          description: The general status of a task
+          enum:
+          - Completed
+          - Failed
+        start_time:
+          type: string
+          description: Start timestamp for the task this event relates to
+        refresh_window:
+          type: object
+          description: The boundaries of the refresh task as requested from the provider. If transactions were returned from the provider
+          properties:
+            from:
+              type: string
+              description: The from timestamp requested with the provider
+            to:
+              type: string
+              description: The to timestamp requested with the provider
+        sub_tasks:
+          description: An array of details about each individual refresh subtask
+          type: array
+          items:
+            $ref: '#/components/schemas/RefreshSubtaskWebhookTask'
+    ReconfirmConsentResponse:
+      title: Reconfirm Consent Response
+      type: object
+      description: Expected response payload structure
+      required:
+      - operation_id
+      - data
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          $ref: '#/components/schemas/ConsentReconfirmation'
+    TaskCreatedMetadata:
+      type: object
+      description: Created task metadata response
+      required:
+      - status
+      - next_url
+      - next_url_delay
+      properties:
+        status:
+          type: string
+          description: The status of the job associated with the specified task id
+          enum:
+          - Pending
+        next_url:
+          type: string
+          description: The url to get the status of the task
+        next_url_delay:
+          type: number
+          description: The time in milliseconds that the client should wait before polling the relevant GET status endpoint
+    ProviderOBV2WebhookBody:
+      title: OB V2 Webhook Payload
+      type: object
+      description: 'The payload sent to the client defined webhook (via the console) when an Open Banking refresh V2 task completes.
+
+        '
+      required:
+      - event
+      - task_id
+      - status
+      - result
+      - reconnect_required
+      - provider
+      - has_new_transactions
+      - customer_id
+      properties:
+        account_ids:
+          description: An array listing all account ids that were updated as part of this task
+          type: array
+          items:
+            type: string
+        consent_ids:
+          description: An array listing all consents that were updated as part of this task
+          type: array
+          items:
+            type: string
+        customer_id:
+          description: The customer the event relates to
+          type: string
+          example: 19677d9f-90e7-44a6-a32e-566990623da4
+        has_new_transactions:
+          $ref: '#/components/schemas/HasNewTransactions'
+        provider:
+          type: string
+          description: Name of the provider (banking institution)
+        reconnect_required:
+          $ref: '#/components/schemas/ReconnectRequired'
+        result:
+          $ref: '#/components/schemas/ConnectResultCodes'
+        status:
+          type: string
+          description: The general status of a task
+          enum:
+          - Completed
+          - Failed
+        task_id:
+          description: The task identifier that the event relates to
+          type: string
+          example: e145c656-4a90-45db-a025-af7765482c8c
+        event:
+          type: string
+          description: The task type for the event.
+        start_time:
+          type: string
+          description: Start timestamp for the task this event relates to
+        refresh_window:
+          type: object
+          description: The boundaries of the refresh task as requested from the provider. If transactions were returned from the provider
+          properties:
+            from:
+              type: string
+              description: The from timestamp requested with the provider
+            to:
+              type: string
+              description: The to timestamp requested with the provider
+        consent_details:
+          type: object
+          description: Details of the consent used as part of this refresh task
+          properties:
+            id:
+              type: string
+              description: The id of the consent that was updated as part of this task
+            expiration_date:
+              type: string
+              description: The expiration date of the consent
+    RevokeTaskCreatedResponse:
+      title: Revoke Task Created Response
+      type: object
+      description: Expected response structure
+      required:
+      - operation_id
+      - data
+      - metadata
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          $ref: '#/components/schemas/TaskCreatedView'
+        metadata:
+          $ref: '#/components/schemas/TaskCreatedMetadata'
+    OBResources:
+      type: string
+      enum:
+      - accounts
+      - balances
+      - transactions
+      - parties
+      - direct-debits
+    TaskCreatedV2ResponseOB:
+      title: Refresh V2 Task Created Response
+      type: object
+      description: Expected response structure
+      required:
+      - operation_id
+      - data
+      - metadata
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          $ref: '#/components/schemas/TaskV2CreatedView'
+        metadata:
+          $ref: '#/components/schemas/AsyncTaskMetadata'
+    RefreshSubtaskWebhookTask:
+      title: Details of an individual refresh Task
+      type: object
+      description: The payload detailing an individual refresh for a single provider
+      required:
+      - has_new_transactions
+      - provider
+      - reconnect_required
+      - result
+      - status
+      - task_id
+      properties:
+        account_ids:
+          description: An array listing all account ids that were updated as part of this task
+          type: array
+          items:
+            type: string
+        consent_ids:
+          description: An array listing all consents that were updated as part of this task
+          type: array
+          items:
+            type: string
+        has_new_transactions:
+          $ref: '#/components/schemas/HasNewTransactions'
+        provider:
+          type: string
+          description: Name of the provider (banking institution)
+        reconnect_required:
+          $ref: '#/components/schemas/ReconnectRequired'
+        result:
+          $ref: '#/components/schemas/ConnectResultCodes'
+        status:
+          type: string
+          description: The general status of a task
+          enum:
+          - Completed
+          - Failed
+        task_id:
+          description: The task identifier that the event relates to
+          type: string
+          example: e145c656-4a90-45db-a025-af7765482c8c
+        start_time:
+          type: string
+          description: Start timestamp for the task this event relates to
+        refresh_window:
+          type: object
+          description: The boundaries of the refresh task as requested from the provider.  If transactions were returned from the provider
+          properties:
+            from:
+              type: string
+              description: The from timestamp requested with the provider
+            to:
+              type: string
+              description: The to timestamp requested with the provider
+        consent_details:
+          type: object
+          description: Details of the consent used as part of this refresh task
+          properties:
+            id:
+              type: string
+              description: The id of the consent that was updated as part of this task
+            expiration_date:
+              type: string
+              description: The expiration date of the consent
+    AsyncTaskMetadata:
+      title: Async Task Metadata
+      type: object
+      description: Metadata associated with an asynchronous task
+      properties:
+        status:
+          type: string
+          description: The status of the job associated with the specified task id
+          enum:
+          - Completed
+          - Pending
+          - Failed
+        next_url:
+          type: string
+          description: The URL to call to obtain the results of the task
+        next_url_delay:
+          type: number
+          description: The time in milliseconds that the client should wait before polling the relevant GET endpoint with the above task id
+    HasNewTransactions:
+      type: boolean
+      description: 'To describe whether new transactions have been pulled from the relevant
+
+        ASPSP during the refresh. Note that if this field is set to `false` then
+
+        there is no need to make a request to any other downstream endpoints to
+
+        collect the data related to that customer.
+
+        '
+    OpenBankingRefreshV2Response:
+      title: Refresh V2 Task Response
+      type: object
+      description: Expected response structure
+      required:
+      - operation_id
+      - data
+      - metadata
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          $ref: '#/components/schemas/TaskV2View'
+        metadata:
+          type: object
+          description: Refresh Response Metadata
+          properties:
+            status:
+              $ref: '#/components/schemas/TaskStatusCaps'
+            next_url:
+              description: The URL to call to obtain the results of the task
+              type: string
+            next_url_delay:
+              description: Recommended delay in milliseconds before next call
+              type: integer
     GetOBConsentsResponseDataItem:
       title: Open Banking Consent
       type: object
@@ -1431,247 +2080,6 @@ components:
         last_synced_at:
           type: string
           description: The date at which the last data refresh (sync) occured for this consent object. For revoked consents this will be the time that the conesnt was revoked.
-    Errors:
-      title: Array of Error Object
-      description: Contains a list of error messages
-      type: object
-      additionalProperties:
-        type: array
-        items:
-          type: string
-    TaskStatusCaps:
-      title: The Task Status
-      type: string
-      description: The general status of a task
-      enum:
-      - Pending
-      - Completed
-      - Failed
-    GetOBConsentsResponse:
-      title: Available Open Banking Consents
-      type: object
-      required:
-      - operation_id
-      - data
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        data:
-          type: array
-          description: List of available consents
-          items:
-            $ref: '#/components/schemas/GetOBConsentsResponseDataItem'
-        metadata:
-          $ref: '#/components/schemas/ResultsMetadata'
-    BadRequestResponse:
-      title: Bad Request Response
-      type: object
-      description: Expected response structure
-      required:
-      - operation_id
-      - code_id
-      - message
-      - errors
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        code_id:
-          type: string
-          description: A descriptive enough string that is linked to the reason for the error.
-        message:
-          type: string
-        errors:
-          anyOf:
-          - $ref: '#/components/schemas/Error'
-          - $ref: '#/components/schemas/Errors'
-    TaskCreatedV2ResponseOB:
-      title: Refresh V2 Task Created Response
-      type: object
-      description: Expected response structure
-      required:
-      - operation_id
-      - data
-      - metadata
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        data:
-          $ref: '#/components/schemas/TaskV2CreatedView'
-        metadata:
-          $ref: '#/components/schemas/AsyncTaskMetadata'
-    ProviderOBV2WebhookBody:
-      title: OB V2 Webhook Payload
-      type: object
-      description: 'The payload sent to the client defined webhook (via the console) when an Open Banking refresh V2 task completes.
-
-        '
-      required:
-      - event
-      - task_id
-      - status
-      - result
-      - reconnect_required
-      - provider
-      - has_new_transactions
-      - customer_id
-      properties:
-        account_ids:
-          description: An array listing all account ids that were updated as part of this task
-          type: array
-          items:
-            type: string
-        consent_ids:
-          description: An array listing all consents that were updated as part of this task
-          type: array
-          items:
-            type: string
-        customer_id:
-          description: The customer the event relates to
-          type: string
-          example: 19677d9f-90e7-44a6-a32e-566990623da4
-        has_new_transactions:
-          $ref: '#/components/schemas/HasNewTransactions'
-        provider:
-          type: string
-          description: Name of the provider (banking institution)
-        reconnect_required:
-          $ref: '#/components/schemas/ReconnectRequired'
-        result:
-          $ref: '#/components/schemas/ConnectResultCodes'
-        status:
-          type: string
-          description: The general status of a task
-          enum:
-          - Completed
-          - Failed
-        task_id:
-          description: The task identifier that the event relates to
-          type: string
-          example: e145c656-4a90-45db-a025-af7765482c8c
-        event:
-          type: string
-          description: The task type for the event.
-        start_time:
-          type: string
-          description: Start timestamp for the task this event relates to
-        refresh_window:
-          type: object
-          description: The boundaries of the refresh task as requested from the provider. If transactions were returned from the provider
-          properties:
-            from:
-              type: string
-              description: The from timestamp requested with the provider
-            to:
-              type: string
-              description: The to timestamp requested with the provider
-        consent_details:
-          type: object
-          description: Details of the consent used as part of this refresh task
-          properties:
-            id:
-              type: string
-              description: The id of the consent that was updated as part of this task
-            expiration_date:
-              type: string
-              description: The expiration date of the consent
-    RevokeTaskCreatedResponse:
-      title: Revoke Task Created Response
-      type: object
-      description: Expected response structure
-      required:
-      - operation_id
-      - data
-      - metadata
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        data:
-          $ref: '#/components/schemas/TaskCreatedView'
-        metadata:
-          $ref: '#/components/schemas/TaskCreatedMetadata'
-    TaskV2View:
-      title: Task V2 View
-      description: A task view.
-      type: object
-      properties:
-        task_id:
-          $ref: '#/components/schemas/TaskId'
-        result:
-          $ref: '#/components/schemas/ConnectResultCodes'
-        status:
-          $ref: '#/components/schemas/TaskStatusCaps'
-        has_new_transactions:
-          $ref: '#/components/schemas/HasNewTransactions'
-        sub_tasks:
-          type: array
-          items:
-            $ref: '#/components/schemas/SubTaskV2View'
-    OperationId:
-      title: Operation Id Field
-      type: string
-      description: A unique identifier/reference associated with a given endpoint/operation
-    RawOBConsents:
-      title: Raw OB Consent
-      type:
-      - object
-      - 'null'
-      description: The raw consent as returned by the provider
-      properties:
-        ConsentId:
-          type: string
-          description: Open Banking consent unique identifier
-        CreationDateTime:
-          type: string
-          format: ISO8601
-          description: Date and time at which the resource was created.
-        Permissions:
-          type: array
-          description: Specifies the Open Banking account access data types that tied to the consent
-          items:
-            type: string
-            enum:
-            - ReadAccountsBasic
-            - ReadAccountsDetail
-            - ReadBalances
-            - ReadDirectDebits
-            - ReadParty
-            - ReadPartyPSU
-            - ReadTransactionsBasic
-            - ReadTransactionsCredits
-            - ReadTransactionsDebits
-            - ReadTransactionsDetail
-        Status:
-          type: string
-          description: Specifies the status of consent resource.
-          enum:
-          - Authorised
-          - AwaitingAuthorisation
-          - Rejected
-          - Revoked
-        StatusUpdateDateTime:
-          type:
-          - string
-          - 'null'
-          format: ISO8601
-          description: Date and time at which the resource status was updated.
-        TransactionFromDateTime:
-          type:
-          - string
-          - 'null'
-          format: ISO8601
-          description: Specified start date and time for the transaction query period.
-    ReconfirmConsentResponse:
-      title: Reconfirm Consent Response
-      type: object
-      description: Expected response payload structure
-      required:
-      - operation_id
-      - data
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        data:
-          $ref: '#/components/schemas/ConsentReconfirmation'
     OBSyncWebhookBody:
       title: OB Synchronisation Webhook Payload
       type: object
@@ -1732,501 +2140,93 @@ components:
             consent_id:
               type: string
               description: The consent identifier that the event relates to
-    ReconnectRequired:
-      type: boolean
-      description: Indicator as to whether the account needs to be connected again, through SCA authentication.
-    TaskCreatedMetadata:
-      type: object
-      description: Created task metadata response
-      required:
-      - status
-      - next_url
-      - next_url_delay
-      properties:
-        status:
-          type: string
-          description: The status of the job associated with the specified task id
-          enum:
-          - Pending
-        next_url:
-          type: string
-          description: The url to get the status of the task
-        next_url_delay:
-          type: number
-          description: The time in milliseconds that the client should wait before polling the relevant GET status endpoint
-    OpenBankingRefreshRequest:
-      title: Open Banking Refresh Payload
-      type: object
-      description: Expected request payload structure
-      required:
-      - provider
-      properties:
-        provider:
-          type: string
-          description: The name of the provider the task is trying to connect to
-        from:
-          type: string
-          description: 'The datetime (ISO 8601) that defines the time since when the Customer''s data needs to be collected.
-
-            Defaults to the datetime of the last pull of transactions less seven days to account for any potential changes to the most recent set of transactions.
-
-            Refreshes can only go back to a maximum of 90 days from the current date.
-
-            '
-        to:
-          type: string
-          description: 'The datetime (ISO 8601) that defines the time up to which the Customer''s data needs to be collected. Defaults to the current datetime.
-
-            Refreshes can only go back to a maximum of 90 days from the current date.
-
-            '
-    AsyncTaskMetadata:
-      title: Async Task Metadata
-      type: object
-      description: Metadata associated with an asynchronous task
-      properties:
-        status:
-          type: string
-          description: The status of the job associated with the specified task id
-          enum:
-          - Completed
-          - Pending
-          - Failed
-        next_url:
-          type: string
-          description: The URL to call to obtain the results of the task
-        next_url_delay:
-          type: number
-          description: The time in milliseconds that the client should wait before polling the relevant GET endpoint with the above task id
-    TaskType:
-      type: string
-      enum:
-      - connect
-      - refresh
-      - revoke
-      - consent-refresh
-      description: The type of task that completed
-    RevokeAccountAccessIntentTaskStatusValidationError:
-      title: Revoke Account Access Intent Status Validation Error
-      type: object
-      required:
-      - operation_id
-      - code_id
-      - message
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        code_id:
-          type: string
-          enum:
-          - failed_validation
-        message:
-          type: string
-          enum:
-          - invalid request
-        errors:
-          type: object
-          description: Extra information on the validation errors
-    ResultsMetadata:
-      title: Results Metadata Object
-      type: object
-      description: Metadata associated with the response schema
-      properties:
-        results:
-          type: number
-          description: The number of results returned
-    TaskView:
-      title: Task View
-      description: A task view.
-      type: object
-      properties:
-        task_id:
-          $ref: '#/components/schemas/TaskId'
-        provider:
-          type: string
-          description: The provider (ASPSP) associated with this task
-        result:
-          $ref: '#/components/schemas/ConnectResultCodes'
-        status:
-          $ref: '#/components/schemas/TaskStatusCaps'
-        reconnect_required:
-          $ref: '#/components/schemas/ReconnectRequired'
-        step:
-          type: number
-          description: The step that this task is currently where 4 = Completed.
-          enum:
-          - 1
-          - 2
-          - 3
-          - 4
-        text:
-          type: string
-          description: A description of the step this task is currently at. In order from step 1 to step 4.
-          enum:
-          - Fetching access token
-          - Fetching accounts
-          - Fetching balances and transactions
-          - Completed
-    OBResources:
-      type: string
-      enum:
-      - accounts
-      - balances
-      - transactions
-      - parties
-      - direct-debits
-    RefreshSubtaskWebhookTask:
-      title: Details of an individual refresh Task
-      type: object
-      description: The payload detailing an individual refresh for a single provider
-      required:
-      - has_new_transactions
-      - provider
-      - reconnect_required
-      - result
-      - status
-      - task_id
-      properties:
-        account_ids:
-          description: An array listing all account ids that were updated as part of this task
-          type: array
-          items:
-            type: string
-        consent_ids:
-          description: An array listing all consents that were updated as part of this task
-          type: array
-          items:
-            type: string
-        has_new_transactions:
-          $ref: '#/components/schemas/HasNewTransactions'
-        provider:
-          type: string
-          description: Name of the provider (banking institution)
-        reconnect_required:
-          $ref: '#/components/schemas/ReconnectRequired'
-        result:
-          $ref: '#/components/schemas/ConnectResultCodes'
-        status:
-          type: string
-          description: The general status of a task
-          enum:
-          - Completed
-          - Failed
-        task_id:
-          description: The task identifier that the event relates to
-          type: string
-          example: e145c656-4a90-45db-a025-af7765482c8c
-        start_time:
-          type: string
-          description: Start timestamp for the task this event relates to
-        refresh_window:
-          type: object
-          description: The boundaries of the refresh task as requested from the provider.  If transactions were returned from the provider
-          properties:
-            from:
-              type: string
-              description: The from timestamp requested with the provider
-            to:
-              type: string
-              description: The to timestamp requested with the provider
-        consent_details:
-          type: object
-          description: Details of the consent used as part of this refresh task
-          properties:
-            id:
-              type: string
-              description: The id of the consent that was updated as part of this task
-            expiration_date:
-              type: string
-              description: The expiration date of the consent
-    SubTaskV2View:
-      title: SubTask V2 View
-      description: A task view.
-      type: object
-      properties:
-        task_id:
-          $ref: '#/components/schemas/TaskId'
-        provider:
-          type: string
-          description: The provider (ASPSP) associated with this task
-        result:
-          $ref: '#/components/schemas/ConnectResultCodes'
-        status:
-          $ref: '#/components/schemas/TaskStatusCaps'
-        reconnect_required:
-          $ref: '#/components/schemas/ReconnectRequired'
-        has_new_transactions:
-          $ref: '#/components/schemas/HasNewTransactions'
-    TaskId:
-      title: Task Id
-      type: string
-      description: Bud Task identifier returned from an async task for the requested action
-    OBV2WebhookBody:
-      title: OB V2 Webhook Payload
-      type: object
-      description: 'The payload sent to the client defined webhook (via the console) when an Open Banking refresh V2 task completes.
-
-        '
-      required:
-      - customer_id
-      - event
-      - has_new_transactions
-      - task_id
-      - result
-      - status
-      properties:
-        customer_id:
-          description: The customer the event relates to
-          type: string
-          example: 19677d9f-90e7-44a6-a32e-566990623da4
-        event:
-          type: string
-          description: The task type for the event.
-        has_new_transactions:
-          $ref: '#/components/schemas/HasNewTransactions'
-        task_id:
-          description: The task identifier that the event relates to
-          type: string
-          example: e145c656-4a90-45db-a025-af7765482c8c
-        result:
-          $ref: '#/components/schemas/ConnectResultCodes'
-        status:
-          type: string
-          description: The general status of a task
-          enum:
-          - Completed
-          - Failed
-        start_time:
-          type: string
-          description: Start timestamp for the task this event relates to
-        refresh_window:
-          type: object
-          description: The boundaries of the refresh task as requested from the provider. If transactions were returned from the provider
-          properties:
-            from:
-              type: string
-              description: The from timestamp requested with the provider
-            to:
-              type: string
-              description: The to timestamp requested with the provider
-        sub_tasks:
-          description: An array of details about each individual refresh subtask
-          type: array
-          items:
-            $ref: '#/components/schemas/RefreshSubtaskWebhookTask'
-    RevokeAccountAccessIntentTastStatusResponse:
-      title: Revoke Account Access Intent Response
-      type: object
-      description: Expected response from a get status request for a revoke account access intent call
-      required:
-      - operation_id
-      - data
-      - metadata
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        data:
-          type: object
-          title: Revoke Task Data
-          required:
-          - task_id
-          - provider
-          - status
-          properties:
-            task_id:
-              $ref: '#/components/schemas/TaskId'
-            provider:
-              type: string
-              description: The provider (ASPSP) associated with this task
-            status:
-              type: string
-              description: The status of the job associated with the specified task id
-              enum:
-              - Completed
-              - Pending
-              - Failed
-            result:
-              type: string
-              description: The result of the operation.
-        metadata:
-          type: object
-          title: Revoke Task Metadata
-          required:
-          - status
-          properties:
-            status:
-              type: string
-              description: The status of the job associated with the specified task id
-              enum:
-              - Completed
-              - Pending
-              - Failed
-            next_url:
-              type: string
-              description: The url to try next if the `status` property returned is `Pending`
-            next_url_delay:
-              type: number
-              description: The time in milliseconds that the client should wait before polling again, if the `status` property returned is `Pending`
-    RevokeAccountAccessIntentRequest:
-      title: Revoke Account Access Intent Payload
-      type: object
-      required:
-      - provider
-      properties:
-        provider:
-          type: string
-          description: The name of the provider (ASPSP) the Customer is requesting to have their consent revoked for
-    ConnectResultCodes:
-      type: string
-      description: The result of the operation. Either success or various error codes.
-      enum:
-      - success
-      - auth_denied
-      - auth_expired
-      - auth_used
-      - awaiting_authorisation
-      - connection_expired
-      - connection_not_found
-      - connection_permission
-      - connection_reauthenticate
-      - connection_revoked
-      - connection_status
-      - consent_not_found
-      - extension_not_permitted
-      - failed_body_decode
-      - failed_validation
-      - internal_auth_error
-      - internal_error
-      - internal_timeout
-      - internal_transient_error
-      - provider_unauthorised
-      - provider_unavailable
-      - provider_endpoint_deprecated
-      - provider_endpoint_unimplemented
-      - provider_endpoint_unsupported
-      - provider_failure
-      - provider_maintenance
-      - provider_marked_account_invalid
-      - provider_not_found
-      - provider_request_limit
-      - provider_timeout
-      - resource_not_found
-      - task_not_found
-    Error:
-      title: Error Object
+    RawOBConsents:
+      title: Raw OB Consent
       type:
       - object
       - 'null'
-      description: Contains a field specific error message
-      additionalProperties:
-        type: string
-    OpenBankingRefreshResponse:
-      title: Refresh Task Response
-      type: object
-      description: Expected response structure
-      required:
-      - operation_id
-      - data
-      - metadata
+      description: The raw consent as returned by the provider
       properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        data:
-          $ref: '#/components/schemas/TaskView'
-        metadata:
-          type: object
-          description: Refresh Response Metadata
-          properties:
-            has_new_transactions:
-              $ref: '#/components/schemas/HasNewTransactions'
-            status:
-              $ref: '#/components/schemas/TaskStatusCaps'
-            next_url:
-              description: The URL to call to obtain the results of the task
-              type: string
-            next_url_delay:
-              description: Recommended delay in milliseconds before next call
-              type: integer
-    TaskCreatedResponseOB:
-      title: Task Created Response
-      type: object
-      description: Expected response structure
-      required:
-      - operation_id
-      - data
-      - metadata
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        data:
-          $ref: '#/components/schemas/TaskCreatedView'
-        metadata:
-          $ref: '#/components/schemas/AsyncTaskMetadata'
-    OpenBankingRefreshV2Response:
-      title: Refresh V2 Task Response
-      type: object
-      description: Expected response structure
-      required:
-      - operation_id
-      - data
-      - metadata
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        data:
-          $ref: '#/components/schemas/TaskV2View'
-        metadata:
-          type: object
-          description: Refresh Response Metadata
-          properties:
-            status:
-              $ref: '#/components/schemas/TaskStatusCaps'
-            next_url:
-              description: The URL to call to obtain the results of the task
-              type: string
-            next_url_delay:
-              description: Recommended delay in milliseconds before next call
-              type: integer
-    TaskV2CreatedView:
-      title: Refresh V2 Task Created View
-      description: Standard successful task created response.
-      type: object
-      required:
-      - task_id
-      - sub_tasks
-      properties:
-        task_id:
-          $ref: '#/components/schemas/TaskId'
-        sub_tasks:
+        ConsentId:
+          type: string
+          description: Open Banking consent unique identifier
+        CreationDateTime:
+          type: string
+          format: ISO8601
+          description: Date and time at which the resource was created.
+        Permissions:
           type: array
+          description: Specifies the Open Banking account access data types that tied to the consent
           items:
-            $ref: '#/components/schemas/TaskCreatedView'
-    ConsentReconfirmation:
-      title: Consent Reconfirmation Outcome
-      type: object
-      description: Result of performing a reconfirmation of consent task
-      required:
-      - provider_id
-      - reconnect_required
-      properties:
-        provider_id:
+            type: string
+            enum:
+            - ReadAccountsBasic
+            - ReadAccountsDetail
+            - ReadBalances
+            - ReadDirectDebits
+            - ReadParty
+            - ReadPartyPSU
+            - ReadTransactionsBasic
+            - ReadTransactionsCredits
+            - ReadTransactionsDebits
+            - ReadTransactionsDetail
+        Status:
           type: string
-          description: The provider that the reconfirmation of consent was performed against
-        reconnect_required:
-          $ref: '#/components/schemas/ReconnectRequired'
-    TaskCreatedView:
-      title: Task Created View
-      description: Standard successful task created response.
+          description: Specifies the status of consent resource.
+          enum:
+          - Authorised
+          - AwaitingAuthorisation
+          - Rejected
+          - Revoked
+        StatusUpdateDateTime:
+          type:
+          - string
+          - 'null'
+          format: ISO8601
+          description: Date and time at which the resource status was updated.
+        TransactionFromDateTime:
+          type:
+          - string
+          - 'null'
+          format: ISO8601
+          description: Specified start date and time for the transaction query period.
+    GetOBConsentsResponse:
+      title: Available Open Banking Consents
       type: object
       required:
-      - task_id
-      - provider
+      - operation_id
+      - data
       properties:
-        task_id:
-          $ref: '#/components/schemas/TaskId'
-        provider:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        data:
+          type: array
+          description: List of available consents
+          items:
+            $ref: '#/components/schemas/GetOBConsentsResponseDataItem'
+        metadata:
+          $ref: '#/components/schemas/ResultsMetadata'
+    OpenBankingRefreshRequestV2:
+      title: Open Banking Refresh V2 Payload
+      type: object
+      description: Expected request payload structure
+      properties:
+        providers:
+          type: array
+          description: Optional parameter defining the name of the providers that a refresh should be completed for. If this is not specified a refresh is completed for all providers that a customer has an authorised consent with.
+          items:
+            type: string
+        from:
           type: string
-          description: The provider (ASPSP) associated with this task
+          description: "The datetime (ISO 8601) that defines the time since when the Customer's data needs to be collected. \nDefaults to the datetime of the last pull of transactions less seven days to account for any potential changes to the most recent set of transactions. \nRefreshes can only go back to a maximum of 90 days from the current date.\n"
+        to:
+          type: string
+          description: "The datetime (ISO 8601) that defines the time up to which the Customer's data needs to be collected. Defaults to the current datetime. \n"
+        resources:
+          type: array
+          description: Optional list of resources that should be refreshed. Default behaviour is to refresh all resources defined on the customers consent
+          items:
+            $ref: '#/components/schemas/OBResources'
   parameters:
     CustomerIdempotentIdentifier:
       in: header
@@ -2236,20 +2236,6 @@ components:
       description: 'Use the internal client identifier, provided in the `client_metadata` object when creating the customer in __Create Customer V3__, in place of an `X-Customer-Id` header.
 
         '
-    CustomerIPAddress:
-      in: header
-      name: X-Customer-Ip-Address
-      schema:
-        type: string
-      required: false
-      description: The Bud Customer IP Address is used for logging customer presence. This is optional and is only required for Agent of Bud clients.
-    CustomerSecret:
-      in: header
-      name: X-Customer-Secret
-      schema:
-        type: string
-      required: false
-      description: The Bud Customer secret used to encrypt customer data. This is required only if the customer secret is not already stored with Bud.
     SigningIdHeaderParameter:
       in: header
       name: X-Signing-ID
@@ -2276,13 +2262,20 @@ components:
         - reconfirm_due
       required: false
       description: By default this endpoint only returns `active` Authorised connections. To retrieve `all` consents, add this query param with the value of `all`. To retrieve consents where reconfirmation is required add this query param with the value of `reconfirm_due`.
-    SignatureHeaderParameter:
-      in: header
-      name: X-Signature
-      description: The signed request body JWT
-      required: true
+    ConsentId:
+      in: path
+      name: consent_id
       schema:
         type: string
+      required: true
+      description: Bud Consent identifier
+    CustomerSecret:
+      in: header
+      name: X-Customer-Secret
+      schema:
+        type: string
+      required: false
+      description: The Bud Customer secret used to encrypt customer data. This is required only if the customer secret is not already stored with Bud.
     ClientId:
       in: header
       name: X-Client-Id
@@ -2291,13 +2284,6 @@ components:
       required: true
       description: The API Client Identifier (Service Application Identifier).
       example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
-    ConsentId:
-      in: path
-      name: consent_id
-      schema:
-        type: string
-      required: true
-      description: Bud Consent identifier
     CustomerId:
       in: header
       name: X-Customer-Id
@@ -2307,6 +2293,20 @@ components:
       required: true
       description: A unique identifier for a Customer, as registered on Bud's platform.
       example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
+    SignatureHeaderParameter:
+      in: header
+      name: X-Signature
+      description: The signed request body JWT
+      required: true
+      schema:
+        type: string
+    CustomerIPAddress:
+      in: header
+      name: X-Customer-Ip-Address
+      schema:
+        type: string
+      required: false
+      description: The Bud Customer IP Address is used for logging customer presence. This is optional and is only required for Agent of Bud clients.
   securitySchemes:
     Basic:
       type: http
