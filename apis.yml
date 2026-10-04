@@ -56,6 +56,7 @@ tags:
   - United Kingdom
   - Artificial Intelligence
   - Machine Learning
+  - Data Enrichment
 tags_raw:
   - Open Banking
   - Transaction Enrichment
@@ -70,6 +71,7 @@ tags_raw:
   - AI
   - Machine Learning
   - Machine-Learning
+  - Data Enrichment
 common:
   - type: CapabilityMap
     url: capabilities/bud-co-capability-edges.yml
