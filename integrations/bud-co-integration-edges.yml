@@ -1,0 +1,18 @@
+generated: '2026-10-12'
+method: none
+source:
+- https://zapier.com/apps/bud-co/integrations
+- https://zapier.com/apps/bud-financial/integrations
+- https://n8n.io/integrations/bud-co/
+- https://composio.dev/toolkits/bud-co
+- https://monid.ai/tools/bud-co
+checked:
+- https://composio.dev/toolkits/bud-co
+- https://monid.ai/tools/bud-co
+- https://n8n.io/integrations/bud-co/
+- https://zapier.com/apps/bud-co/integrations
+- https://zapier.com/apps/bud-financial/integrations
+summary: null
+marketplace_apps: []
+edges: []
+templates: []
