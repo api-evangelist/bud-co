@@ -106,81 +106,7 @@ paths:
         5XX:
           description: An unexpected error occurred on the server side.
 components:
-  parameters:
-    RedirectURLCallbackError:
-      in: query
-      name: error
-      description: "Error code indicating the status of the connection.\n\n  - `connection_expired` - link was accessed after expiry time\n  - `connection_already_started` - customer has already used the link to connect accounts\n"
-      schema:
-        type: string
-        enum:
-        - connection_expired
-        - connection_already_started
-    RedirectURLCallbackCustomerID:
-      in: query
-      name: customer_id
-      description: 'Open Banking "Connect Completed" event customer ID. This is the `customer_id`
-
-        seen on the customer application under [Retrieve Customer Application](https://docs.thisisbud.com/reference/v1_customer_application_get).
-
-        '
-      schema:
-        type: string
-        format: uuid
-    RedirectURLCallbackApplicationID:
-      in: query
-      name: application_id
-      schema:
-        $ref: '#/components/schemas/CustomerApplicationID'
-    ClientId:
-      in: header
-      name: X-Client-Id
-      schema:
-        type: string
-      required: true
-      description: The API Client Identifier (Service Application Identifier).
-      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
-    RedirectURLCallbackConnectionID:
-      in: query
-      name: connection_id
-      schema:
-        $ref: '#/components/schemas/ConnectionID'
-    RedirectURLCallbackTaskID:
-      in: query
-      name: task_id
-      description: 'Open Banking "Connect Completed" event task ID.
-
-
-        See [here](https://docs.thisisbud.com/docs/open-banking-connect-completed) for details.
-
-        '
-      schema:
-        type: string
-        format: uuid
-    RedirectURLCallbackStatus:
-      in: query
-      name: status
-      required: true
-      schema:
-        type: string
-        enum:
-        - success
-        - failure
-        - pending
-    CustomerApplicationID:
-      in: path
-      name: application_id
-      required: true
-      schema:
-        $ref: '#/components/schemas/CustomerApplicationID'
   schemas:
-    ConnectionID:
-      title: Connection ID
-      type: string
-      format: uuid
-      description: 'The unique identifier for a customer application''s link (for connecting accounts).
-
-        '
     PostCustomerLinksResponse:
       title: Post Customer Link Response Object
       type: object
@@ -216,17 +142,6 @@ components:
                 contained within the link in the payload).
 
                 '
-    OperationId:
-      title: Operation Id Field
-      type: string
-      description: A unique identifier/reference associated with a given endpoint/operation
-    CustomerApplicationID:
-      title: Customer Application ID
-      type: string
-      format: uuid
-      description: 'The unique identifier for a customer application.
-
-        '
     PostCustomerLinksRequest:
       title: Post Customer Links Request Object
       type: object
@@ -240,6 +155,91 @@ components:
           type: string
           format: url
           description: URL where the customer will be redirected to once they complete the connection flow.
+    ConnectionID:
+      title: Connection ID
+      type: string
+      format: uuid
+      description: 'The unique identifier for a customer application''s link (for connecting accounts).
+
+        '
+    OperationId:
+      title: Operation Id Field
+      type: string
+      description: A unique identifier/reference associated with a given endpoint/operation
+    CustomerApplicationID:
+      title: Customer Application ID
+      type: string
+      format: uuid
+      description: 'The unique identifier for a customer application.
+
+        '
+  parameters:
+    RedirectURLCallbackCustomerID:
+      in: query
+      name: customer_id
+      description: 'Open Banking "Connect Completed" event customer ID. This is the `customer_id`
+
+        seen on the customer application under [Retrieve Customer Application](https://docs.thisisbud.com/reference/v1_customer_application_get).
+
+        '
+      schema:
+        type: string
+        format: uuid
+    ClientId:
+      in: header
+      name: X-Client-Id
+      schema:
+        type: string
+      required: true
+      description: The API Client Identifier (Service Application Identifier).
+      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
+    RedirectURLCallbackConnectionID:
+      in: query
+      name: connection_id
+      schema:
+        $ref: '#/components/schemas/ConnectionID'
+    RedirectURLCallbackApplicationID:
+      in: query
+      name: application_id
+      schema:
+        $ref: '#/components/schemas/CustomerApplicationID'
+    CustomerApplicationID:
+      in: path
+      name: application_id
+      required: true
+      schema:
+        $ref: '#/components/schemas/CustomerApplicationID'
+    RedirectURLCallbackTaskID:
+      in: query
+      name: task_id
+      description: 'Open Banking "Connect Completed" event task ID.
+
+
+        See [here](https://docs.thisisbud.com/docs/open-banking-connect-completed) for details.
+
+        '
+      schema:
+        type: string
+        format: uuid
+    RedirectURLCallbackError:
+      in: query
+      name: error
+      description: "Error code indicating the status of the connection.\n\n  - `connection_expired` - link was accessed after expiry time\n  - `connection_already_started` - customer has already used the link to connect accounts\n"
+      schema:
+        type: string
+        enum:
+        - connection_expired
+        - connection_already_started
+    RedirectURLCallbackStatus:
+      in: query
+      name: status
+      required: true
+      schema:
+        type: string
+        enum:
+        - success
+        - failure
+        - pending
   securitySchemes:
     Basic:
       type: http

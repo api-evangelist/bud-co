@@ -136,13 +136,20 @@ paths:
                 message: 'An error occurred while processing your request. Get in touch with us and provide us your request id: 7ef63242-ba6d-4661-8014-f9eaa9cb2ad8'
 components:
   parameters:
-    CustomerSecret:
-      in: header
-      name: X-Customer-Secret
+    QueryFromDate:
+      in: query
+      name: from
       schema:
         type: string
-      required: false
-      description: The Bud Customer secret used to encrypt customer data. This is required only if the customer secret is not already stored with Bud.
+      example: '2019-02-29'
+      description: 'Filter from this date (format: `YYYY-MM-DD`).'
+    QueryToDate:
+      in: query
+      name: to
+      schema:
+        type: string
+      example: '2019-02-29'
+      description: 'Filter to this date (format: `YYYY-MM-DD`).'
     ClientId:
       in: header
       name: X-Client-Id
@@ -168,21 +175,18 @@ components:
       description: 'Use the internal client identifier, provided in the `client_metadata` object when creating the customer in __Create Customer V3__, in place of an `X-Customer-Id` header.
 
         '
-    QueryToDate:
-      in: query
-      name: to
+    CustomerSecret:
+      in: header
+      name: X-Customer-Secret
       schema:
         type: string
-      example: '2019-02-29'
-      description: 'Filter to this date (format: `YYYY-MM-DD`).'
-    QueryFromDate:
-      in: query
-      name: from
-      schema:
-        type: string
-      example: '2019-02-29'
-      description: 'Filter from this date (format: `YYYY-MM-DD`).'
+      required: false
+      description: The Bud Customer secret used to encrypt customer data. This is required only if the customer secret is not already stored with Bud.
   schemas:
+    BudMonetaryValue:
+      title: Monetary Value
+      description: "The value of the monetary amount. The value is formatted with the number of decimal places for the respective currency. \n\nExample: `10.98`\n"
+      type: string
     ServerErrorResponse:
       title: Server Error Response
       type: object
@@ -203,44 +207,6 @@ components:
           anyOf:
           - $ref: '#/components/schemas/Error'
           - $ref: '#/components/schemas/Errors'
-    BudCurrency:
-      title: Currency
-      description: 'The three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) of the monetary amount.
-
-
-        Example: `GBP`
-
-        '
-      type: string
-    BadRequestResponse:
-      title: Bad Request Response
-      type: object
-      description: Expected response structure
-      required:
-      - operation_id
-      - code_id
-      - message
-      - errors
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        code_id:
-          type: string
-          description: A descriptive enough string that is linked to the reason for the error.
-        message:
-          type: string
-        errors:
-          anyOf:
-          - $ref: '#/components/schemas/Error'
-          - $ref: '#/components/schemas/Errors'
-    Errors:
-      title: Array of Error Object
-      description: Contains a list of error messages
-      type: object
-      additionalProperties:
-        type: array
-        items:
-          type: string
     GetProductsResponseV2:
       title: Retrieve Financial Products V2 Response Structure
       type: object
@@ -331,6 +297,56 @@ components:
                 type: number
                 title: Results count
                 description: Number of products returned.
+    Error:
+      title: Error Object
+      type:
+      - object
+      - 'null'
+      description: Contains a field specific error message
+      additionalProperties:
+        type: string
+    BadRequestResponse:
+      title: Bad Request Response
+      type: object
+      description: Expected response structure
+      required:
+      - operation_id
+      - code_id
+      - message
+      - errors
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        code_id:
+          type: string
+          description: A descriptive enough string that is linked to the reason for the error.
+        message:
+          type: string
+        errors:
+          anyOf:
+          - $ref: '#/components/schemas/Error'
+          - $ref: '#/components/schemas/Errors'
+    Errors:
+      title: Array of Error Object
+      description: Contains a list of error messages
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          type: string
+    OperationId:
+      title: Operation Id Field
+      type: string
+      description: A unique identifier/reference associated with a given endpoint/operation
+    BudCurrency:
+      title: Currency
+      description: 'The three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) of the monetary amount.
+
+
+        Example: `GBP`
+
+        '
+      type: string
     BudAmount:
       title: Standard Bud Amount
       type: object
@@ -356,22 +372,6 @@ components:
         to:
           type: string
           description: "The date up to when results were retrieved in the format [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339).\nThis is either populated with the default value used when retrieving the results, or the user specified parameter.\n\nExamples:\n  - `2023-03-17T17:29:51Z`\n  - `2023-03-17T17:29:51-08:00`\n"
-    OperationId:
-      title: Operation Id Field
-      type: string
-      description: A unique identifier/reference associated with a given endpoint/operation
-    Error:
-      title: Error Object
-      type:
-      - object
-      - 'null'
-      description: Contains a field specific error message
-      additionalProperties:
-        type: string
-    BudMonetaryValue:
-      title: Monetary Value
-      description: "The value of the monetary amount. The value is formatted with the number of decimal places for the respective currency. \n\nExample: `10.98`\n"
-      type: string
   securitySchemes:
     Basic:
       type: http

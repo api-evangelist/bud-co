@@ -468,20 +468,67 @@ paths:
                 code_id: unknown
                 message: 'An error occurred while processing your request. Get in touch with us and provide us your request id: 7ef63242-ba6d-4661-8014-f9eaa9cb2ad8'
 components:
+  parameters:
+    PathSavingsGoalIDV2:
+      name: savings_goal_id
+      in: path
+      schema:
+        type: string
+        format: uuid
+      required: true
+      description: 'The ID of the savings goal.
+
+
+        Example: `81a68821-dca6-4771-80d4-002c7fce412e`
+
+        '
+      example: 81a68821-dca6-4771-80d4-002c7fce412e
+    CustomerId:
+      in: header
+      name: X-Customer-Id
+      schema:
+        type: string
+        format: uuid
+      required: true
+      description: A unique identifier for a Customer, as registered on Bud's platform.
+      example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
+    QueryBudAccountID:
+      in: query
+      name: account_id
+      schema:
+        type: string
+      example: RxsYshVGded4JeilkXgWKdXA
+      description: 'Use this parameter to filter the results on data associated with the given account id.
+
+
+        Example: `RxsYshVGded4JeilkXgWKdXA`
+
+        '
+    ClientId:
+      in: header
+      name: X-Client-Id
+      schema:
+        type: string
+      required: true
+      description: The API Client Identifier (Service Application Identifier).
+      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
+    CustomerIdempotentIdentifier:
+      in: header
+      name: X-Customer-Idempotent-Identifier
+      schema:
+        type: string
+      description: 'Use the internal client identifier, provided in the `client_metadata` object when creating the customer in __Create Customer V3__, in place of an `X-Customer-Id` header.
+
+        '
   schemas:
-    CreateSavingsGoalV2Response:
-      title: Create Savings Goal V2 Response
-      required:
-      - operation_id
-      - data
-      properties:
-        operation_id:
-          title: Operation ID
-          type: string
-          enum:
-          - goals_v2_savings_goal_post
-        data:
-          $ref: '#/components/schemas/SavingsGoalV2'
+    Error:
+      title: Error Object
+      type:
+      - object
+      - 'null'
+      description: Contains a field specific error message
+      additionalProperties:
+        type: string
     BadRequestResponse:
       title: Bad Request Response
       type: object
@@ -503,6 +550,96 @@ components:
           anyOf:
           - $ref: '#/components/schemas/Error'
           - $ref: '#/components/schemas/Errors'
+    OperationId:
+      title: Operation Id Field
+      type: string
+      description: A unique identifier/reference associated with a given endpoint/operation
+    BudMonetaryValue:
+      title: Monetary Value
+      description: "The value of the monetary amount. The value is formatted with the number of decimal places for the respective currency. \n\nExample: `10.98`\n"
+      type: string
+    ServerErrorResponse:
+      title: Server Error Response
+      type: object
+      required:
+      - operation_id
+      - code_id
+      - message
+      properties:
+        operation_id:
+          $ref: '#/components/schemas/OperationId'
+        code_id:
+          type: string
+          description: A descriptive enough string that is linked to the reason for the error.
+        message:
+          type: string
+          description: An actual user friendly error message.
+        errors:
+          anyOf:
+          - $ref: '#/components/schemas/Error'
+          - $ref: '#/components/schemas/Errors'
+    RetrieveSavingsGoalsV2Response:
+      title: Retrieve Savings Goals V2 Response
+      required:
+      - operation_id
+      - data
+      properties:
+        operation_id:
+          title: Operation ID
+          type: string
+          enum:
+          - goals_v2_savings_goals_get
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SavingsGoalV2'
+    Errors:
+      title: Array of Error Object
+      description: Contains a list of error messages
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          type: string
+    CreateSavingsGoalV2Response:
+      title: Create Savings Goal V2 Response
+      required:
+      - operation_id
+      - data
+      properties:
+        operation_id:
+          title: Operation ID
+          type: string
+          enum:
+          - goals_v2_savings_goal_post
+        data:
+          $ref: '#/components/schemas/SavingsGoalV2'
+    RetrieveSavingsGoalV2Response:
+      title: Retrieve Savings Goal V2 Response
+      required:
+      - operation_id
+      - data
+      properties:
+        operation_id:
+          title: Operation ID
+          type: string
+          enum:
+          - goals_v2_savings_goal_get
+        data:
+          $ref: '#/components/schemas/SavingsGoalV2'
+    UpdateSavingsGoalV2Response:
+      title: Update Savings Goal V2 Response
+      required:
+      - operation_id
+      - data
+      properties:
+        operation_id:
+          title: Operation ID
+          type: string
+          enum:
+          - goals_v2_savings_goal_patch
+        data:
+          $ref: '#/components/schemas/SavingsGoalV2'
     CreateSavingsGoalV2Request:
       title: Create Savings Goal V2 Request
       required:
@@ -560,14 +697,6 @@ components:
 
             '
           example: 0.2
-    Error:
-      title: Error Object
-      type:
-      - object
-      - 'null'
-      description: Contains a field specific error message
-      additionalProperties:
-        type: string
     UpdateSavingsGoalV2Request:
       title: Update Savings Goal V2 Request
       properties:
@@ -622,21 +751,6 @@ components:
 
             '
           example: 0.25
-    RetrieveSavingsGoalsV2Response:
-      title: Retrieve Savings Goals V2 Response
-      required:
-      - operation_id
-      - data
-      properties:
-        operation_id:
-          title: Operation ID
-          type: string
-          enum:
-          - goals_v2_savings_goals_get
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/SavingsGoalV2'
     BudCurrency:
       title: Currency
       description: 'The three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) of the monetary amount.
@@ -646,51 +760,6 @@ components:
 
         '
       type: string
-    Errors:
-      title: Array of Error Object
-      description: Contains a list of error messages
-      type: object
-      additionalProperties:
-        type: array
-        items:
-          type: string
-    BudMonetaryValue:
-      title: Monetary Value
-      description: "The value of the monetary amount. The value is formatted with the number of decimal places for the respective currency. \n\nExample: `10.98`\n"
-      type: string
-    RetrieveSavingsGoalV2Response:
-      title: Retrieve Savings Goal V2 Response
-      required:
-      - operation_id
-      - data
-      properties:
-        operation_id:
-          title: Operation ID
-          type: string
-          enum:
-          - goals_v2_savings_goal_get
-        data:
-          $ref: '#/components/schemas/SavingsGoalV2'
-    ServerErrorResponse:
-      title: Server Error Response
-      type: object
-      required:
-      - operation_id
-      - code_id
-      - message
-      properties:
-        operation_id:
-          $ref: '#/components/schemas/OperationId'
-        code_id:
-          type: string
-          description: A descriptive enough string that is linked to the reason for the error.
-        message:
-          type: string
-          description: An actual user friendly error message.
-        errors:
-          anyOf:
-          - $ref: '#/components/schemas/Error'
-          - $ref: '#/components/schemas/Errors'
     SavingsGoalV2:
       title: Savings Goal V2
       required:
@@ -783,75 +852,6 @@ components:
           title: Created At
           type: string
           description: "The date and time the savings goal was created in the format [RFC-3339](https://www.rfc-editor.org/rfc/rfc3339).\n\nExamples:\n  - `2023-01-17T17:29:51Z`\n  - `2023-01-17T17:29:51-08:00`\n"
-    OperationId:
-      title: Operation Id Field
-      type: string
-      description: A unique identifier/reference associated with a given endpoint/operation
-    UpdateSavingsGoalV2Response:
-      title: Update Savings Goal V2 Response
-      required:
-      - operation_id
-      - data
-      properties:
-        operation_id:
-          title: Operation ID
-          type: string
-          enum:
-          - goals_v2_savings_goal_patch
-        data:
-          $ref: '#/components/schemas/SavingsGoalV2'
-  parameters:
-    CustomerIdempotentIdentifier:
-      in: header
-      name: X-Customer-Idempotent-Identifier
-      schema:
-        type: string
-      description: 'Use the internal client identifier, provided in the `client_metadata` object when creating the customer in __Create Customer V3__, in place of an `X-Customer-Id` header.
-
-        '
-    QueryBudAccountID:
-      in: query
-      name: account_id
-      schema:
-        type: string
-      example: RxsYshVGded4JeilkXgWKdXA
-      description: 'Use this parameter to filter the results on data associated with the given account id.
-
-
-        Example: `RxsYshVGded4JeilkXgWKdXA`
-
-        '
-    PathSavingsGoalIDV2:
-      name: savings_goal_id
-      in: path
-      schema:
-        type: string
-        format: uuid
-      required: true
-      description: 'The ID of the savings goal.
-
-
-        Example: `81a68821-dca6-4771-80d4-002c7fce412e`
-
-        '
-      example: 81a68821-dca6-4771-80d4-002c7fce412e
-    ClientId:
-      in: header
-      name: X-Client-Id
-      schema:
-        type: string
-      required: true
-      description: The API Client Identifier (Service Application Identifier).
-      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
-    CustomerId:
-      in: header
-      name: X-Customer-Id
-      schema:
-        type: string
-        format: uuid
-      required: true
-      description: A unique identifier for a Customer, as registered on Bud's platform.
-      example: c3339af9-2426-44d4-9c4d-ddb8fd281e23
   securitySchemes:
     Basic:
       type: http

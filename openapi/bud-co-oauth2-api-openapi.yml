@@ -162,6 +162,15 @@ paths:
                 code_id: unknown
                 message: 'An error occurred while processing your request. Get in touch with us and provide us your request id: 7ef63242-ba6d-4661-8014-f9eaa9cb2ad8'
 components:
+  parameters:
+    ClientId:
+      in: header
+      name: X-Client-Id
+      schema:
+        type: string
+      required: true
+      description: The API Client Identifier (Service Application Identifier).
+      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
   schemas:
     ServerErrorResponse:
       title: Server Error Response
@@ -183,6 +192,22 @@ components:
           anyOf:
           - $ref: '#/components/schemas/Error'
           - $ref: '#/components/schemas/Errors'
+    Error:
+      title: Error Object
+      type:
+      - object
+      - 'null'
+      description: Contains a field specific error message
+      additionalProperties:
+        type: string
+    Errors:
+      title: Array of Error Object
+      description: Contains a list of error messages
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          type: string
     RetrieveAuthTokenResponse:
       title: Retrieve Auth Token Response
       required:
@@ -213,35 +238,10 @@ components:
             refresh_token:
               type: string
               description: A long-lived token that can be used to obtain a new `access_token` when the current `access_token` expires.
-    Errors:
-      title: Array of Error Object
-      description: Contains a list of error messages
-      type: object
-      additionalProperties:
-        type: array
-        items:
-          type: string
     OperationId:
       title: Operation Id Field
       type: string
       description: A unique identifier/reference associated with a given endpoint/operation
-    Error:
-      title: Error Object
-      type:
-      - object
-      - 'null'
-      description: Contains a field specific error message
-      additionalProperties:
-        type: string
-  parameters:
-    ClientId:
-      in: header
-      name: X-Client-Id
-      schema:
-        type: string
-      required: true
-      description: The API Client Identifier (Service Application Identifier).
-      example: 8711bbef-b357-4c2d-97ca-0d9df4206e9a
   securitySchemes:
     Basic:
       type: http
